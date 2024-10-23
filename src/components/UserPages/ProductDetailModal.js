@@ -7,6 +7,7 @@ const ProductDetailModal = ({
   unDisplayDetailModal,
 }) => {
   const [selectedImage, setSelectedImage] = useState(selectedProduct.images[0]);
+  const [openDescription, setOpenDescription] = useState(null);
   const modalRef = useRef(null);
 
   // Close modal when clicking outside of it
@@ -25,6 +26,10 @@ const ProductDetailModal = ({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [unDisplayDetailModal]);
+
+  const toggleDescription = (index) => {
+    setOpenDescription(openDescription === index ? null : index);
+  }
 
   if (!showDetailModel) return null; // Hide modal if not visible
 
@@ -74,11 +79,57 @@ const ProductDetailModal = ({
           </div>
           <div className="product-info">
             <div className="mw-450">
-              <h3>{selectedProduct.name}</h3>
-              <p>{selectedProduct.description}</p>
+              <div className="product-name">
+                <h1 className="pr-name-title">{selectedProduct.name}</h1>
+              </div>
+              <div className="list-size">
+                <div className="size-list">
+                  {selectedProduct.size.map((size, index) => (
+                    <div key={index} className="size-item">
+                      {size}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="product-color">
+                <p className="color-label">Color: </p>
+                <p className="color-value">{selectedProduct.color}</p>
+              </div>
+              <div className="product-wrapper">
+                <p className="product-price">${selectedProduct.price}</p>
+                <button className="btn btn-outline-success d-flex d-row ml-auto">
+                  <i className="fas fa-cart-plus align-self-center mr-2 fa-sm" />
+                  <small className="font-weight-bold">Cart</small>
+                </button>
+              </div>
+            </div>
+            {/* Collapsible Descriptions */}
+            <div className="product-description">
+              {/* <h3>Description</h3> */}
+              {selectedProduct.description.map((item, index) => (
+                <div key={index} className="description-item">
+                  <div
+                    className={`description-title ${
+                      openDescription === index ? "active" : ""
+                    }`}
+                    onClick={() => toggleDescription(index)}
+                  >
+                    {Object.keys(item)[1]}{" "}
+                    {/* This will display the title of the description */}
+                    <span className="toggle-icon">
+                      {openDescription === index ? "▲" : "▼"}
+                    </span>
+                  </div>
+                  {openDescription === index && (
+                    <div className="description-content">
+                      <p>{Object.values(item)[1]}</p>{" "}
+                      {/* This will display the content */}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
-          {/* </div> */}
         </div>
       </div>
     </div>
