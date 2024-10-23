@@ -1,159 +1,88 @@
-import React, { useState, useEffect } from "react";
-import { connect } from "react-redux";
-import logo from "../../assets/logo.png";
-import { Modal } from "react-bootstrap";
+import React, { useRef, useState, useEffect } from "react";
+import "../Users.css";
 
-import { addItemToCart } from "../../actionCreators/UserAction";
+const ProductDetailModal = ({
+  selectedProduct,
+  showDetailModel,
+  unDisplayDetailModal,
+}) => {
+  const [selectedImage, setSelectedImage] = useState(selectedProduct.images[0]);
+  const modalRef = useRef(null);
 
-const ProductDetailModal = (props) => {
-  const urlLocalhost = `${process.env.REACT_APP_API_URL}`;
-  // Sample photo to try on display
-  const samplePhoto1 =
-    "public/productImages/2020-06-23T11:07:29.174Z-!GRADIENT%20COLOR.png";
-  const samplePhoto2 =
-    "public/productImages/2020-06-23T11:28:36.352Z-flat-thinking-concept_23-2148154726.jpg";
-  const samplePhoto3 = "public/productImages/2020-06-23T11:30:30.982Z-tes.jpg";
-
-  // To make dynamic photo displayer.
-  const [Image, setImage] = useState("");
-
-  // parameter (ID) so that useEffect would run everytime id change.
+  // Close modal when clicking outside of it
   useEffect(() => {
-    setImage("");
-  }, [props.dataProduct._id]);
-
-  // Function to change Image.
-  const changeImage = (imageCandidate) => {
-    setImage(imageCandidate);
-  };
-
-  const inputCart = (data) => {
-    props.addItemToCart(data);
-  };
-
-  const picture = (picture) => {
-    // Condition to cover the undefined value of Image in row 15.
-    // Assignment to constant variable = ERROR yang bakal muncul kalau kamu ganti "Var" dengan "Const"
-    var pictureChecked = "";
-    if (!picture) {
-      pictureChecked = props.dataProduct.image;
-    } else {
-      pictureChecked = picture;
-    }
-    return {
-      backgroundImage: `url(${urlLocalhost}/${pictureChecked})`,
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-      height: "17rem",
+    const handleClickOutside = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        unDisplayDetailModal(); // Call the prop function to close the modal
+      }
     };
-  };
 
-  const miniPicture = (picture) => {
-    return {
-      backgroundImage: `url(${urlLocalhost}/${picture})`,
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-      height: "2.5rem",
-      width: "2.5rem",
-      cursor: "pointer",
+    // Add event listener
+    document.addEventListener("mousedown", handleClickOutside);
+
+    // Cleanup function to remove event listener
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
     };
-  };
-  const closeDetailModal = () => {
-    props.unDisplayDetailModal(false);
-  };
+  }, [unDisplayDetailModal]);
+
+  if (!showDetailModel) return null; // Hide modal if not visible
 
   return (
-    <Modal size="lg" show={props.showDetailModal} onHide={closeDetailModal}>
-      <Modal.Header closeButton>
-        <Modal.Title>
-          <img src={logo} alt="..." style={{ width: "25%" }} />
-        </Modal.Title>
-      </Modal.Header>
-
-      <Modal.Body className="px-0">
-        <div className="container">
-          <div className="row">
-            <div className="col-md-6 px-5 py-3 align-self-center">
-              <div style={picture(Image)} alt="..." className="w-100 mb-3" />
-
-              <div className="d-flex d-row justify-content-center">
-                <div
-                  className="mini-picture mr-3"
-                  onClick={() => changeImage(props.dataProduct.image)}
-                >
-                  <div style={miniPicture(props.dataProduct.image)} alt="..." />
+    <div className="product-detail-modal">
+      <div className="modal-content-tab" ref={modalRef}>
+        <span
+          className="close-button"
+          onClick={unDisplayDetailModal} // Use the correct prop
+        >
+          &times;
+        </span>
+        <div className="product-detail-tabs">
+          {/* <div className="product-card"> */}
+          <div className="images-column">
+            <div className="mw-450">
+              {selectedProduct.images.length > 0 ? (
+                <div>
+                  <img
+                    src={selectedImage}
+                    alt={selectedProduct.name}
+                    className="large-product-image"
+                  />
+                  <ul className="image-gallery">
+                    {selectedProduct.images.map((image, index) => (
+                      <li
+                        className="image-item"
+                        key={index}
+                        onClick={() => setSelectedImage(image)}
+                      >
+                        <img
+                          key={index}
+                          src={image}
+                          alt={`${selectedProduct.name} - ${index + 1}`}
+                          className={`product-image ${
+                            image === selectedImage ? "selected" : ""
+                          }`} // Add conditional class
+                        />
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-
-                <div
-                  className="mini-picture mr-3"
-                  onClick={() => changeImage(samplePhoto1)}
-                >
-                  <div style={miniPicture(samplePhoto1)} alt="..." />
-                </div>
-
-                <div
-                  className="mini-picture mr-3"
-                  onClick={() => changeImage(samplePhoto2)}
-                >
-                  <div style={miniPicture(samplePhoto2)} alt="..." />
-                </div>
-
-                <div
-                  className="mini-picture"
-                  onClick={() => changeImage(samplePhoto3)}
-                >
-                  <div style={miniPicture(samplePhoto3)} alt="..." />
-                </div>
-              </div>
-            </div>
-
-            <div className="col-md-6 px-5 py-3 border-left">
-              <div className="mb-4">
-                <h3 className="font-weight-bold">{props.dataProduct.name}</h3>
-                <p className="my-0 text-success-s2 font-weight-bold">
-                  ${props.dataProduct.price}
-                </p>
-                <small className="card-text text-secondary">
-                  Stock : {props.dataProduct.quantity}
-                </small>
-              </div>
-
-              <div className="mb-5">
-                <p className="text-secondary">
-                  {props.dataProduct.description}
-                </p>
-              </div>
-
-              <button
-                onClick={() => inputCart(props.dataProduct)}
-                className="btn btn-outline-success d-flex d-row mt-5 mb-4"
-              >
-                <i className="fas fa-cart-plus align-self-center mr-2 fa-sm" />
-                <small className="font-weight-bold">Cart</small>
-              </button>
-
-              <div className="d-flex d-row">
-                <div
-                  className="px-3 py-2"
-                  style={{ borderRadius: "7px", backgroundColor: "#dedede" }}
-                >
-                  {props.dataProduct.productGender}
-                </div>
-                <div
-                  className="px-3 py-2 ml-3"
-                  style={{ borderRadius: "7px", backgroundColor: "#dedede" }}
-                >
-                  {props.dataProduct.productType}
-                </div>
-              </div>
+              ) : (
+                <p>No images available</p>
+              )}
             </div>
           </div>
+          <div className="product-info">
+            <div className="mw-450">
+              <h3>{selectedProduct.name}</h3>
+              <p>{selectedProduct.description}</p>
+            </div>
+          </div>
+          {/* </div> */}
         </div>
-      </Modal.Body>
-    </Modal>
+      </div>
+    </div>
   );
 };
 
-const mapDispatchToProps = { addItemToCart };
-
-export default connect(null, mapDispatchToProps)(ProductDetailModal);
+export default ProductDetailModal;
