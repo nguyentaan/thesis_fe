@@ -6,6 +6,7 @@ import { auth, googleProvider } from "../../firebaseConfig";
 import { googleLogin } from "../../Slices/AuthenSlice";
 import { signInWithPopup } from "firebase/auth";
 
+
 const Login = ({ showLoginModal, closeLoginModal }) => {
   const dispatch = useDispatch();
   const { isLoading } = useSelector((state) => state.authen);
@@ -13,9 +14,12 @@ const Login = ({ showLoginModal, closeLoginModal }) => {
   // Handles Google Sign-In and dispatches token to the backend
   const handleGoogleLogin = async () => {
     try {
-      const result = await signInWithPopup(googleProvider);
-      console.log(result);
+      console.log("Google Provider:", googleProvider); // Log to check if it's defined
+      console.log("Auth:", auth); // Log to check if it's defined
       
+      const result = await signInWithPopup(auth, googleProvider); // Pass auth as the first argument
+      console.log(result);
+
       const token = await result.user.getIdToken();
       dispatch(googleLogin(token));
     } catch (error) {
