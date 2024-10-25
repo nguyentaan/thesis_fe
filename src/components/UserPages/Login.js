@@ -73,7 +73,7 @@ const Login = ({ showLoginModal, closeLoginModal }) => {
                 style={{ padding: "0.7rem 0.2rem" }}
                 disabled={isLoading}
               >
-                {isLoading ? "Logging in..." : "Login"}
+                 {isLoading ? "Logging in..." : "Login"}
               </button>
             </div>
 
