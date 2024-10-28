@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "../../Slices/AuthenSlice";
 import "react-toastify/dist/ReactToastify.css";
 import mainBg from "../../assets/mainBackground.png";
 import logo from "../../assets/logo.png";
@@ -8,35 +10,48 @@ import Footer from "./Footer";
 import Carousel from "./Carousel";
 import ProductField from "./Products";
 import LoginModal from "./Login";
+
 import "../Users.css";
 
 const Index = (props) => {
+  const dispatch = useDispatch();
+  const { isAuth, user } = useSelector((state) => state.auth);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [NavLoginSuccess, setNavLoginSuccess] = useState(false);
+  // const [NavLoginSuccess, setNavLoginSuccess] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [submitSearch, setSubmitSearch] = useState(false);
 
-  const loginSuccess = (boolean) => {
-    setNavLoginSuccess(boolean);
-  };
+  // console.log("User:", user);
+  // console.log("isAuth:", isAuth);
+  
+  
+  // const loginSuccess = (boolean) => {
+  //   setNavLoginSuccess(boolean);
+  // };
 
-  const parseJwt = (token) => {
-    try {
-      const base64Url = token.split(".")[1];
-      const base64 = base64Url.replace("-", "+").replace("_", "/");
-      const decoded = JSON.parse(atob(base64));
-      return decoded;
-    } catch (e) {
-      console.error("Error parsing JWT:", e);
-      return null;
+  // const parseJwt = (token) => {
+  //   try {
+  //     const base64Url = token.split(".")[1];
+  //     const base64 = base64Url.replace("-", "+").replace("_", "/");
+  //     const decoded = JSON.parse(atob(base64));
+  //     return decoded;
+  //   } catch (e) {
+  //     console.error("Error parsing JWT:", e);
+  //     return null;
+  //   }
+  // };
+
+  // // Usage
+  // if (localStorage.getItem("token-user")) {
+  //   var userData = parseJwt(localStorage.getItem("token-user"));
+  //   // Now userData contains the decoded JWT payload
+  // }
+
+  useEffect(() => {
+    if(isAuth) {
+      setShowLoginModal(false);
     }
-  };
-
-  // Usage
-  if (localStorage.getItem("token-user")) {
-    var userData = parseJwt(localStorage.getItem("token-user"));
-    // Now userData contains the decoded JWT payload
-  }
+  }, [isAuth]);
 
   const noLoginCartNotification = () => {
     toast.error("Please login first to continue.", {
@@ -75,9 +90,16 @@ const Index = (props) => {
     setShowLoginModal(boolean);
   };
 
+  const handleLoginSuccess = () => {
+    setShowLoginModal(false);
+  }
+
   const Logout = () => {
-    props.userLogout();
-    setNavLoginSuccess(false);
+    dispatch(logout());
+    // setNavLoginSuccess(false);
+    toast.success("Successfully logged out!", {
+      position: toast.POSITION.TOP_CENTER,
+    });
   };
 
   const picture = (image) => {
@@ -137,7 +159,7 @@ const Index = (props) => {
                 )}
 
                 <li className="nav-item mx-4">
-                  {NavLoginSuccess ? (
+                  {isAuth ? (
                     <div className="btn-group">
                       <button
                         type="button"
@@ -146,7 +168,7 @@ const Index = (props) => {
                         aria-haspopup="true"
                         aria-expanded="false"
                       >
-                        {`Hello, ${userData.username}`}
+                        {`Hello, ${user.data.name}`}
                       </button>
                       <div className="dropdown-menu">
                         <button
@@ -279,7 +301,7 @@ const Index = (props) => {
       <LoginModal
         showLoginModal={showLoginModal}
         closeLoginModal={closeLoginModal}
-        loginSuccess={loginSuccess}
+        onLoginSuccess={handleLoginSuccess} // Pass the callback here
       />
       {/* Modals */}
     </div>

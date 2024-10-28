@@ -3,6 +3,7 @@ import "../Users.css";
 import { getAllProducts } from "../../Slices/UserSlice";
 import { useDispatch, useSelector } from "react-redux";
 import ProductDetailModal from "./ProductDetailModal";
+import Loader from "./Loader";
 
 const Products = () => {
   const dispatch = useDispatch();
@@ -34,8 +35,9 @@ const Products = () => {
 
   return (
     <div style={{ fontFamily: "Karla,sans-serif" }}>
+      {isProductLoading && <Loader />}
       {/* Render product list only if modal is not visible */}
-      {!showDetailModel && (
+      {!showDetailModel && !isProductLoading && (
         <div className="row">
           {dataProduct &&
           dataProduct.products &&

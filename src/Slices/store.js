@@ -5,7 +5,7 @@ import authenReducer from "./AuthenSlice"; // Import the default export
 const store = configureStore({
   reducer: {
     user: userReducer, // Correct reducer configuration
-    authen: authenReducer, // Correct reducer configuration
+    auth: authenReducer, // Correct reducer configuration
   },
 });
 
