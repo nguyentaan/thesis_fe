@@ -13,7 +13,13 @@ export const googleLogin = createAsyncThunk(
   "authen/googleLogin",
   async (token, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/api/auth/google`, { token });
+      // Send the token as `credential` in the request body
+      const response = await axios.post(`${API_URL}/api/auth/google`, {
+        credential: token,
+      });
+
+      // Log the response data for debugging
+      // console.log(response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(handleError(error));
@@ -74,7 +80,6 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Google Login Cases
       .addCase(googleLogin.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -131,6 +136,5 @@ const authSlice = createSlice({
       });
   },
 });
-
 export const { logout } = authSlice.actions;
 export default authSlice.reducer;

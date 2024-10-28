@@ -7,8 +7,9 @@ import { emailLogin, googleLogin } from "../../Slices/AuthenSlice";
 import { signInWithPopup } from "firebase/auth";
 import OtpVerification from "./OtpVerification";
 import SignUp from "./SignUp";
+import GoogleButton from "./googleButton";
 
-const Login = ({ showLoginModal, closeLoginModal }) => {
+const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
   const dispatch = useDispatch();
   const { isLoading } = useSelector((state) => state.authen);
   const [email, setEmail] = useState("");
@@ -121,8 +122,25 @@ const Login = ({ showLoginModal, closeLoginModal }) => {
                 <i className="fab fa-google fa-lg align-self-center mr-3" />
                 {isLoading ? "Signing in with Google..." : "Login with Google"}
               </button>
+            <p style={{ fontSize: "1rem", margin: "0.7rem 0rem" }}>or</p>
 
-              <p style={{ fontSize: "1rem", margin: "0.7rem 0rem" }}>
+            {/* <button
+              type="button"
+              className="btn btn-danger w-100 d-flex justify-content-center"
+              style={{ padding: "0.7rem 0.2rem" }}
+              onClick={handleGoogleLogin}
+              disabled={isLoading}
+            >
+              <i className="fab fa-google fa-lg align-self-center mr-3" />
+              {isLoading ? "Signing in with Google..." : "Login with Google"}
+            </button> */}
+            <div className="mt-3">
+              <div className="d-flex justify-content-center">
+                <GoogleButton />
+              </div>
+            </div>
+
+             <p style={{ fontSize: "1rem", margin: "0.7rem 0rem" }}>
                 Don't have an account?
                 <button
                   className="btn btn-link p-0 text-success-s2 ml-1"
@@ -134,8 +152,7 @@ const Login = ({ showLoginModal, closeLoginModal }) => {
                   Sign Up
                 </button>
               </p>
-            </form>
-          )}
+          </form>
         </div>
       </Modal.Body>
     </Modal>
