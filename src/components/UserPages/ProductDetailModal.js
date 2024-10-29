@@ -1,14 +1,24 @@
 import React, { useRef, useState, useEffect } from "react";
 import "../Users.css";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart } from "../../Slices/CartSlice";
+import { toast, ToastContainer } from "react-toastify"; // Import toast
+import "react-toastify/dist/ReactToastify.css"; // Import CSS
 
 const ProductDetailModal = ({
   selectedProduct,
   showDetailModel,
   unDisplayDetailModal,
 }) => {
+  const dispatch = useDispatch();
   const [selectedImage, setSelectedImage] = useState(selectedProduct.images[0]);
+  const [selectedSize, setSelectedSize] = useState(null);
   const [openDescription, setOpenDescription] = useState(null);
   const modalRef = useRef(null);
+  const user = useSelector((state) => state.auth.user);
+
+  // Check if user is logged in
+  const isUserLoggedIn = user && user.data;
 
   // Close modal when clicking outside of it
   useEffect(() => {
@@ -29,7 +39,43 @@ const ProductDetailModal = ({
 
   const toggleDescription = (index) => {
     setOpenDescription(openDescription === index ? null : index);
-  }
+  };
+
+  const handleAddToCart = () => {
+    if (!isUserLoggedIn) {
+      // Notify user to log in
+      toast.info("Please log in to add items to your cart!", {
+        position: toast.POSITION.TOP_CENTER,
+      });
+      return; // Exit early if user is not logged in
+    }
+
+    if (!selectedSize) {
+      toast.error("Please select a size!");
+      return;
+    }
+
+    // Check if the selected size is in stock
+    const selectedSizeStock = selectedProduct.sizes.find(
+      (size) => size.size_name === selectedSize
+    )?.stock;
+
+    if (selectedSizeStock === 0) {
+      toast.error("This size is out of stock!");
+      return;
+    }
+
+    // Proceed to add to cart if size is selected and in stock
+    const productId = selectedProduct._id;
+    const size = selectedSize;
+    const quantity = 1;
+
+    dispatch(addToCart({ userId: user.data._id, productId, quantity, size }));
+  };
+
+  const handleSelectSize = (size) => {
+    setSelectedSize(size);
+  };
 
   if (!showDetailModel) return null; // Hide modal if not visible
 
@@ -43,7 +89,6 @@ const ProductDetailModal = ({
           &times;
         </span>
         <div className="product-detail-tabs">
-          {/* <div className="product-card"> */}
           <div className="images-column">
             <div className="mw-450">
               {selectedProduct.images.length > 0 ? (
@@ -54,19 +99,18 @@ const ProductDetailModal = ({
                     className="large-product-image"
                   />
                   <ul className="image-gallery">
-                    {selectedProduct.images.map((image, index) => (
+                    {selectedProduct.images.slice(0, -1).map((image, index) => (
                       <li
                         className="image-item"
                         key={index}
                         onClick={() => setSelectedImage(image)}
                       >
                         <img
-                          key={index}
                           src={image}
                           alt={`${selectedProduct.name} - ${index + 1}`}
                           className={`product-image ${
                             image === selectedImage ? "selected" : ""
-                          }`} // Add conditional class
+                          }`}
                         />
                       </li>
                     ))}
@@ -84,9 +128,20 @@ const ProductDetailModal = ({
               </div>
               <div className="list-size">
                 <div className="size-list">
-                  {selectedProduct.size.map((size, index) => (
-                    <div key={index} className="size-item">
-                      {size}
+                  {selectedProduct.sizes.map((size, index) => (
+                    <div
+                      key={index}
+                      className={`size-item ${
+                        selectedSize === size.size_name ? "selected" : ""
+                      } ${size.stock === 0 ? "out-of-stock" : ""}`}
+                      onClick={() =>
+                        size.stock > 0 && handleSelectSize(size.size_name)
+                      }
+                      style={{
+                        cursor: size.stock > 0 ? "pointer" : "not-allowed",
+                      }}
+                    >
+                      {size.size_name} {size.stock === 0 && "(Out of stock)"}
                     </div>
                   ))}
                 </div>
@@ -97,15 +152,17 @@ const ProductDetailModal = ({
               </div>
               <div className="product-wrapper">
                 <p className="product-price">${selectedProduct.price}</p>
-                <button className="btn btn-outline-success d-flex d-row ml-auto">
+                <button
+                  className="btn btn-outline-success d-flex d-row ml-auto"
+                  onClick={handleAddToCart}
+                >
                   <i className="fas fa-cart-plus align-self-center mr-2 fa-sm" />
-                  <small className="font-weight-bold">Cart</small>
+                  <small className="font-weight-bold">Add to Cart</small>
                 </button>
               </div>
             </div>
             {/* Collapsible Descriptions */}
             <div className="product-description">
-              {/* <h3>Description</h3> */}
               {selectedProduct.description.map((item, index) => (
                 <div key={index} className="description-item">
                   <div
@@ -115,15 +172,13 @@ const ProductDetailModal = ({
                     onClick={() => toggleDescription(index)}
                   >
                     {Object.keys(item)[1]}{" "}
-                    {/* This will display the title of the description */}
                     <span className="toggle-icon">
                       {openDescription === index ? "▲" : "▼"}
                     </span>
                   </div>
                   {openDescription === index && (
                     <div className="description-content">
-                      <p>{Object.values(item)[1]}</p>{" "}
-                      {/* This will display the content */}
+                      <p>{Object.values(item)[1]}</p>
                     </div>
                   )}
                 </div>
@@ -132,6 +187,8 @@ const ProductDetailModal = ({
           </div>
         </div>
       </div>
+      {/* Toast container */}
+      <ToastContainer />{" "}
     </div>
   );
 };

@@ -69,10 +69,10 @@ const Products = () => {
                         <p className="my-0 text-success-s2 font-weight-bold">
                           ${product.price}
                         </p>
-                        <button className="btn btn-outline-success d-flex d-row ml-auto">
+                        {/* <button className="btn btn-outline-success d-flex d-row ml-auto">
                           <i className="fas fa-cart-plus align-self-center mr-2 fa-sm" />
                           <small className="font-weight-bold">Cart</small>
-                        </button>
+                        </button> */}
                       </div>
                     </div>
                   </div>

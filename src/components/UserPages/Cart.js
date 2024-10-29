@@ -1,12 +1,48 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../Users.css";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchCart,
+  increaseQuantity,
+  decreaseQuantity,
+} from "../../Slices/CartSlice";
 
+const Cart = ({ removeItem }) => {
+  const dispatch = useDispatch();
+  const {
+    dataCart = [],
+    cartTotal,
+    isCartLoading,
+    error,
+  } = useSelector((state) => state.cart);
 
-const Cart = (props) => {
+  const { user } = useSelector((state) => state.auth);
+  const userId = user.data._id;
+
+  // Fetch the cart when the component mounts
+  useEffect(() => {
+    dispatch(fetchCart(userId));
+  }, [dispatch, userId]);
+
+  if (isCartLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  const handleIncreaseQty = (item) => {
+    dispatch(increaseQuantity({ userId, productId: item.productId._id }));
+  };
+
+  const handleDecreaseQty = (item) => {
+    dispatch(decreaseQuantity({ userId, productId: item.productId._id }));
+  };
 
   return (
     <div>
@@ -50,91 +86,86 @@ const Cart = (props) => {
             <tr>
               <th scope="col">PRODUCT</th>
               <th scope="col">NAME</th>
+              <th scope="col">SIZE</th>
               <th scope="col">UNIT PRICE</th>
               <th scope="col">QUANTITY</th>
               <th scope="col">TOTAL</th>
             </tr>
           </thead>
-          {/* <tbody>
-            {props.dataCart.length !== 0 ? (
-              props.dataCart.map((item, index) => {
-                return (
-                  <tr key={index}>
-                    <td>
-                      <div
-                        className="w-75 text-center"
-                        style={picture(item.image)}
-                      />
-                    </td>
-                    <td>
-                      <div>
-                        <h6 className="text-secondary font-weight-bold">
-                          {item.name}
-                        </h6>
-                        <small className="my-0 text-secondary">
-                          Type: <b>{item.productType}</b>
-                        </small>
-                        <br />
-                        <small className="my-0 text-secondary">
-                          Gender: <b>{item.productGender}</b>
-                        </small>
-                      </div>
-                    </td>
-                    <th style={{ verticalAlign: "middle" }}>
-                      <p className="my-0 text-secondary">${item.price}</p>
-                    </th>
-                    <td>
-                      <div className="btn-group" role="group" aria-label="...">
-                        <button
-                          onClick={() => decreaseQuantity(item._id)}
-                          className="btn btn-outline-success"
-                        >
-                          -
-                        </button>
-                        <p
-                          className="btn my-0 text-success-s2"
-                          style={{ borderColor: "#009e7f", cursor: "default" }}
-                        >
-                          <b>{item.qtyBuy}</b>
-                        </p>
-                        <button
-                          onClick={() => addQuantity(item._id)}
-                          className="btn btn-outline-success"
-                        >
-                          +
-                        </button>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="d-flex d-row">
-                        <h6 className="font-weight-bold text-secondary align-self-center my-0">
-                          ${item.price * item.qtyBuy}
-                        </h6>
-                        <button
-                          className="btn trash-cart-btn ml-2"
-                          onClick={() => removeItem(item)}
-                        >
-                          <i className="far fa-trash-alt fa-sm"></i>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })
+          <tbody>
+            {dataCart.length !== 0 ? (
+              dataCart.map((item, index) => (
+                <tr key={index}>
+                  <td>
+                    <div
+                      className="w-75 text-center"
+                      style={{
+                        backgroundImage: `url(${item.productId.images[0]})`,
+                        height: "75px",
+                        backgroundSize: "cover",
+                      }}
+                    />
+                  </td>
+                  <td>
+                    <p className="my-0 text-secondary">{item.productId.name}</p>
+                  </td>
+                  <td>
+                    <p className="my-0 text-secondary">{item.size}</p>
+                  </td>
+                  <td style={{ verticalAlign: "middle" }}>
+                    <p className="my-0 text-secondary">
+                      ${item.productId.price}
+                    </p>
+                  </td>
+                  <td>
+                    <div className="btn-group" role="group" aria-label="...">
+                      <button
+                        onClick={() => handleDecreaseQty(item)}
+                        className="btn btn-outline-success"
+                      >
+                        -
+                      </button>
+                      <p
+                        className="btn my-0 text-success-s2"
+                        style={{ borderColor: "#009e7f", cursor: "default" }}
+                      >
+                        <b>{item.quantity}</b>
+                      </p>
+                      <button
+                        onClick={() => handleIncreaseQty(item)}
+                        className="btn btn-outline-success"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="d-flex d-row">
+                      <h6 className="font-weight-bold text-secondary align-self-center my-0">
+                        ${item.productId.price * item.quantity}
+                      </h6>
+                      <button
+                        className="btn trash-cart-btn ml-2"
+                        onClick={() => removeItem(item)}
+                      >
+                        <i className="far fa-trash-alt fa-sm"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
             ) : (
-              <></>
+              <tr>
+                <td colSpan="6" className="text-center">
+                  <h3 className="my-0 text-secondary">
+                    The cart is still empty, let's search something cool in the
+                    shop!
+                  </h3>
+                </td>
+              </tr>
             )}
-          </tbody> */}
+          </tbody>
         </table>
-        {/* {props.dataCart.length === 0 ? ( */}
-          <div>
-            <h3 className="my-0 text-secondary text-center">
-              The cart is still empty, let's search something cool in the shop!
-            </h3>
-          </div>
-        {/* ) : (
-          <> </>
-        )} */}
 
         <div style={{ margin: "4rem 16rem" }}>
           <div className="card shadow-subtotal-fx">
@@ -143,7 +174,7 @@ const Cart = (props) => {
               <div className="border border-top-0">
                 <div className="border-top d-flex d-row py-3 px-3">
                   <h6 className="font-weight-bold my-0">Subtotal</h6>
-                  <h6 className="ml-auto my-0">${props.subTotalPrice}</h6>
+                  <h6 className="ml-auto my-0">${cartTotal}</h6>
                 </div>
                 <div className="border-top d-flex d-row py-3 px-3">
                   <h6 className="font-weight-bold my-0">Shipping</h6>
@@ -151,12 +182,12 @@ const Cart = (props) => {
                 </div>
                 <div className="border-top d-flex d-row py-3 px-3">
                   <h6 className="font-weight-bold my-0">Total</h6>
-                  <h6 className="ml-auto my-0">${props.subTotalPrice + 5}</h6>
+                  <h6 className="ml-auto my-0">${cartTotal + 5}</h6>
                 </div>
               </div>
               <div className="d-flex">
                 <div>
-                  {props.dataCart.length !== 0 ? (
+                  {dataCart.length !== 0 ? (
                     <Link
                       className="btn btn-outline-success mt-4"
                       to="/checkout"

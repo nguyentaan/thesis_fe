@@ -3,11 +3,8 @@ import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { useDispatch } from "react-redux";
 import { googleLogin } from "../../Slices/AuthenSlice";
 
-// const CLIENT_ID = process.env.REACT_CLIENT_ID;
-const CLIENT_ID =
-  "949928109687-ualg36c3l1v73dtqmudotboi79f7pvds.apps.googleusercontent.com";
-
-const GoogleButton = () => {
+const CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+const GoogleButton = () => {  
   const dispatch = useDispatch();
 
   const onSuccess = (response) => {

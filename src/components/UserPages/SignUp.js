@@ -1,14 +1,12 @@
 import React, { useState } from "react";
 import { Modal } from "react-bootstrap";
 import logo from "../../assets/logo.png";
-import { useDispatch, useSelector } from "react-redux";
-import { auth, googleProvider } from "../../firebaseConfig";
-import { googleLogin } from "../../Slices/AuthenSlice";
-import { signInWithPopup } from "firebase/auth";
+import { useSelector } from "react-redux";
+import GoogleButton from "./googleButton";
 
 const SignUp = ({ showLoginModal, closeLoginModal, onBack }) => {
-  const dispatch = useDispatch();
-  const { isLoading } = useSelector((state) => state.authen);
+  // const dispatch = useDispatch();
+  const { isLoading } = useSelector((state) => state.auth);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,16 +24,6 @@ const SignUp = ({ showLoginModal, closeLoginModal, onBack }) => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
-  const handleGoogleLogin = async () => {
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const token = await result.user.getIdToken();
-      dispatch(googleLogin(token));
-    } catch (error) {
-      console.error("Google login error:", error);
-    }
-  };
-
   const handleCloseModal = () => {
     // Reset states when closing the modal
     setEmail("");
@@ -45,7 +33,6 @@ const SignUp = ({ showLoginModal, closeLoginModal, onBack }) => {
     closeLoginModal(false); // Close the modal
     onBack();
   };
-
 
   const handleEmailSignUp = async (e) => {
     e.preventDefault();
@@ -61,8 +48,12 @@ const SignUp = ({ showLoginModal, closeLoginModal, onBack }) => {
       <Modal.Body style={{ padding: "2rem 4rem" }}>
         <div className="text-center">
           <form onSubmit={handleEmailSignUp}>
-            <h4 className="text-success-s2 font-weight-bold">Welcome to Our Registration</h4>
-            <h6 className="text-secondary">Fill in the following to create an account</h6>
+            <h4 className="text-success-s2 font-weight-bold">
+              Welcome to Our Registration
+            </h4>
+            <h6 className="text-secondary">
+              Fill in the following to create an account
+            </h6>
 
             <div className="mt-4">
               <input
@@ -90,8 +81,16 @@ const SignUp = ({ showLoginModal, closeLoginModal, onBack }) => {
                   onChange={(e) => setPassword(e.target.value)}
                 />
                 <div className="input-group-append">
-                  <button className="btn btn-outline-success" type="button" onClick={togglePasswordVisibility}>
-                    <i className={showPassword ? "fas fa-eye-slash" : "fas fa-eye"} />
+                  <button
+                    className="btn btn-outline-success"
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                  >
+                    <i
+                      className={
+                        showPassword ? "fas fa-eye-slash" : "fas fa-eye"
+                      }
+                    />
                   </button>
                 </div>
               </div>
@@ -104,8 +103,16 @@ const SignUp = ({ showLoginModal, closeLoginModal, onBack }) => {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                 />
                 <div className="input-group-append">
-                  <button className="btn btn-outline-success" type="button" onClick={toggleConfirmPasswordVisibility}>
-                    <i className={showConfirmPassword ? "fas fa-eye-slash" : "fas fa-eye"} />
+                  <button
+                    className="btn btn-outline-success"
+                    type="button"
+                    onClick={toggleConfirmPasswordVisibility}
+                  >
+                    <i
+                      className={
+                        showConfirmPassword ? "fas fa-eye-slash" : "fas fa-eye"
+                      }
+                    />
                   </button>
                 </div>
               </div>
@@ -129,19 +136,18 @@ const SignUp = ({ showLoginModal, closeLoginModal, onBack }) => {
 
             <p style={{ fontSize: "1rem", margin: "0.7rem 0rem" }}>or</p>
 
-            <button
-              type="button"
-              className="btn btn-danger w-100 d-flex justify-content-center"
-              onClick={handleGoogleLogin}
-              disabled={isLoading}
-            >
-              <i className="fab fa-google fa-lg align-self-center mr-3" />
-              {isLoading ? "Signing up with Google..." : "Sign Up with Google"}
-            </button>
+            <div className="mt-3">
+              <div className="d-flex justify-content-center">
+                <GoogleButton />
+              </div>
+            </div>
 
             <p style={{ fontSize: "1rem", margin: "0.7rem 0rem" }}>
               Already have an account?
-              <button className="btn btn-link p-0 text-success-s2 ml-1" onClick={onBack}>
+              <button
+                className="btn btn-link p-0 text-success-s2 ml-1"
+                onClick={onBack}
+              >
                 Login
               </button>
             </p>
