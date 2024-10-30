@@ -9,9 +9,10 @@ import {
   fetchCart,
   increaseQuantity,
   decreaseQuantity,
+  // removeItem,
 } from "../../Slices/CartSlice";
 
-const Cart = ({ removeItem }) => {
+const Cart = () => {
   const dispatch = useDispatch();
   const {
     dataCart = [],
@@ -33,16 +34,45 @@ const Cart = ({ removeItem }) => {
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div>Error: {error.message || "Something went wrong"}</div>;
   }
 
-  const handleIncreaseQty = (item) => {
-    dispatch(increaseQuantity({ userId, productId: item.productId._id }));
+  const handleIncreaseQty = async (item) => {
+    await dispatch(
+      increaseQuantity({
+        userId,
+        productId: item.productId._id,
+        size: item.size,
+      })
+    );
+    dispatch(fetchCart(userId)); // Refetch the cart data
   };
 
-  const handleDecreaseQty = (item) => {
-    dispatch(decreaseQuantity({ userId, productId: item.productId._id }));
+  const handleDecreaseQty = async (item) => {
+    await dispatch(
+      decreaseQuantity({
+        userId,
+        productId: item.productId._id,
+        size: item.size,
+      })
+    );
+    dispatch(fetchCart(userId)); // Refetch the cart data
   };
+
+  // const handleRemoveItem = async (item) => {
+  //   try {
+  //     await dispatch(
+  //       removeItem({
+  //         userId,
+  //         productId: item.productId._id,
+  //         size: item.size,
+  //       })
+  //     ).unwrap(); // Unwraps to handle errors directly
+  //     dispatch(fetchCart(userId)); // Refetch the cart data
+  //   } catch (removeError) {
+  //     console.error("Error removing item:", removeError);
+  //   }
+  // };
 
   return (
     <div>
@@ -146,7 +176,7 @@ const Cart = ({ removeItem }) => {
                       </h6>
                       <button
                         className="btn trash-cart-btn ml-2"
-                        onClick={() => removeItem(item)}
+                        // onClick={handleRemoveItem(item)}
                       >
                         <i className="far fa-trash-alt fa-sm"></i>
                       </button>
