@@ -110,6 +110,9 @@
 .dropdown-item:active {
   background-color: #cfcfcf !important;
 }
+.t45 {
+  top: 45px;
+}
 .facebook-button {
   width: 100%;
   padding: 0.7rem 0.2rem !important;
@@ -496,7 +499,22 @@ td {
 }
 
 .size-item:hover {
-  background-color: #ccc;
+  background-color: #f0f0f0; /* Light background on hover */
+  border-color: #888; /* Darker border color on hover */
+}
+
+.size-item.selected {
+  background-color: #007bff; /* Blue background for selected size */
+  color: white; /* White text for selected size */
+  border-color: #0056b3; /* Darker border color for selected size */
+}
+
+.size-item.out-of-stock {
+  color: gray;
+  opacity: 0.6;
+}
+.size-item.out-of-stock:hover {
+  cursor: not-allowed;
 }
 
 .product-color {
@@ -533,10 +551,7 @@ td {
 .product-description {
   margin-top: 20px;
   padding: 10px;
-  border: 1px solid #e0e0e0;
   border-radius: 5px;
-  background-color: #fafafa;
-  max-height: 300px;
   overflow-y: auto;
   transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
 }
