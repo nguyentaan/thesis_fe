@@ -17,9 +17,6 @@ export const googleLogin = createAsyncThunk(
       const response = await axios.post(`${API_URL}/api/auth/google`, {
         credential: token,
       });
-
-      // Log the response data for debugging
-      // console.log(response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(handleError(error));
@@ -77,6 +74,12 @@ const authSlice = createSlice({
       state.user = null;
       state.isAuth = false;
     },
+    loginSuccess(state, action) {
+      state.isAuth = true;
+      state.user = { data: action.payload.user };
+      state.accessToken = action.payload.accessToken; 
+      state.refreshToken = action.payload.refreshToken;
+  },
   },
   extraReducers: (builder) => {
     builder
@@ -98,11 +101,6 @@ const authSlice = createSlice({
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(emailLogin.fulfilled, (state, action) => {
-        state.user = action.payload;
-        state.isAuth = true; // Change to true upon successful login
-        state.isLoading = false;
-      })
       .addCase(emailLogin.rejected, (state, action) => {
         state.error = action.payload; // Capture error message
         state.isLoading = false;
@@ -111,10 +109,6 @@ const authSlice = createSlice({
       .addCase(verifyOTP.pending, (state) => {
         state.isLoading = true;
         state.error = null;
-      })
-      .addCase(verifyOTP.fulfilled, (state) => {
-        state.isAuth = true; // Set to true on successful OTP verification
-        state.isLoading = false;
       })
       .addCase(verifyOTP.rejected, (state, action) => {
         state.error = action.payload; // Capture error message
@@ -126,7 +120,7 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(createUser.fulfilled, (state, action) => {
-        state.user = action.payload;
+        state.user = { data: action.payload.data };
         state.isAuth = true; // Set to true upon successful registration
         state.isLoading = false;
       })
@@ -136,5 +130,5 @@ const authSlice = createSlice({
       });
   },
 });
-export const { logout } = authSlice.actions;
+export const { logout, loginSuccess } = authSlice.actions;
 export default authSlice.reducer;

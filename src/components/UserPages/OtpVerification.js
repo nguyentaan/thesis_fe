@@ -1,7 +1,7 @@
 // OtpVerification.js
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { verifyOTP } from "../../Slices/AuthenSlice"; // Import action for OTP verification
+import { verifyOTP, loginSuccess } from "../../Slices/AuthenSlice"; // Import action for OTP verification
 
 const OtpVerification = ({ email, password, onBack }) => {
     const dispatch = useDispatch();
@@ -10,10 +10,12 @@ const OtpVerification = ({ email, password, onBack }) => {
 
     const handleOtpVerification = async (e) => {
         e.preventDefault();
-        setIsLoading(true);
+        setIsLoading(true); // Set loading state before making the API call
         try {
-            const result = await dispatch(verifyOTP({ email, password, otp })).unwrap();
-            if (result.success) {
+            const response = await dispatch(verifyOTP({ email, password, otp })).unwrap();
+            if (response.status === "OK") {
+                const { data, access_token, refresh_token } = response; // Destructure the result
+                dispatch(loginSuccess({  user: data , accessToken: access_token, refreshToken: refresh_token }));
                 alert("OTP verified successfully!");
             } else {
                 alert("Invalid OTP");

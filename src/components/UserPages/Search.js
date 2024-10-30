@@ -1,52 +1,30 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../../Slices/AuthenSlice";
 import "react-toastify/dist/ReactToastify.css";
 import mainBg from "../../assets/mainBackground.png";
-import logo from "../../assets/logo.png";
 import Footer from "./Footer";
-import Carousel from "./Carousel";
-import ProductField from "./Products";
+import ProductsRender from "./ProductsRender";
 import LoginModal from "./Login";
-import { useNavigate } from 'react-router-dom';
-
+import { useParams } from "react-router-dom";
+import { getSearchProducts } from "../../Slices/UserSlice";
 import "../Users.css";
+import logo from "../../assets/logo.png";
+import { Link } from "react-router-dom";
+import Carousel from "./Carousel";
+import { logout } from "../../Slices/AuthenSlice";
 
-const Index = (props) => {
+const Search = () => {
+  const { keyword } = useParams(); // Get the keyword from the URL
   const dispatch = useDispatch();
   const { isAuth, user } = useSelector((state) => state.auth);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  // const [NavLoginSuccess, setNavLoginSuccess] = useState(false);
-  const [searchInput, setSearchInput] = useState('');
-  const [submitSearch, setSubmitSearch] = useState(false);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if(isAuth) {
-      setShowLoginModal(false);
-      console.log("user data", user);
-    }
-  }, [isAuth]);
-
-  const noLoginCartNotification = () => {
-    toast.error("Please login first to continue.", {
-      position: toast.POSITION.TOP_CENTER,
-    });
-  };
-
-  const comingSoonNotification = () => {
-    toast.success("This Feature will coming soon, Stay tune!", {
-      position: toast.POSITION.TOP_CENTER,
-    });
-  };
-
-  // const searchNotification = () => {
-  //   toast.success("Discover the clothe that you search below.", {
-  //     position: toast.POSITION.TOP_CENTER,
-  //   });
-  // };
+  const [searchInput, setSearchInput] = useState(keyword || ""); // Initialize with keyword if available
+  const [searchResults, setSearchResults] = useState([]); // State to hold search results
+  const [isLoading, setIsLoading] = useState(false); // State to manage loading status
+  const [sessionContext, setSessionContext] = useState([]); // State to hold session context
+  const [currentPage, setCurrentPage] = useState(1); // State for current page
+  const [totalResults, setTotalResults] = useState(0); // State for total results
 
   const handleSearchInput = (event) => {
     setSearchInput(event.target.value); // Update search input state
@@ -54,29 +32,75 @@ const Index = (props) => {
 
   const handleSearchSubmit = () => {
     if (searchInput.trim()) {
-      navigate(`/search/${encodeURIComponent(searchInput)}`);
+      const updatedSessionContext = [...sessionContext, searchInput];
+      fetchSearchProducts(updatedSessionContext); // Call fetch function with updated context
     }
+  };
+
+  const fetchSearchProducts = async (updatedSessionContext, page) => {
+    setIsLoading(true);
+    try {
+      const response = await dispatch(getSearchProducts({
+        query: searchInput,
+        session_context: updatedSessionContext,
+        page,
+        limit: 20 // Set limit here
+      })).unwrap();
+      setSearchResults(response?.refined_products || []);
+      setSessionContext(updatedSessionContext);
+      setCurrentPage(page); // Update current page
+      setTotalResults(response?.total_results || 0); // Set total results for pagination
+    } catch (error) {
+      console.error("Failed to fetch search products:", error);
+      setSearchResults([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuth) {
+      setShowLoginModal(false);
+      console.log("user data", user);
+    }
+  }, [isAuth, user]);
+
+  useEffect(() => {
+    if (searchInput) {
+      fetchSearchProducts(sessionContext); // Fetch products if search input changes
+    }
+  }, [dispatch, searchInput, sessionContext]); // Now also depend on sessionContext
+
+
+  // const noLoginCartNotification = () => {
+  //   toast.error("Please login first to continue.", {
+  //     position: toast.POSITION.TOP_CENTER,
+  //   });
+  // };
+
+  const handlePageChange = (newPage) => {
+    fetchSearchProducts(sessionContext, newPage); // Fetch products for the new page
   };
 
   const openLoginModal = () => {
     setShowLoginModal(true);
-    // cause warning but needed to stop logout alert shows 2 times.
+  };
+
+  const Logout = () => {
+    dispatch(logout());
+    toast.success("Successfully logged out!", {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  };
+
+  const comingSoonNotification = () => {
+    toast.success("This feature will be coming soon. Stay tuned!", {
+      position: toast.POSITION.TOP_CENTER,
+    });
   };
 
   const closeLoginModal = (boolean) => {
     setShowLoginModal(boolean);
-  };
-
-  const handleLoginSuccess = () => {
-    setShowLoginModal(false);
-  }
-
-  const Logout = () => {
-    dispatch(logout());
-    // setNavLoginSuccess(false);
-    toast.success("Successfully logged out!", {
-      position: toast.POSITION.TOP_CENTER,
-    });
   };
 
   const picture = (image) => {
@@ -85,6 +109,19 @@ const Index = (props) => {
       backgroundSize: "cover",
       backgroundPosition: "center",
     };
+  };
+
+  const handleLoginSuccess = () => {
+    setShowLoginModal(false);
+  };
+
+  const totalPages = Math.ceil(totalResults / 20); // Calculate total pages
+
+  const backgroundStyle = {
+    // backgroundImage: `url(${mainBg})`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    height: "100vh",
   };
 
   return (
@@ -114,27 +151,6 @@ const Index = (props) => {
             </button>
             <div className="collapse navbar-collapse" id="navbarNav">
               <ul className="navbar-nav ml-auto">
-                {props.tokenUser ? (
-                  <Link to="/cart" style={{ textDecoration: "none" }}>
-                    <li className="nav-item">
-                      <button className="btn btn-success d-flex d-row">
-                        <i className="fas fa-shopping-cart align-self-center mr-2" />
-                        <p className="my-0">Cart</p>
-                      </button>
-                    </li>
-                  </Link>
-                ) : (
-                  <li className="nav-item">
-                    <button
-                      onClick={() => noLoginCartNotification()}
-                      className="btn btn-secondary d-flex d-row"
-                    >
-                      <i className="fas fa-shopping-cart align-self-center mr-2" />
-                      <p className="my-0">Cart </p>
-                    </button>
-                  </li>
-                )}
-
                 <li className="nav-item mx-4">
                   {isAuth ? (
                     <div className="btn-group">
@@ -262,10 +278,19 @@ const Index = (props) => {
           {/* Sidebar */}
 
           <div className="col-md-9">
-            <ProductField
-              searchInput={searchInput}
-              submitSearch={submitSearch}
-            />
+            {isLoading ? (
+              <p>Loading...</p>
+            ) : (
+              <ProductsRender
+                dataProduct={{ products: searchResults, total: searchResults.length }} // Adjust as needed
+                isProductLoading={isLoading}
+              />
+            )}
+            <div className="pagination">
+              <button disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)}>Previous</button>
+              <span>Page {currentPage} of {totalPages}</span>
+              <button disabled={currentPage === totalPages} onClick={() => handlePageChange(currentPage + 1)}>Next</button>
+            </div>
           </div>
         </div>
       </div>
@@ -286,4 +311,5 @@ const Index = (props) => {
     </div>
   );
 };
-export default Index;
+
+export default Search;

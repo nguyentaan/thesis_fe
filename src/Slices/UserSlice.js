@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 
 const API_URL = `${process.env.REACT_APP_API_URL}`;
+const PYTHON_URL = `${process.env.REACT_APP_PYTHON_URL}`;
 
 const initialState = {
   isProductLoading: false,
@@ -31,6 +32,21 @@ export const getAllProducts = createAsyncThunk(
   }
 );
 
+export const getSearchProducts = createAsyncThunk(
+  "product/search",
+  async ({ query, session_context }, { rejectWithValue }) => {
+    try {
+      const res = await axios.post(`${PYTHON_URL}/search/`, {
+        query,
+        session_context, // Send query and session_context in the body
+      });
+      return res.data;
+    } catch (error) {
+      console.error("API error:", error);
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
 
 const userSlice = createSlice({
   name: "user",
@@ -67,10 +83,21 @@ const userSlice = createSlice({
         //   position: toast.POSITION.TOP_CENTER,
         //   autoClose: 3000,
         // });
+      })
+      .addCase(getSearchProducts.pending, (state) => {
+        state.isProductLoading = true;
+      })
+      .addCase(getSearchProducts.fulfilled, (state, action) => {
+        state.dataProduct.products = action.payload.products;
+        state.dataProduct.total = action.payload.total;
+        state.isProductLoading = false;
+      })
+      .addCase(getSearchProducts.rejected, (state, action) => {
+        state.isProductLoading = false;
       });
   },
 });
 
 // Correctly export the reducer and actions separately
-export const { setIsProductLoading } = userSlice.actions;
+export const { setIsProductLoading, resetProducts } = userSlice.actions;
 export default userSlice.reducer;

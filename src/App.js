@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import UserPage from "./components/UserPages/Index";
 import AdminPage from "./components/AdminPages/Index";
 import CartPage from "./components/UserPages/Cart";
+import SearchPage from "./components/UserPages/Search";
 import CheckoutPage from "./components/UserPages/Checkout";
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
             <Route path="/" element={<UserPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/search/:keyword" element={<SearchPage/>} />
             <Route path="/admin/*" element={<AdminPage />} />
           </Routes>
         </Router>

@@ -8,7 +8,7 @@ import { signInWithPopup } from "firebase/auth";
 
 const SignUp = ({ showLoginModal, closeLoginModal, onBack }) => {
   const dispatch = useDispatch();
-  const { isLoading } = useSelector((state) => state.authen);
+  const { isLoading } = useSelector((state) => state.auth);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

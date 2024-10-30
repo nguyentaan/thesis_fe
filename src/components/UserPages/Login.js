@@ -11,9 +11,9 @@ import GoogleButton from "./googleButton";
 
 const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
   const dispatch = useDispatch();
-  const { isLoading } = useSelector((state) => state.authen);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const { isLoading } = useSelector((state) =>state.auth);
+  const [email, setEmail] = useState("20521920@gm.uit.edu.vn"); 
+  const [password, setPassword] = useState("12345678");
   const [otpVisible, setOtpVisible] = useState(false);
   const [signUpVisible, setSignUpVisible] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -21,7 +21,7 @@ const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-  
+
   const handleGoogleLogin = async () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
@@ -36,12 +36,18 @@ const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
   const handleEmailLogin = async (e) => {
     e.preventDefault();
     try {
-      await dispatch(emailLogin({ email, password }));
-      setOtpVisible(true);
+      const response = await dispatch(emailLogin({ email, password })).unwrap();
+      console.log("response: ", response);
+      if (response.status === "OK") {
+        setOtpVisible(true); 
+      } else {
+        console.error("Login failed:", response.message);
+      }
     } catch (error) {
       console.error("Email login error:", error);
     }
   };
+  
 
   const handleBackToLogin = () => {
     setOtpVisible(false);
@@ -57,10 +63,7 @@ const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
   };
 
   return (
-    <Modal
-      show={showLoginModal}
-      onHide={handleCloseModal}
-    >
+    <Modal show={showLoginModal} onHide={handleCloseModal}>
       <Modal.Header closeButton>
         <Modal.Title>
           <img src={logo} alt="Logo" style={{ width: "40%" }} />
@@ -84,6 +87,7 @@ const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
                   placeholder="Email"
                   aria-label="Email"
                   value={email}
+                  required
                   onChange={(e) => setEmail(e.target.value)}
                 />
                 <div className="input-group mb-2">
@@ -92,6 +96,7 @@ const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
                     className="form-control"
                     placeholder="Password"
                     value={password}
+                    required
                     onChange={(e) => setPassword(e.target.value)}
                   />
                   <div className="input-group-append">
@@ -122,25 +127,15 @@ const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
                 <i className="fab fa-google fa-lg align-self-center mr-3" />
                 {isLoading ? "Signing in with Google..." : "Login with Google"}
               </button>
-            <p style={{ fontSize: "1rem", margin: "0.7rem 0rem" }}>or</p>
+              <p style={{ fontSize: "1rem", margin: "0.7rem 0rem" }}>or</p>
 
-            {/* <button
-              type="button"
-              className="btn btn-danger w-100 d-flex justify-content-center"
-              style={{ padding: "0.7rem 0.2rem" }}
-              onClick={handleGoogleLogin}
-              disabled={isLoading}
-            >
-              <i className="fab fa-google fa-lg align-self-center mr-3" />
-              {isLoading ? "Signing in with Google..." : "Login with Google"}
-            </button> */}
-            <div className="mt-3">
-              <div className="d-flex justify-content-center">
-                <GoogleButton />
+              <div className="mt-3">
+                <div className="d-flex justify-content-center">
+                  <GoogleButton />
+                </div>
               </div>
-            </div>
 
-             <p style={{ fontSize: "1rem", margin: "0.7rem 0rem" }}>
+              <p style={{ fontSize: "1rem", margin: "0.7rem 0rem" }}>
                 Don't have an account?
                 <button
                   className="btn btn-link p-0 text-success-s2 ml-1"
@@ -152,7 +147,8 @@ const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
                   Sign Up
                 </button>
               </p>
-          </form>
+            </form>
+          )}
         </div>
       </Modal.Body>
     </Modal>
