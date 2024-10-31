@@ -7,7 +7,7 @@ const API_URL = `${process.env.REACT_APP_API_URL}`;
 const initialState = {
   dataCart: [],
   isCartLoading: false,
-  cartTotal: 0,
+  // cartTotal: 0,
   error: null,
 };
 
@@ -92,7 +92,7 @@ const cartSlice = createSlice({
   reducers: {
     clearCart: (state) => {
       state.dataCart = [];
-      state.cartTotal = 0;
+      // state.cartTotal = 0;
     },
   },
   extraReducers: (builder) => {
@@ -103,7 +103,7 @@ const cartSlice = createSlice({
       .addCase(addToCart.fulfilled, (state, action) => {
         state.isCartLoading = false;
         state.dataCart = action.payload.items;
-        state.cartTotal = action.payload.total;
+        // state.cartTotal = calculateCartTotal(state.dataCart); // Calculate total here
         toast.success("Item added to cart!", {
           position: toast.POSITION.TOP_CENTER,
           autoClose: 3000,
@@ -123,7 +123,7 @@ const cartSlice = createSlice({
       })
       .addCase(fetchCart.fulfilled, (state, action) => {
         state.dataCart = action.payload.items;
-        state.cartTotal = action.payload.total;
+        // state.cartTotal = calculateCartTotal(state.dataCart); // Calculate total here
         state.isCartLoading = false;
       })
       .addCase(fetchCart.rejected, (state, action) => {
@@ -136,7 +136,7 @@ const cartSlice = createSlice({
       })
       .addCase(increaseQuantity.fulfilled, (state, action) => {
         state.dataCart = action.payload.items;
-        state.cartTotal = action.payload.total;
+        // state.cartTotal = calculateCartTotal(state.dataCart); // Calculate total here
         state.isCartLoading = false;
         toast.success("Quantity increased!", {
           position: toast.POSITION.TOP_CENTER,
@@ -157,7 +157,7 @@ const cartSlice = createSlice({
       })
       .addCase(decreaseQuantity.fulfilled, (state, action) => {
         state.dataCart = action.payload.items;
-        state.cartTotal = action.payload.total;
+        // state.cartTotal = calculateCartTotal(state.dataCart); // Calculate total here
         state.isCartLoading = false;
         toast.success("Quantity decreased!", {
           position: toast.POSITION.TOP_CENTER,
@@ -178,7 +178,7 @@ const cartSlice = createSlice({
       })
       .addCase(removeItem.fulfilled, (state, action) => {
         state.dataCart = action.payload.items;
-        state.cartTotal = action.payload.total;
+        // state.cartTotal = action.payload.total;
         state.isCartLoading = false;
         toast.success("Item removed from cart!", {
           position: toast.POSITION.TOP_CENTER,

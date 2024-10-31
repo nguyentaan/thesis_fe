@@ -16,10 +16,13 @@ const Cart = () => {
   const dispatch = useDispatch();
   const {
     dataCart = [],
-    cartTotal,
+    // cartTotal,
     isCartLoading,
     error,
   } = useSelector((state) => state.cart);
+  const [subTotal, setSubTotal] = React.useState(0);
+  const total = subTotal + 5;
+  // console.log(cartTotal);
 
   const { user } = useSelector((state) => state.auth);
   const userId = user.data._id;
@@ -28,6 +31,27 @@ const Cart = () => {
   useEffect(() => {
     dispatch(fetchCart(userId));
   }, [dispatch, userId]);
+
+  useEffect(() => {
+    setSubTotal(
+      dataCart.reduce((total, item) => {
+        // Use parsePrice to sanitize and parse each item price
+        const itemPrice = parsePrice(item.productId.price);
+        return total + itemPrice * item.quantity;
+      }, 0)
+    );
+  }, [dataCart]);
+
+  // Enhanced parsePrice function to handle different invalid cases
+  const parsePrice = (price) => {
+    if (price == null || price === "" || typeof price !== "string") return 0; // Handle null, undefined, or non-string values
+
+    // Use regex to find the first valid number in the string, like "17.50" in "$Now 17.50"
+    const match = price.match(/(\d+(\.\d+)?)/);
+    const sanitizedPrice = match ? parseFloat(match[0]) : 0;
+
+    return sanitizedPrice;
+  };
 
   if (isCartLoading) {
     return <div>Loading...</div>;
@@ -172,7 +196,7 @@ const Cart = () => {
                   <td>
                     <div className="d-flex d-row">
                       <h6 className="font-weight-bold text-secondary align-self-center my-0">
-                        ${item.productId.price * item.quantity}
+                        ${parsePrice(item.productId.price) * item.quantity}
                       </h6>
                       <button
                         className="btn trash-cart-btn ml-2"
@@ -204,7 +228,7 @@ const Cart = () => {
               <div className="border border-top-0">
                 <div className="border-top d-flex d-row py-3 px-3">
                   <h6 className="font-weight-bold my-0">Subtotal</h6>
-                  <h6 className="ml-auto my-0">${cartTotal}</h6>
+                  <h6 className="ml-auto my-0">${subTotal}</h6>
                 </div>
                 <div className="border-top d-flex d-row py-3 px-3">
                   <h6 className="font-weight-bold my-0">Shipping</h6>
@@ -212,7 +236,7 @@ const Cart = () => {
                 </div>
                 <div className="border-top d-flex d-row py-3 px-3">
                   <h6 className="font-weight-bold my-0">Total</h6>
-                  <h6 className="ml-auto my-0">${cartTotal + 5}</h6>
+                  <h6 className="ml-auto my-0">${total}</h6>
                 </div>
               </div>
               <div className="d-flex">
