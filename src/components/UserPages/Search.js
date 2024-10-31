@@ -7,7 +7,7 @@ import Footer from "./Footer";
 import ProductsRender from "./ProductsRender";
 import LoginModal from "./Login";
 import { useParams } from "react-router-dom";
-import { getSearchProducts } from "../../Slices/UserSlice";
+import { getSearchProducts, addSearchKeyword, updateSearchHistory } from "../../Slices/UserSlice";
 import "../Users.css";
 import logo from "../../assets/logo.png";
 import { Link } from "react-router-dom";
@@ -15,41 +15,58 @@ import Carousel from "./Carousel";
 import { logout } from "../../Slices/AuthenSlice";
 
 const Search = () => {
-  const { keyword } = useParams(); // Get the keyword from the URL
+  const { keyword } = useParams();
   const dispatch = useDispatch();
   const { isAuth, user } = useSelector((state) => state.auth);
+  
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [searchInput, setSearchInput] = useState(keyword || ""); // Initialize with keyword if available
-  const [searchResults, setSearchResults] = useState([]); // State to hold search results
-  const [isLoading, setIsLoading] = useState(false); // State to manage loading status
-  const [sessionContext, setSessionContext] = useState([]); // State to hold session context
-  const [currentPage, setCurrentPage] = useState(1); // State for current page
-  const [totalResults, setTotalResults] = useState(0); // State for total results
+  const [searchInput, setSearchInput] = useState(keyword || "");
+  const [searchResults, setSearchResults] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [sessionContext, setSessionContext] = useState([]);
+  const [searchHistory, setSearchHistory] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalResults, setTotalResults] = useState(0);
+  const [isFocused, setIsFocused] = useState(false);
 
   const handleSearchInput = (event) => {
-    setSearchInput(event.target.value); // Update search input state
+    setSearchInput(event.target.value);
   };
 
-  const handleSearchSubmit = () => {
+  const handleSearchSubmit = async () => {
     if (searchInput.trim()) {
-      const updatedSessionContext = [...sessionContext, searchInput];
-      fetchSearchProducts(updatedSessionContext); // Call fetch function with updated context
+      if (!sessionContext.includes(searchInput)) {
+        setSessionContext((prev) => [...prev, searchInput]);
+      }
+
+      await fetchSearchProducts(sessionContext);
+      
+      if (isAuth) {
+        try {
+          const response = await dispatch(addSearchKeyword({ query: searchInput, user_id: user?.data?._id })).unwrap();
+          const newHistory = response.data;
+          dispatch(updateSearchHistory(newHistory));
+          setSearchHistory(newHistory);
+        } catch (error) {
+          console.error("Failed to add search keyword:", error);
+        }
+      }
     }
   };
 
-  const fetchSearchProducts = async (updatedSessionContext, page) => {
+  const fetchSearchProducts = async (updatedSessionContext, page = currentPage) => {
     setIsLoading(true);
     try {
       const response = await dispatch(getSearchProducts({
         query: searchInput,
         session_context: updatedSessionContext,
         page,
-        limit: 20 // Set limit here
+        limit: 20,
       })).unwrap();
+      
       setSearchResults(response?.refined_products || []);
-      setSessionContext(updatedSessionContext);
-      setCurrentPage(page); // Update current page
-      setTotalResults(response?.total_results || 0); // Set total results for pagination
+      setCurrentPage(page);
+      setTotalResults(response?.total_results || 0);
     } catch (error) {
       console.error("Failed to fetch search products:", error);
       setSearchResults([]);
@@ -61,32 +78,31 @@ const Search = () => {
   useEffect(() => {
     if (isAuth) {
       setShowLoginModal(false);
-      console.log("user data", user);
     }
   }, [isAuth, user]);
 
   useEffect(() => {
     if (searchInput) {
-      fetchSearchProducts(sessionContext); // Fetch products if search input changes
+      if (isAuth) {
+        dispatch(addSearchKeyword({ query: searchInput, user_id: user?.data?._id }))
+          .unwrap()
+          .then((response) => {
+            dispatch(updateSearchHistory(response.data));
+          })
+          .catch((error) => console.error("Failed to add search keyword:", error));
+      }
     }
-  }, [dispatch, searchInput, sessionContext]); // Now also depend on sessionContext
-
-
-  // const noLoginCartNotification = () => {
-  //   toast.error("Please login first to continue.", {
-  //     position: toast.POSITION.TOP_CENTER,
-  //   });
-  // };
+  }, [dispatch, isAuth, sessionContext, searchInput]);
 
   const handlePageChange = (newPage) => {
-    fetchSearchProducts(sessionContext, newPage); // Fetch products for the new page
+    fetchSearchProducts(sessionContext, newPage);
   };
 
   const openLoginModal = () => {
     setShowLoginModal(true);
   };
 
-  const Logout = () => {
+  const handleLogout = () => {
     dispatch(logout());
     toast.success("Successfully logged out!", {
       position: toast.POSITION.TOP_CENTER,
@@ -103,40 +119,25 @@ const Search = () => {
     setShowLoginModal(boolean);
   };
 
-  const picture = (image) => {
-    return {
-      backgroundImage: `url(${image})`,
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-    };
-  };
-
   const handleLoginSuccess = () => {
     setShowLoginModal(false);
   };
 
-  const totalPages = Math.ceil(totalResults / 20); // Calculate total pages
-
+  const totalPages = Math.ceil(totalResults / 20);
   const backgroundStyle = {
-    // backgroundImage: `url(${mainBg})`,
+    backgroundImage: `url(${mainBg})`,
     backgroundSize: "cover",
     backgroundPosition: "center",
     height: "100vh",
   };
 
   return (
-    <div
-      style={{
-        fontFamily: "Karla,sans-serif",
-        backgroundColor: "#f8f9fa",
-      }}
-    >
-      {/* start header - part1 */}
-      <div className="main-bg-height" style={picture(mainBg)}>
+    <div style={{ fontFamily: "Karla,sans-serif", backgroundColor: "#f8f9fa" }}>
+      <div className="main-bg-height" style={backgroundStyle}>
         <nav className="navbar fixed-top navbar-expand-lg navbar-light bg-light">
           <div className="container">
             <a className="navbar-brand" href="/">
-              <img src={logo} className="logo-fx" alt="..." />
+              <img src={logo} className="logo-fx" alt="Logo" />
             </a>
             <button
               className="navbar-toggler"
@@ -164,20 +165,13 @@ const Search = () => {
                         {`Hello, ${user?.data?.name}`}
                       </button>
                       <div className="dropdown-menu">
-                        <button
-                          className="dropdown-item text-danger"
-                          onClick={Logout}
-                        >
+                        <button className="dropdown-item text-danger" onClick={handleLogout}>
                           Logout <i className="fas fa-sign-out-alt"></i>
                         </button>
                       </div>
                     </div>
                   ) : (
-                    <button
-                      type="button"
-                      onClick={openLoginModal}
-                      className="btn btn-success"
-                    >
+                    <button type="button" onClick={openLoginModal} className="btn btn-success">
                       Sign In <i className="fas fa-sign-in-alt ml-2"></i>
                     </button>
                   )}
@@ -190,15 +184,11 @@ const Search = () => {
         <ToastContainer />
 
         <div className="vertical-center">
-          <h1
-            className="display-4 font-weight-bold text-center"
-            style={{ fontFamily: "Poppins, sans-serif" }}
-          >
+          <h1 className="display-4 font-weight-bold text-center" style={{ fontFamily: "Poppins, sans-serif" }}>
             Shop your designer dresses
           </h1>
           <p className="text-center text-secondary">
-            Ready to wear dresses tailored for you from online. Hurry up while
-            stock lasts.
+            Ready to wear dresses tailored for you from online. Hurry up while stock lasts.
           </p>
           <div className="form-group mt-5">
             <input
@@ -206,83 +196,64 @@ const Search = () => {
               className="search-box"
               placeholder="Search the fashion name that you want here"
               name="searchinput"
-              value={searchInput} // Bind input value to state
+              value={searchInput}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
               onChange={handleSearchInput}
               required
-              onKeyPress={(event) =>
-                event.key === "Enter" ? handleSearchSubmit() : null
-              }
+              onKeyPress={(event) => event.key === "Enter" && handleSearchSubmit()}
             />
-            <button
-              className="btn-search"
-              type="button"
-              id="button-addon2"
-              onClick={handleSearchSubmit}
-            >
+            <button className="btn-search" type="button" id="button-addon2" onClick={handleSearchSubmit}>
               <i className="fas fa-search"></i>
             </button>
           </div>
+          {isFocused && searchHistory?.length > 0 && (
+            <div className="search-history-dropdown">
+              {searchHistory?.map((keyword, index) => (
+                <div
+                  key={index}
+                  className="search-history-item"
+                  onMouseDown={() => setSearchInput(keyword)}
+                >
+                  {keyword}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
-      {/* start header - part 1 */}
 
-      {/* carousel-brochure */}
+      {/* Carousel */}
       <div className="container my-5">
         <Carousel />
       </div>
-      {/* carousel-brochure */}
 
-      {/* part 3 - content */}
+      {/* Products Section */}
       <div className="container">
         <div className="row mb-5">
           {/* Sidebar */}
           <div className="col-md-3 mt-3">
             <div className="list-group">
-              <button
-                onClick={comingSoonNotification}
-                type="button"
-                className="list-group-item list-group-item-action d-flex d-row mb-2"
-              >
-                Face
-              </button>
-              <button
-                onClick={comingSoonNotification}
-                type="button"
-                className="list-group-item list-group-item-action d-flex d-row mb-2"
-              >
-                Eyes
-              </button>
-              <button
-                onClick={comingSoonNotification}
-                type="button"
-                className="list-group-item list-group-item-action d-flex d-row mb-4"
-              >
-                Lips
-              </button>
-              <button
-                onClick={comingSoonNotification}
-                type="button"
-                className="list-group-item list-group-item-action d-flex d-row mb-2"
-              >
-                Accessories
-              </button>
-              <button
-                onClick={comingSoonNotification}
-                type="button"
-                className="list-group-item list-group-item-action d-flex d-row mb-2"
-              >
-                Shaving Needs
-              </button>
+              {["Face", "Eyes", "Lips", "Accessories", "Shaving Needs"].map((item) => (
+                <button
+                  key={item}
+                  onClick={comingSoonNotification}
+                  type="button"
+                  className="list-group-item list-group-item-action d-flex d-row mb-2"
+                >
+                  {item}
+                </button>
+              ))}
             </div>
           </div>
-          {/* Sidebar */}
 
+          {/* Products Render */}
           <div className="col-md-9">
             {isLoading ? (
               <p>Loading...</p>
             ) : (
               <ProductsRender
-                dataProduct={{ products: searchResults, total: searchResults.length }} // Adjust as needed
+                dataProduct={{ products: searchResults, total: searchResults.length }}
                 isProductLoading={isLoading}
               />
             )}
@@ -294,20 +265,10 @@ const Search = () => {
           </div>
         </div>
       </div>
-      {/* part 3 - content */}
 
       {/* Footer */}
-      <hr className="horizontal-line" />
       <Footer />
-      {/* Footer */}
-
-      {/* Modals */}
-      <LoginModal
-        showLoginModal={showLoginModal}
-        closeLoginModal={closeLoginModal}
-        onLoginSuccess={handleLoginSuccess} // Pass the callback here
-      />
-      {/* Modals */}
+      {showLoginModal && <LoginModal onClose={closeLoginModal} onSuccess={handleLoginSuccess} />}
     </div>
   );
 };

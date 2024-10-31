@@ -48,6 +48,22 @@ export const getSearchProducts = createAsyncThunk(
   }
 );
 
+export const addSearchKeyword = createAsyncThunk(
+  "user/search",
+  async ({ query, user_id }, { rejectWithValue }) => {
+    try {
+      const res = await axios.put(`${API_URL}/api/users/keyword/add`, {
+        query,
+        user_id
+      });
+      return res.data;
+    } catch (error) {
+      console.error("API error:", error);
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 const userSlice = createSlice({
   name: "user",
   initialState,
@@ -57,6 +73,12 @@ const userSlice = createSlice({
     },
     resetProducts(state) {
       state.dataProduct = []; // Clear products when necessary
+    },
+    updateSearchHistory(state, action) {
+      state.searchHistory = action.payload; 
+      toast.success("Search history updated successfully!", {
+        position: toast.POSITION.TOP_CENTER,
+      });
     },
   },
   extraReducers: (builder) => {
@@ -99,5 +121,5 @@ const userSlice = createSlice({
 });
 
 // Correctly export the reducer and actions separately
-export const { setIsProductLoading, resetProducts } = userSlice.actions;
+export const { setIsProductLoading, resetProducts, updateSearchHistory } = userSlice.actions;
 export default userSlice.reducer;
