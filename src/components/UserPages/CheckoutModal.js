@@ -1,19 +1,7 @@
 import React from "react";
-import { connect } from "react-redux";
 import logo from "../../assets/logo.png";
 import { Modal } from "react-bootstrap";
-
-const parseJwt = (token) => {
-  try {
-    const base64Url = token.split(".")[1];
-    const base64 = base64Url.replace("-", "+").replace("_", "/");
-    const decoded = JSON.parse(atob(base64));
-    return decoded;
-  } catch (e) {
-    console.error("Error parsing JWT:", e);
-    return null;
-  }
-};
+import "../Checkout.css";
 
 const CheckoutModal = (props) => {
   const monthNames = [
@@ -37,9 +25,6 @@ const CheckoutModal = (props) => {
     date.getDate() +
     ", " +
     date.getFullYear();
-
-  const storedToken = localStorage.getItem("token-user");
-  const userData = parseJwt(storedToken);
   
   const closeCheckoutModal = () => {
     props.unDisplayCheckoutModal(false);
@@ -60,7 +45,7 @@ const CheckoutModal = (props) => {
               className=" p-3 text-center text-success-s2"
               style={{ border: "2.5px dashed #009e7f" }}
             >
-              Thankyou <b>{userData.username}</b>, your order has been received.
+              {/* Thankyou <b>{userData.username}</b>, your order has been received. */}
             </p>
           </div>
           <div className="d-flex justify-content-center mt-4">
@@ -75,7 +60,7 @@ const CheckoutModal = (props) => {
             <p className="text-center text-secondary my-0">
               Total: <br />
               <span className="font-weight-bold text-dark">
-                ${props.subTotalPrice + 5}
+                {/* ${props.subTotalPrice + 5} */}
               </span>
             </p>
             <div
@@ -85,7 +70,7 @@ const CheckoutModal = (props) => {
             <p className=" text-secondary">
               Payment Method: <br />
               <span className="font-weight-bold text-dark">
-                {props.dataInputCheckout.payment}
+                {/* {props.dataInputCheckout.payment} */}
               </span>
             </p>
           </div>
@@ -95,8 +80,8 @@ const CheckoutModal = (props) => {
             className="text-secondary py-3 mt-3 mb-4"
           >
             <p className="text-center my-0">
-              We will also send this to your email (
-              <b>{props.dataInputCheckout.emailAddress}</b>)
+              We will also send this to your email 
+              {/* <b>{props.dataInputCheckout.emailAddress}</b>) */}
             </p>
           </div>
 
@@ -117,21 +102,21 @@ const CheckoutModal = (props) => {
                   <th scope="row">1</th>
                   <td>Firstname:</td>
                   <td>
-                    <b>{props.dataInputCheckout.firstName}</b>
+                    {/* <b>{props.dataInputCheckout.firstName}</b> */}
                   </td>
                 </tr>
                 <tr>
                   <th scope="row">2</th>
                   <td>Lastname:</td>
                   <td>
-                    <b>{props.dataInputCheckout.lastName}</b>
+                    {/* <b>{props.dataInputCheckout.lastName}</b> */}
                   </td>
                 </tr>
                 <tr>
                   <th scope="row">3</th>
                   <td>Phone Number:</td>
                   <td>
-                    <b>{props.dataInputCheckout.phoneNumber}</b>
+                    {/* <b>{props.dataInputCheckout.phoneNumber}</b> */}
                   </td>
                 </tr>
                 <tr>
@@ -139,16 +124,16 @@ const CheckoutModal = (props) => {
                   <td>Location:</td>
                   <td>
                     <b>
-                      {props.dataInputCheckout.address},
+                      {/* {props.dataInputCheckout.address},
                       {props.dataInputCheckout.city},
-                      {props.dataInputCheckout.country}
+                      {props.dataInputCheckout.country} */}
                     </b>
                   </td>
                 </tr>
                 <tr>
                   <th scope="row">5</th>
                   <td className="checkout-modal-td">Product:</td>
-                  <td>
+                  {/* <td>
                     {props.dataCart.map((item, index) => {
                       return (
                         <div className="d-flex d-row" key={index}>
@@ -168,14 +153,14 @@ const CheckoutModal = (props) => {
                         </div>
                       );
                     })}
-                  </td>
+                  </td> */}
                 </tr>
                 <tr>
                   <th scope="row">6</th>
                   <td> SubTotal:</td>
                   <td>
                     <b className="text-success-s2 font-weight-bold">
-                      ${props.subTotalPrice}
+                      {/* ${props.subTotalPrice} */}
                     </b>
                   </td>
                 </tr>
@@ -190,14 +175,14 @@ const CheckoutModal = (props) => {
                   <th scope="row">8</th>
                   <td>Postal Code:</td>
                   <td>
-                    <b>{props.dataInputCheckout.postalCode}</b>
+                    {/* <b>{props.dataInputCheckout.postalCode}</b> */}
                   </td>
                 </tr>
                 <tr>
                   <th scope="row">9</th>
                   <td> Payment:</td>
                   <td>
-                    <b>{props.dataInputCheckout.payment}</b>
+                    {/* <b>{props.dataInputCheckout.payment}</b> */}
                   </td>
                 </tr>
                 <tr>
@@ -210,7 +195,7 @@ const CheckoutModal = (props) => {
                   </td>
                   <td style={{ fontSize: "1.1rem" }}>
                     <b className="text-success-s2">
-                      ${props.subTotalPrice + 5}
+                      {/* ${props.subTotalPrice + 5} */}
                     </b>
                   </td>
                 </tr>
@@ -234,10 +219,4 @@ const CheckoutModal = (props) => {
   );
 };
 
-const mapStateToProps = (state) => {
-  return {
-    dataCart: state.UserReducer.dataCart,
-  };
-};
-
-export default connect(mapStateToProps, null)(CheckoutModal);
+export default CheckoutModal;
