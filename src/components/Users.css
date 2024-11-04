@@ -606,3 +606,7 @@ td {
   color: #333;
   transition: max-height 0.3s ease-in-out;
 }
+
+.m-b-20{
+  margin-bottom: 20px;
+}
