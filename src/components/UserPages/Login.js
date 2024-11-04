@@ -9,9 +9,10 @@ import GoogleButton from "./googleButton";
 
 const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
   const dispatch = useDispatch();
-  const { isLoading } = useSelector((state) => state.auth);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+
+  const { isLoading } = useSelector((state) =>state.auth);
+  const [email, setEmail] = useState("20521920@gm.uit.edu.vn"); 
+  const [password, setPassword] = useState("12345678");
   const [otpVisible, setOtpVisible] = useState(false);
   const [signUpVisible, setSignUpVisible] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -20,15 +21,32 @@ const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
     setShowPassword(!showPassword);
   };
 
+  // const handleGoogleLogin = async () => {
+  //   try {
+  //     const result = await signInWithPopup(auth, googleProvider);
+  //     const token = await result.user.getIdToken();
+  //     dispatch(googleLogin(token));
+  //     setOtpVisible(true);
+  //   } catch (error) {
+  //     console.error("Google login error:", error);
+  //   }
+  // };
+
   const handleEmailLogin = async (e) => {
     e.preventDefault();
     try {
-      await dispatch(emailLogin({ email, password }));
-      setOtpVisible(true);
+      const response = await dispatch(emailLogin({ email, password })).unwrap();
+      console.log("response: ", response);
+      if (response.status === "OK") {
+        setOtpVisible(true); 
+      } else {
+        console.error("Login failed:", response.message);
+      }
     } catch (error) {
       console.error("Email login error:", error);
     }
   };
+  
 
   const handleBackToLogin = () => {
     setOtpVisible(false);
@@ -78,8 +96,9 @@ const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
                   placeholder="Email"
                   aria-label="Email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
                   required
+                  onChange={(e) => setEmail(e.target.value)}
+                  // required
                 />
                 <div className="input-group mb-2">
                   <input
@@ -87,8 +106,9 @@ const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
                     className="form-control"
                     placeholder="Password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
                     required
+                    onChange={(e) => setPassword(e.target.value)}
+                    // required
                   />
                   <div className="input-group-append">
                     <button

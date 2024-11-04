@@ -10,6 +10,7 @@ import Footer from "./Footer";
 import Carousel from "./Carousel";
 import ProductField from "./Products";
 import LoginModal from "./Login";
+import { useNavigate } from 'react-router-dom';
 
 import "../Users.css";
 
@@ -18,38 +19,14 @@ const Index = (props) => {
   const { isAuth, user } = useSelector((state) => state.auth);
   const [showLoginModal, setShowLoginModal] = useState(false);
   // const [NavLoginSuccess, setNavLoginSuccess] = useState(false);
-  const [searchInput, setSearchInput] = useState("");
+  const [searchInput, setSearchInput] = useState('');
   const [submitSearch, setSubmitSearch] = useState(false);
-
-  // console.log("User:", user.data._id);
-  // console.log("isAuth:", isAuth);
-  
-  
-  // const loginSuccess = (boolean) => {
-  //   setNavLoginSuccess(boolean);
-  // };
-
-  // const parseJwt = (token) => {
-  //   try {
-  //     const base64Url = token.split(".")[1];
-  //     const base64 = base64Url.replace("-", "+").replace("_", "/");
-  //     const decoded = JSON.parse(atob(base64));
-  //     return decoded;
-  //   } catch (e) {
-  //     console.error("Error parsing JWT:", e);
-  //     return null;
-  //   }
-  // };
-
-  // // Usage
-  // if (localStorage.getItem("token-user")) {
-  //   var userData = parseJwt(localStorage.getItem("token-user"));
-  //   // Now userData contains the decoded JWT payload
-  // }
+  const navigate = useNavigate();
 
   useEffect(() => {
     if(isAuth) {
       setShowLoginModal(false);
+      console.log("user data", user);
     }
   }, [isAuth]);
 
@@ -65,20 +42,20 @@ const Index = (props) => {
     });
   };
 
-  const searchNotification = () => {
-    toast.success("Discover the clothe that you search below.", {
-      position: toast.POSITION.TOP_CENTER,
-    });
-  };
+  // const searchNotification = () => {
+  //   toast.success("Discover the clothe that you search below.", {
+  //     position: toast.POSITION.TOP_CENTER,
+  //   });
+  // };
 
   const handleSearchInput = (event) => {
-    let { value } = event.currentTarget;
-    setSearchInput(value);
+    setSearchInput(event.target.value); // Update search input state
   };
 
   const handleSearchSubmit = () => {
-    setSubmitSearch(true);
-    searchNotification();
+    if (searchInput.trim()) {
+      navigate(`/search/${encodeURIComponent(searchInput)}`);
+    }
   };
 
   const openLoginModal = () => {
@@ -168,7 +145,7 @@ const Index = (props) => {
                         aria-haspopup="true"
                         aria-expanded="false"
                       >
-                        {`Hello, ${user.data.name}`}
+                        {`Hello, ${user?.data?.name}`}
                       </button>
                       <div className="dropdown-menu t45">
                         <button
@@ -213,7 +190,9 @@ const Index = (props) => {
               className="search-box"
               placeholder="Search the fashion name that you want here"
               name="searchinput"
+              value={searchInput} // Bind input value to state
               onChange={handleSearchInput}
+              required
               onKeyPress={(event) =>
                 event.key === "Enter" ? handleSearchSubmit() : null
               }

@@ -1,33 +1,38 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import logo from "../../assets/logo.png";
-
+import { fetchCart } from "../../Slices/CartSlice";
 import CheckoutModal from "./CheckoutModal";
 import "../Checkout.css";
+import { useDispatch, useSelector } from "react-redux";
 
 const Checkout = (props) => {
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
-  // const [dataInputCheckout, setDataInputCheckout] = useState({
-  //   firstName: "",
-  //   lastName: "",
-  //   emailAddress: "",
-  //   country: "",
-  //   city: "",
-  //   address: "",
-  //   phoneNumber: "",
-  //   postalCode: "",
-  //   payment: "Direct Bank Transfer",
-  // });
+  const { dataCart } = useSelector((state) => state.cart);
+  const [subTotal, setSubTotal] = useState(0);
+  const total = subTotal + 5;
 
-  // const unavailableAlert = () =>
-  //   toast.error(
-  //     "Sorry,for now we are unavailable for direct bank transfer. You can try with cash on delivery.",
-  //     {
-  //       position: toast.POSITION.TOP_CENTER,
-  //       autoClose: 6000,
-  //     }
-  //   );
+  useEffect(() => {
+    setSubTotal(
+      dataCart.reduce((total, item) => {
+        // Use parsePrice to sanitize and parse each item price
+        const itemPrice = parsePrice(item.productId.price);
+        return total + itemPrice * item.quantity;
+      }, 0)
+    );
+  }, [dataCart]);
+
+  // Enhanced parsePrice function to handle different invalid cases
+  const parsePrice = (price) => {
+    if (price == null || price === "" || typeof price !== "string") return 0; // Handle null, undefined, or non-string values
+
+    // Use regex to find the first valid number in the string, like "17.50" in "$Now 17.50"
+    const match = price.match(/(\d+(\.\d+)?)/);
+    const sanitizedPrice = match ? parseFloat(match[0]) : 0;
+
+    return sanitizedPrice;
+  };
 
   return (
     <div
@@ -73,84 +78,40 @@ const Checkout = (props) => {
 
       <div style={{ paddingTop: "5rem" }} className="mx-5">
         <form>
-          <div className="row">
-            <div className="col-md-7 pr-3">
+          <div className="row jc-c">
+            <div className="col-md-5 pr-3">
               <div className="checkout-div-1">
                 <h4 className="font-weight-bold text-success-s2 mb-4">
                   BILLING DETAILS
                 </h4>
 
-                <div className="form-row">
-                  <div className="form-group1 col-md-6 pr-3">
-                    <p className="checkout-txt">
-                      First Name <span className="text-danger">*</span>
-                    </p>
-                    <input
-                      type="text"
-                      name="firstName"
-                      className="form-control"
-                      placeholder="First Name"
-                      // onChange={handleInputCheckoutChange}
-                      required
-                    />
-                  </div>
-                  <div className="form-group1 col-md-6 pl-3">
-                    <p className="checkout-txt">
-                      Last Name <span className="text-danger">*</span>
-                    </p>
-                    <input
-                      type="text"
-                      name="lastName"
-                      className="form-control"
-                      placeholder="Last Name"
-                      // onChange={handleInputCheckoutChange}
-                      required
-                    />
-                  </div>
-                </div>
-
                 <div className="form-group1">
                   <p className="checkout-txt">
-                    Email Address <span className="text-danger">*</span>
+                    First Name <span className="text-danger">*</span>
                   </p>
                   <input
                     type="text"
-                    name="emailAddress"
+                    name="firstName"
                     className="form-control"
-                    placeholder="Email address"
+                    placeholder="First Name"
+                    // onChange={handleInputCheckoutChange}
+                    required
+                  />
+                </div>
+                <div className="form-group1">
+                  <p className="checkout-txt">
+                    Last Name <span className="text-danger">*</span>
+                  </p>
+                  <input
+                    type="text"
+                    name="lastName"
+                    className="form-control"
+                    placeholder="Last Name"
                     // onChange={handleInputCheckoutChange}
                     required
                   />
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group1 col-md-6 pr-3">
-                    <p className="checkout-txt">
-                      Country <span className="text-danger">*</span>
-                    </p>
-                    <input
-                      type="text"
-                      name="country"
-                      className="form-control"
-                      placeholder="Country"
-                      // onChange={handleInputCheckoutChange}
-                      required
-                    />
-                  </div>
-                  <div className="form-group1 col-md-6 pl-3">
-                    <p className="checkout-txt">
-                      Town/City <span className="text-danger">*</span>
-                    </p>
-                    <input
-                      type="text"
-                      name="city"
-                      className="form-control"
-                      placeholder="Town/City"
-                      // onChange={handleInputCheckoutChange}
-                      required
-                    />
-                  </div>
-                </div>
                 <div className="form-group1">
                   <p className="checkout-txt">
                     Address <span className="text-danger">*</span>
@@ -173,19 +134,6 @@ const Checkout = (props) => {
                     name="phoneNumber"
                     className="form-control"
                     placeholder="Phone Number"
-                    // onChange={handleInputCheckoutChange}
-                    required
-                  />
-                </div>
-                <div className="form-group1">
-                  <p className="checkout-txt">
-                    Postal Code <span className="text-danger">*</span>
-                  </p>
-                  <input
-                    type="text"
-                    name="postalCode"
-                    className="form-control"
-                    placeholder="Postal Code"
                     // onChange={handleInputCheckoutChange}
                     required
                   />
@@ -218,12 +166,36 @@ const Checkout = (props) => {
                 />
 
                 <div className="mx-1 mb-4">
-                  <div>
+                  {dataCart && dataCart.length > 0 ? (
+                    dataCart.map((item) => (
+                      <div
+                        key={item.productId._id}
+                        className="d-flex justify-content-between"
+                      >
+                        <div className="df fd-r mg-b-5">
+                          <div
+                            className=" text-center"
+                            style={{
+                              backgroundImage: `url(${item.productId.images[0]})`,
+                              height: "75px",
+                              width: "75px",
+                              backgroundSize: "contain",
+                              backgroundRepeat: "no-repeat",
+                            }}
+                          />
+                          <p>{item.productId.name}</p>{" "}
+                        </div>
+                        {/* Assumes each item has product details under productId */}
+                        <p>${item.productId.price}</p>{" "}
+                        {/* Adjust according to where price is stored */}
+                      </div>
+                    ))
+                  ) : (
                     <h6 className="my-0">
                       It seems you've just reloaded this page, try to reopen
                       this website.
                     </h6>
-                  </div>
+                  )}
                 </div>
 
                 <hr
@@ -243,7 +215,7 @@ const Checkout = (props) => {
                     </div>
                     <div className="col-md-5 pl-0 text-right">
                       <p className="text-success-s2 my-0 font-weight-bold">
-                        ${props.subTotalPrice}
+                        ${subTotal}
                       </p>
                       <p className="text-success-s2 mb-0 mt-2 font-weight-bold">
                         $5
@@ -266,7 +238,7 @@ const Checkout = (props) => {
                     </div>
                     <div className="col-md-5 pl-0 text-right">
                       <h5 className="text-success-s2 my-0 font-weight-bold">
-                        ${props.subTotalPrice + 5}
+                        ${total}
                       </h5>
                     </div>
                   </div>

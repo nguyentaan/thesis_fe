@@ -222,7 +222,7 @@ const Cart = () => {
         </table>
 
         <div style={{ margin: "4rem 16rem" }}>
-          <div className="card shadow-subtotal-fx">
+          <div className="card shadow-subtotal-fx m-b-20">
             <div className="card-body p-5">
               <h5 className="font-weight-bold mb-4">Cart Totals</h5>
               <div className="border border-top-0">

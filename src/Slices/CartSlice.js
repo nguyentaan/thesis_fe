@@ -94,6 +94,10 @@ const cartSlice = createSlice({
       state.dataCart = [];
       // state.cartTotal = 0;
     },
+    setCartData: (state, action) => {
+      state.dataCart = action.payload;
+      // state.cartTotal = calculateCartTotal(state.dataCart); // Calculate total here
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -196,5 +200,5 @@ const cartSlice = createSlice({
   },
 });
 
-export const { clearCart } = cartSlice.actions;
+export const { clearCart, setCartData } = cartSlice.actions;
 export default cartSlice.reducer;
