@@ -610,3 +610,21 @@ td {
 .m-b-20{
   margin-bottom: 20px;
 }
+
+.text-right{
+  text-align: right;
+}
+
+.jc-c{
+  justify-content: center;
+}
+.df{
+  display: flex;
+}
+.fd-r{
+  flex-direction: row;
+}
+
+.mg-b-5{
+  margin-bottom: 5px;
+}
