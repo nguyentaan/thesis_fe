@@ -2,15 +2,14 @@ import React, { useState } from "react";
 import { Modal } from "react-bootstrap";
 import logo from "../../assets/logo.png";
 import { useDispatch, useSelector } from "react-redux";
-import { auth, googleProvider } from "../../firebaseConfig";
-import { emailLogin, googleLogin } from "../../Slices/AuthenSlice";
-import { signInWithPopup } from "firebase/auth";
+import { emailLogin } from "../../Slices/AuthenSlice";
 import OtpVerification from "./OtpVerification";
 import SignUp from "./SignUp";
 import GoogleButton from "./googleButton";
 
 const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
   const dispatch = useDispatch();
+
   const { isLoading } = useSelector((state) =>state.auth);
   const [email, setEmail] = useState("20521920@gm.uit.edu.vn"); 
   const [password, setPassword] = useState("12345678");
@@ -22,16 +21,16 @@ const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
     setShowPassword(!showPassword);
   };
 
-  const handleGoogleLogin = async () => {
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const token = await result.user.getIdToken();
-      dispatch(googleLogin(token));
-      setOtpVisible(true);
-    } catch (error) {
-      console.error("Google login error:", error);
-    }
-  };
+  // const handleGoogleLogin = async () => {
+  //   try {
+  //     const result = await signInWithPopup(auth, googleProvider);
+  //     const token = await result.user.getIdToken();
+  //     dispatch(googleLogin(token));
+  //     setOtpVisible(true);
+  //   } catch (error) {
+  //     console.error("Google login error:", error);
+  //   }
+  // };
 
   const handleEmailLogin = async (e) => {
     e.preventDefault();
@@ -72,13 +71,23 @@ const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
       <Modal.Body style={{ padding: "2rem 4rem" }}>
         <div className="text-center">
           {otpVisible ? (
-            <OtpVerification email={email} password={password} onBack={handleBackToLogin} />
+            <OtpVerification
+              email={email}
+              password={password}
+              onBack={handleBackToLogin}
+            />
           ) : signUpVisible ? (
-            <SignUp showLoginModal={showLoginModal} closeLoginModal={closeLoginModal} onBack={handleBackToLogin} />
+            <SignUp
+              showLoginModal={showLoginModal}
+              closeLoginModal={closeLoginModal}
+              onBack={handleBackToLogin}
+            />
           ) : (
             <form onSubmit={handleEmailLogin}>
               <h4 className="text-success-s2 font-weight-bold">Welcome Back</h4>
-              <h6 className="text-secondary">Login with your email & password</h6>
+              <h6 className="text-secondary">
+                Login with your email & password
+              </h6>
 
               <div className="mt-4">
                 <input
@@ -89,6 +98,7 @@ const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
                   value={email}
                   required
                   onChange={(e) => setEmail(e.target.value)}
+                  // required
                 />
                 <div className="input-group mb-2">
                   <input
@@ -98,10 +108,19 @@ const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
                     value={password}
                     required
                     onChange={(e) => setPassword(e.target.value)}
+                    // required
                   />
                   <div className="input-group-append">
-                    <button className="btn btn-outline-success" type="button" onClick={togglePasswordVisibility}>
-                      <i className={showPassword ? "fas fa-eye-slash" : "fas fa-eye"} />
+                    <button
+                      className="btn btn-outline-success"
+                      type="button"
+                      onClick={togglePasswordVisibility}
+                    >
+                      <i
+                        className={
+                          showPassword ? "fas fa-eye-slash" : "fas fa-eye"
+                        }
+                      />
                     </button>
                   </div>
                 </div>
@@ -115,18 +134,6 @@ const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
                 </button>
               </div>
 
-              <p style={{ fontSize: "1rem", margin: "0.7rem 0rem" }}>or</p>
-
-              <button
-                type="button"
-                className="btn btn-danger w-100 d-flex justify-content-center"
-                style={{ padding: "0.7rem 0.2rem" }}
-                onClick={handleGoogleLogin}
-                disabled={isLoading}
-              >
-                <i className="fab fa-google fa-lg align-self-center mr-3" />
-                {isLoading ? "Signing in with Google..." : "Login with Google"}
-              </button>
               <p style={{ fontSize: "1rem", margin: "0.7rem 0rem" }}>or</p>
 
               <div className="mt-3">

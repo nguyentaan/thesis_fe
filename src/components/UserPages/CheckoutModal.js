@@ -1,21 +1,18 @@
 import React from "react";
-import { connect } from "react-redux";
 import logo from "../../assets/logo.png";
 import { Modal } from "react-bootstrap";
+import "../Checkout.css";
 
-const parseJwt = (token) => {
-  try {
-    const base64Url = token.split(".")[1];
-    const base64 = base64Url.replace("-", "+").replace("_", "/");
-    const decoded = JSON.parse(atob(base64));
-    return decoded;
-  } catch (e) {
-    console.error("Error parsing JWT:", e);
-    return null;
-  }
-};
+const CheckoutModal = ({
+  showCheckoutModal,
+  unDisplayCheckoutModal,
+  subTotalPrice,
+  dataInputCheckout = {},
+  dataCart = [],
+}) => {
+  const { firstName, lastName, phoneNumber, address, paymentMethod } =
+    dataInputCheckout;
 
-const CheckoutModal = (props) => {
   const monthNames = [
     "January",
     "February",
@@ -30,82 +27,66 @@ const CheckoutModal = (props) => {
     "November",
     "December",
   ];
-  var date = new Date();
-  var todayDate =
-    monthNames[date.getMonth()] +
-    " " +
-    date.getDate() +
-    ", " +
-    date.getFullYear();
 
-  const storedToken = localStorage.getItem("token-user");
-  const userData = parseJwt(storedToken);
-  
-  const closeCheckoutModal = () => {
-    props.unDisplayCheckoutModal(false);
+  const date = new Date();
+  const todayDate = `${
+    monthNames[date.getMonth()]
+  } ${date.getDate()}, ${date.getFullYear()}`;
+
+  const closeCheckoutModal = () => unDisplayCheckoutModal(false);
+  // Enhanced parsePrice function to handle different invalid cases
+  const parsePrice = (price) => {
+    if (price == null || price === "" || typeof price !== "string") return 0; // Handle null, undefined, or non-string values
+
+    // Use regex to find the first valid number in the string, like "17.50" in "$Now 17.50"
+    const match = price.match(/(\d+(\.\d+)?)/);
+    const sanitizedPrice = match ? parseFloat(match[0]) : 0;
+
+    return sanitizedPrice;
   };
-
   return (
-    <Modal size="lg" show={props.showCheckoutModal} onHide={closeCheckoutModal}>
+    <Modal size="lg" show={showCheckoutModal} onHide={closeCheckoutModal}>
       <Modal.Header closeButton>
         <Modal.Title>
-          <img src={logo} alt="..." style={{ width: "25%" }} />
+          <img src={logo} alt="Logo" className="checkout-modal-logo" />
         </Modal.Title>
       </Modal.Header>
 
-      <Modal.Body style={{ padding: "2rem 4rem" }}>
-        <div style={{ fontFamily: "Karla,sans-serif" }}>
-          <div>
-            <p
-              className=" p-3 text-center text-success-s2"
-              style={{ border: "2.5px dashed #009e7f" }}
-            >
-              Thankyou <b>{userData.username}</b>, your order has been received.
+      <Modal.Body className="checkout-modal-body">
+        <div className="checkout-modal-content">
+          <div className="checkout-message">
+            <p className="p-3 text-center text-success-s2">
+              Thank you, your order has been received.
             </p>
           </div>
-          <div className="d-flex justify-content-center mt-4">
-            <p className="text-center text-secondary my-0">
+
+          <div className="d-flex justify-content-center mt-4 order-summary">
+            <p className="text-center text-secondary">
               Date: <br />
               <span className="font-weight-bold text-dark">{todayDate}</span>
             </p>
-            <div
-              className="mx-5"
-              style={{ borderLeft: "2px solid #e3e3e3", height: "3rem" }}
-            />
-            <p className="text-center text-secondary my-0">
+            <div className="divider" />
+            <p className="text-center text-secondary">
               Total: <br />
               <span className="font-weight-bold text-dark">
-                ${props.subTotalPrice + 5}
+                ${subTotalPrice + 5}
               </span>
             </p>
-            <div
-              className="mx-5"
-              style={{ borderLeft: "2px solid #e3e3e3", height: "3rem" }}
-            />
-            <p className=" text-secondary">
+            <div className="divider" />
+            <p className="text-secondary">
               Payment Method: <br />
               <span className="font-weight-bold text-dark">
-                {props.dataInputCheckout.payment}
+                {paymentMethod}
               </span>
             </p>
           </div>
 
-          <div
-            style={{ backgroundColor: "#e3e3e3" }}
-            className="text-secondary py-3 mt-3 mb-4"
-          >
-            <p className="text-center my-0">
-              We will also send this to your email (
-              <b>{props.dataInputCheckout.emailAddress}</b>)
-            </p>
-          </div>
-
-          <div>
+          <div className="order-details">
             <h5 className="font-weight-bold text-success-s2 mb-3">
               ORDER DETAILS
             </h5>
             <table className="table">
-              <thead style={{ backgroundColor: "#009e7f", color: "white" }}>
+              <thead className="table-header">
                 <tr>
                   <th scope="col">#</th>
                   <th scope="col">Subject</th>
@@ -117,87 +98,66 @@ const CheckoutModal = (props) => {
                   <th scope="row">1</th>
                   <td>Firstname:</td>
                   <td>
-                    <b>{props.dataInputCheckout.firstName}</b>
+                    <b>{firstName}</b>
                   </td>
                 </tr>
                 <tr>
                   <th scope="row">2</th>
                   <td>Lastname:</td>
                   <td>
-                    <b>{props.dataInputCheckout.lastName}</b>
+                    <b>{lastName}</b>
                   </td>
                 </tr>
                 <tr>
                   <th scope="row">3</th>
                   <td>Phone Number:</td>
                   <td>
-                    <b>{props.dataInputCheckout.phoneNumber}</b>
+                    <b>{phoneNumber}</b>
                   </td>
                 </tr>
                 <tr>
                   <th scope="row">4</th>
                   <td>Location:</td>
                   <td>
-                    <b>
-                      {props.dataInputCheckout.address},
-                      {props.dataInputCheckout.city},
-                      {props.dataInputCheckout.country}
-                    </b>
+                    <b>{`${address}`}</b>
                   </td>
                 </tr>
                 <tr>
                   <th scope="row">5</th>
-                  <td className="checkout-modal-td">Product:</td>
+                  <td>Product:</td>
                   <td>
-                    {props.dataCart.map((item, index) => {
-                      return (
-                        <div className="d-flex d-row" key={index}>
-                          <div className="col-md-9 px-0">
-                            <p className="text-success-s2 mb-0 mt-1">
-                              {item.name}
-                              <span className="text-secondary font-weight-bold ml-2">
-                                × {item.qtyBuy}
-                              </span>
-                            </p>
-                          </div>
-                          <div className="col-md-3 text-right pr-0">
-                            <p className="text-success-s2 mb-0 mt-2 font-weight-bold">
-                              ${item.price * item.qtyBuy}
-                            </p>
-                          </div>
-                        </div>
-                      );
-                    })}
+                    {dataCart.map((item, index) => (
+                      <div className="d-flex align-items-center" key={index}>
+                        <p className="text-success-s2 mb-0">
+                          {item.productId.name}
+                        </p>
+                        <span className="ml-2">× {item.quantity}</span>
+                        <p className="mb-0 font-weight-bold">
+                          ${parsePrice(item.productId.price) * item.quantity}
+                        </p>
+                      </div>
+                    ))}
                   </td>
                 </tr>
                 <tr>
                   <th scope="row">6</th>
-                  <td> SubTotal:</td>
+                  <td>SubTotal:</td>
                   <td>
-                    <b className="text-success-s2 font-weight-bold">
-                      ${props.subTotalPrice}
-                    </b>
+                    <b className="text-success-s2">${subTotalPrice}</b>
                   </td>
                 </tr>
                 <tr>
                   <th scope="row">7</th>
-                  <td> Shipping:</td>
+                  <td>Shipping:</td>
                   <td>
-                    <b className="text-success-s2 font-weight-bold">$5 </b>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">8</th>
-                  <td>Postal Code:</td>
-                  <td>
-                    <b>{props.dataInputCheckout.postalCode}</b>
+                    <b className="text-success-s2">$5</b>
                   </td>
                 </tr>
                 <tr>
                   <th scope="row">9</th>
-                  <td> Payment:</td>
+                  <td>Payment:</td>
                   <td>
-                    <b>{props.dataInputCheckout.payment}</b>
+                    <b>{paymentMethod}</b>
                   </td>
                 </tr>
                 <tr>
@@ -209,23 +169,17 @@ const CheckoutModal = (props) => {
                     Total:
                   </td>
                   <td style={{ fontSize: "1.1rem" }}>
-                    <b className="text-success-s2">
-                      ${props.subTotalPrice + 5}
-                    </b>
+                    <b className="text-success-s2">${subTotalPrice + 5}</b>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <div
-            className="mt-4 mb-2"
-            style={{ borderTop: "2px solid #009e7f" }}
-          />
-          <div>
-            <h6 className="text-success-s2 my-0">
-              Thank you for being our valued customer. We are so grateful for
-              the pleasure of serving you and hope you enjoy your experience at
-              our website, hope you come back soon!
+
+          <div className="thank-you">
+            <h6 className="text-success-s2">
+              Thank you for being our valued customer. We hope you enjoy your
+              experience and come back soon!
             </h6>
           </div>
         </div>
@@ -234,10 +188,4 @@ const CheckoutModal = (props) => {
   );
 };
 
-const mapStateToProps = (state) => {
-  return {
-    dataCart: state.UserReducer.dataCart,
-  };
-};
-
-export default connect(mapStateToProps, null)(CheckoutModal);
+export default CheckoutModal;

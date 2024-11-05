@@ -1,13 +1,13 @@
 .checkout-div-1 {
-  background-color: #f8f8f8;
-  border-radius: 10px;
-  box-shadow: 0px 3px 10px 10px rgba(0, 0, 0, 0.1);
-  padding: 2.5rem;
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 .checkout-div-2 {
-  background-color: #f8f8f8;
+  background-color: #ffffff;
   border-radius: 10px;
-  box-shadow: 0px 3px 10px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   padding: 2.5rem;
   margin-bottom: 4rem;
 }
@@ -17,12 +17,113 @@
 .text-success-s2 {
   color: #009e7f;
 }
+/* Title styling */
+.checkout-div-1 h4 {
+  color: #28a745; /* Adjust as needed */
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+/* Form text */
 .checkout-txt {
+  font-size: 1rem;
+  color: #333;
+  font-weight: 500;
+  /* padding: 0 20px; */
+  width: 130px;
   margin-bottom: 0.5rem;
-  font-size: 0.9rem;
-  font-weight: bold;
+}
+.form-row {
+  display: flex;
+  width: 100%;
+}
+/* Form input styling */
+.form-control {
+  border-radius: 4px;
+  border: 1px solid #ced4da;
+  padding: 0.75rem;
+  font-size: 1rem;
+  color: #495057;
+}
+
+.form-control::placeholder {
+  color: #adb5bd;
 }
 .form-control:focus {
   border-color: #009e7f !important;
   box-shadow: 0 0 0 0.2rem rgba(0, 158, 127, 0.3) !important;
+}
+.form-group1 {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+  width: 100%;
+  box-shadow: none;
+}
+
+/* Highlight required fields */
+.text-danger {
+  color: #dc3545;
+}
+
+/* Column spacing */
+.form-group.col-md-6 {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.pr-3 {
+  padding-right: 1rem !important;
+}
+
+.pl-3 {
+  padding-left: 1rem !important;
+}
+
+.checkout-modal-logo {
+  width: 25%;
+}
+
+.checkout-modal-body {
+  padding: 2rem 4rem;
+}
+
+.checkout-message {
+  border: 2.5px dashed #009e7f;
+}
+
+.order-summary .divider {
+  border-left: 2px solid #e3e3e3;
+  height: 3rem;
+  margin: 0 1.5rem;
+}
+
+.email-info {
+  background-color: #e3e3e3;
+  padding: 1rem;
+  margin: 1.5rem 0;
+}
+
+.table-header {
+  background-color: #009e7f;
+  color: white;
+}
+
+.thank-you {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 2px solid #009e7f;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+  }
+
+  .pr-3,
+  .pl-3 {
+    padding: 0 !important;
+  }
 }

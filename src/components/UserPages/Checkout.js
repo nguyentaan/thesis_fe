@@ -1,58 +1,87 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { connect } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 import logo from "../../assets/logo.png";
-
+// import { fetchCart } from "../../Slices/CartSlice";
 import CheckoutModal from "./CheckoutModal";
 import "../Checkout.css";
+import { useDispatch, useSelector } from "react-redux";
+import { createOrderFromCart } from "../../Slices/OrderSlice";
 
 const Checkout = (props) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
-  const [dataInputCheckout, setDataInputCheckout] = useState({
+  const { dataCart } = useSelector((state) => state.cart);
+  const [subTotal, setSubTotal] = useState(0);
+  const [orderDetails, setOrderDetails] = useState({
     firstName: "",
     lastName: "",
-    emailAddress: "",
-    country: "",
-    city: "",
     address: "",
     phoneNumber: "",
-    postalCode: "",
-    payment: "Direct Bank Transfer",
+    paymentMethod: "Direct Bank Transfer",
   });
+  const total = subTotal + 5;
+  const { user } = useSelector((state) => state.auth);
+  const userId = user.data._id;
 
-  const handleInputCheckoutChange = (event) => {
-    setDataInputCheckout({
-      ...dataInputCheckout,
-      [event.currentTarget.name]: event.currentTarget.value,
-    });
+  const handleShowModal = () => setShowCheckoutModal(true);
+  const handleCloseModal = () => {
+    setShowCheckoutModal(false);
+    navigate("/"); // Redirect to home page after successful order
   };
-  console.log(dataInputCheckout);
 
-  const unavailableAlert = () =>
-    toast.error(
-      "Sorry,for now we are unavailable for direct bank transfer. You can try with cash on delivery.",
-      {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 6000,
-      }
+  useEffect(() => {
+    setSubTotal(
+      dataCart.reduce((total, item) => {
+        // Use parsePrice to sanitize and parse each item price
+        const itemPrice = parsePrice(item.productId.price);
+        return total + itemPrice * item.quantity;
+      }, 0)
     );
+  }, [dataCart]);
 
-  const handleCheckoutSubmit = (event) => {
-    event.preventDefault();
-    if (dataInputCheckout.payment === "Direct Bank Transfer") {
-      unavailableAlert();
-    } else {
-      setShowCheckoutModal(true);
+  // Enhanced parsePrice function to handle different invalid cases
+  const parsePrice = (price) => {
+    if (price == null || price === "" || typeof price !== "string") return 0; // Handle null, undefined, or non-string values
+
+    // Use regex to find the first valid number in the string, like "17.50" in "$Now 17.50"
+    const match = price.match(/(\d+(\.\d+)?)/);
+    const sanitizedPrice = match ? parseFloat(match[0]) : 0;
+
+    return sanitizedPrice;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setOrderDetails((prevDetails) => ({ ...prevDetails, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const { firstName, lastName, address, phoneNumber, paymentMethod } =
+      orderDetails;
+    if (!firstName || !lastName || !address || !phoneNumber) {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
+
+    try {
+      await dispatch(
+        createOrderFromCart({
+          userId: userId, // Replace with actual user ID
+          paymentMethod,
+          shipping_address: address,
+          fullName: `${firstName} ${lastName}`,
+          phoneNumber,
+        })
+      );
+      toast.success("Order placed successfully!");
+    } catch (error) {
+      toast.error("Failed to place order. Please try again.");
     }
   };
-
-  const navigate = useNavigate();
-  const unDisplayCheckoutModal = (boolean) => {
-    setShowCheckoutModal(boolean);
-    // take back user to home page
-    navigate("/");
-  };
+  console.log("orderDetails", orderDetails);
 
   return (
     <div
@@ -97,86 +126,42 @@ const Checkout = (props) => {
       </nav>
 
       <div style={{ paddingTop: "5rem" }} className="mx-5">
-        <form onSubmit={handleCheckoutSubmit}>
-          <div className="row">
-            <div className="col-md-7 pr-3">
+        <form onSubmit={handleSubmit}>
+          <div className="row jc-c">
+            <div className="col-md-5 pr-3">
               <div className="checkout-div-1">
                 <h4 className="font-weight-bold text-success-s2 mb-4">
                   BILLING DETAILS
                 </h4>
 
-                <div className="form-row">
-                  <div className="form-group col-md-6 pr-3">
-                    <p className="checkout-txt">
-                      First Name <span className="text-danger">*</span>
-                    </p>
-                    <input
-                      type="text"
-                      name="firstName"
-                      className="form-control"
-                      placeholder="First Name"
-                      onChange={handleInputCheckoutChange}
-                      required
-                    />
-                  </div>
-                  <div className="form-group col-md-6 pl-3">
-                    <p className="checkout-txt">
-                      Last Name <span className="text-danger">*</span>
-                    </p>
-                    <input
-                      type="text"
-                      name="lastName"
-                      className="form-control"
-                      placeholder="Last Name"
-                      onChange={handleInputCheckoutChange}
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="form-group">
+                <div className="form-group1">
                   <p className="checkout-txt">
-                    Email Address <span className="text-danger">*</span>
+                    First Name <span className="text-danger">*</span>
                   </p>
                   <input
                     type="text"
-                    name="emailAddress"
+                    name="firstName"
                     className="form-control"
-                    placeholder="Email address"
-                    onChange={handleInputCheckoutChange}
+                    placeholder="First Name"
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <div className="form-group1">
+                  <p className="checkout-txt">
+                    Last Name <span className="text-danger">*</span>
+                  </p>
+                  <input
+                    type="text"
+                    name="lastName"
+                    className="form-control"
+                    placeholder="Last Name"
+                    onChange={handleChange}
                     required
                   />
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group col-md-6 pr-3">
-                    <p className="checkout-txt">
-                      Country <span className="text-danger">*</span>
-                    </p>
-                    <input
-                      type="text"
-                      name="country"
-                      className="form-control"
-                      placeholder="Country"
-                      onChange={handleInputCheckoutChange}
-                      required
-                    />
-                  </div>
-                  <div className="form-group col-md-6 pl-3">
-                    <p className="checkout-txt">
-                      Town/City <span className="text-danger">*</span>
-                    </p>
-                    <input
-                      type="text"
-                      name="city"
-                      className="form-control"
-                      placeholder="Town/City"
-                      onChange={handleInputCheckoutChange}
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="form-group">
+                <div className="form-group1">
                   <p className="checkout-txt">
                     Address <span className="text-danger">*</span>
                   </p>
@@ -185,11 +170,11 @@ const Checkout = (props) => {
                     name="address"
                     className="form-control"
                     placeholder="Address"
-                    onChange={handleInputCheckoutChange}
+                    onChange={handleChange}
                     required
                   />
                 </div>
-                <div className="form-group">
+                <div className="form-group1">
                   <p className="checkout-txt">
                     Phone Number <span className="text-danger">*</span>
                   </p>
@@ -198,20 +183,7 @@ const Checkout = (props) => {
                     name="phoneNumber"
                     className="form-control"
                     placeholder="Phone Number"
-                    onChange={handleInputCheckoutChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <p className="checkout-txt">
-                    Postal Code <span className="text-danger">*</span>
-                  </p>
-                  <input
-                    type="text"
-                    name="postalCode"
-                    className="form-control"
-                    placeholder="Postal Code"
-                    onChange={handleInputCheckoutChange}
+                    onChange={handleChange}
                     required
                   />
                 </div>
@@ -243,33 +215,35 @@ const Checkout = (props) => {
                 />
 
                 <div className="mx-1 mb-4">
-                  {props.dataCart.length !== 0 ? (
-                    props.dataCart.map((item, index) => {
-                      return (
-                        <div className="d-flex d-row" key={index}>
-                          <div className="col-md-9 px-0">
-                            <p className="text-success-s2 mb-0 mt-2">
-                              {item.name}
-                              <span className="text-secondary font-weight-bold ml-2">
-                                × {item.qtyBuy}
-                              </span>
-                            </p>
-                          </div>
-                          <div className="col-md-3 text-right pr-0">
-                            <p className="text-success-s2 mb-0 mt-2 font-weight-bold">
-                              ${item.price * item.qtyBuy}
-                            </p>
-                          </div>
+                  {dataCart && dataCart.length > 0 ? (
+                    dataCart.map((item) => (
+                      <div
+                        key={item.productId._id}
+                        className="d-flex justify-content-between"
+                      >
+                        <div className="df fd-r mg-b-5">
+                          <div
+                            className=" text-center"
+                            style={{
+                              backgroundImage: `url(${item.productId.images[0]})`,
+                              height: "75px",
+                              width: "75px",
+                              backgroundSize: "contain",
+                              backgroundRepeat: "no-repeat",
+                            }}
+                          />
+                          <p>{item.productId.name}</p>{" "}
                         </div>
-                      );
-                    })
+                        {/* Assumes each item has product details under productId */}
+                        <p>${item.productId.price}</p>{" "}
+                        {/* Adjust according to where price is stored */}
+                      </div>
+                    ))
                   ) : (
-                    <div>
-                      <h6 className="my-0">
-                        It seems you've just reloaded this page, try to reopen
-                        this website.
-                      </h6>
-                    </div>
+                    <h6 className="my-0">
+                      It seems you've just reloaded this page, try to reopen
+                      this website.
+                    </h6>
                   )}
                 </div>
 
@@ -290,7 +264,7 @@ const Checkout = (props) => {
                     </div>
                     <div className="col-md-5 pl-0 text-right">
                       <p className="text-success-s2 my-0 font-weight-bold">
-                        ${props.subTotalPrice}
+                        ${subTotal}
                       </p>
                       <p className="text-success-s2 mb-0 mt-2 font-weight-bold">
                         $5
@@ -313,7 +287,7 @@ const Checkout = (props) => {
                     </div>
                     <div className="col-md-5 pl-0 text-right">
                       <h5 className="text-success-s2 my-0 font-weight-bold">
-                        ${props.subTotalPrice + 5}
+                        ${total}
                       </h5>
                     </div>
                   </div>
@@ -324,10 +298,10 @@ const Checkout = (props) => {
                     <input
                       className="form-check-input"
                       type="radio"
-                      name="payment"
+                      name="paymentMethod"
                       id="exampleRadios1"
                       value="Direct Bank Transfer"
-                      onChange={handleInputCheckoutChange}
+                      onChange={handleChange}
                     />
                     <label
                       className="form-check-label font-weight-bold"
@@ -349,10 +323,10 @@ const Checkout = (props) => {
                     <input
                       className="form-check-input"
                       type="radio"
-                      name="payment"
+                      name="paymentMethod"
                       id="exampleRadios1"
                       value="Cash on Delivery"
-                      onChange={handleInputCheckoutChange}
+                      onChange={handleChange}
                     />
                     <label
                       className="form-check-label font-weight-bold"
@@ -390,6 +364,7 @@ const Checkout = (props) => {
                   type="submit"
                   className="btn btn-success w-100 py-3 mt-4"
                   style={{ borderRadius: "0" }}
+                  onClick={handleShowModal} // Show modal on click
                 >
                   PLACE ORDER
                 </button>
@@ -400,27 +375,14 @@ const Checkout = (props) => {
       </div>
       <CheckoutModal
         showCheckoutModal={showCheckoutModal}
-        unDisplayCheckoutModal={unDisplayCheckoutModal}
-        dataInputCheckout={dataInputCheckout}
-        subTotalPrice={props.subTotalPrice}
+        unDisplayCheckoutModal={handleCloseModal}
+        // userData={userData}
+        subTotalPrice={subTotal}
+        dataInputCheckout={orderDetails}
+        dataCart={dataCart}
       />
     </div>
   );
 };
-const mapStateToProps = (state) => {
-  var dataCart = state.UserReducer.dataCart;
-  var subTotalPrice = 0;
-  var i;
-  // selama i lebih kecil dari banyaknya array di datacart, dia bakal tambah terus.
-  for (i = 0; i < dataCart.length; i++) {
-    // += itu smacam kalkulator untuk tambah terus. Jadi subtotal yang awalnya 0 di render prtama jadi $10, nah habis render lgi $10 + $10 lagi jadi $20.
-    subTotalPrice += dataCart[i].qtyBuy * dataCart[i].price;
-  }
 
-  return {
-    dataCart: state.UserReducer.dataCart,
-    subTotalPrice: subTotalPrice,
-  };
-};
-
-export default connect(mapStateToProps, null)(Checkout);
+export default Checkout;

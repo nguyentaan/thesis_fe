@@ -14,7 +14,7 @@ export const googleLogin = createAsyncThunk(
   async (token, { rejectWithValue }) => {
     try {
       // Send the token as `credential` in the request body
-      const response = await axios.post(`${API_URL}/api/auth/google`, {
+      const response = await axios.post(`${API_URL}/api/auth/google-signin`, {
         credential: token,
       });
       return response.data;

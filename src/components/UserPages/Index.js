@@ -114,7 +114,7 @@ const Index = (props) => {
             </button>
             <div className="collapse navbar-collapse" id="navbarNav">
               <ul className="navbar-nav ml-auto">
-                {props.tokenUser ? (
+                {isAuth ? (
                   <Link to="/cart" style={{ textDecoration: "none" }}>
                     <li className="nav-item">
                       <button className="btn btn-success d-flex d-row">
@@ -147,7 +147,7 @@ const Index = (props) => {
                       >
                         {`Hello, ${user?.data?.name}`}
                       </button>
-                      <div className="dropdown-menu">
+                      <div className="dropdown-menu t45">
                         <button
                           className="dropdown-item text-danger"
                           onClick={Logout}

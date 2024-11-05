@@ -8,7 +8,6 @@ const PYTHON_URL = `${process.env.REACT_APP_PYTHON_URL}`;
 const initialState = {
   isProductLoading: false,
   dataProduct: { products: [], total: 0 }, // Update initial state to include products and total
-  dataCart: [],
   alert: {
     show: false,
     message: "",
