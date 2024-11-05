@@ -1,17 +1,35 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import logo from "../../assets/logo.png";
-import { fetchCart } from "../../Slices/CartSlice";
+// import { fetchCart } from "../../Slices/CartSlice";
 import CheckoutModal from "./CheckoutModal";
 import "../Checkout.css";
 import { useDispatch, useSelector } from "react-redux";
+import { createOrderFromCart } from "../../Slices/OrderSlice";
 
 const Checkout = (props) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const { dataCart } = useSelector((state) => state.cart);
   const [subTotal, setSubTotal] = useState(0);
+  const [orderDetails, setOrderDetails] = useState({
+    firstName: "",
+    lastName: "",
+    address: "",
+    phoneNumber: "",
+    paymentMethod: "Direct Bank Transfer",
+  });
   const total = subTotal + 5;
+  const { user } = useSelector((state) => state.auth);
+  const userId = user.data._id;
+
+  const handleShowModal = () => setShowCheckoutModal(true);
+  const handleCloseModal = () => {
+    setShowCheckoutModal(false);
+    navigate("/"); // Redirect to home page after successful order
+  };
 
   useEffect(() => {
     setSubTotal(
@@ -33,6 +51,37 @@ const Checkout = (props) => {
 
     return sanitizedPrice;
   };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setOrderDetails((prevDetails) => ({ ...prevDetails, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const { firstName, lastName, address, phoneNumber, paymentMethod } =
+      orderDetails;
+    if (!firstName || !lastName || !address || !phoneNumber) {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
+
+    try {
+      await dispatch(
+        createOrderFromCart({
+          userId: userId, // Replace with actual user ID
+          paymentMethod,
+          shipping_address: address,
+          fullName: `${firstName} ${lastName}`,
+          phoneNumber,
+        })
+      );
+      toast.success("Order placed successfully!");
+    } catch (error) {
+      toast.error("Failed to place order. Please try again.");
+    }
+  };
+  console.log("orderDetails", orderDetails);
 
   return (
     <div
@@ -77,7 +126,7 @@ const Checkout = (props) => {
       </nav>
 
       <div style={{ paddingTop: "5rem" }} className="mx-5">
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="row jc-c">
             <div className="col-md-5 pr-3">
               <div className="checkout-div-1">
@@ -94,7 +143,7 @@ const Checkout = (props) => {
                     name="firstName"
                     className="form-control"
                     placeholder="First Name"
-                    // onChange={handleInputCheckoutChange}
+                    onChange={handleChange}
                     required
                   />
                 </div>
@@ -107,7 +156,7 @@ const Checkout = (props) => {
                     name="lastName"
                     className="form-control"
                     placeholder="Last Name"
-                    // onChange={handleInputCheckoutChange}
+                    onChange={handleChange}
                     required
                   />
                 </div>
@@ -121,7 +170,7 @@ const Checkout = (props) => {
                     name="address"
                     className="form-control"
                     placeholder="Address"
-                    // onChange={handleInputCheckoutChange}
+                    onChange={handleChange}
                     required
                   />
                 </div>
@@ -134,7 +183,7 @@ const Checkout = (props) => {
                     name="phoneNumber"
                     className="form-control"
                     placeholder="Phone Number"
-                    // onChange={handleInputCheckoutChange}
+                    onChange={handleChange}
                     required
                   />
                 </div>
@@ -249,10 +298,10 @@ const Checkout = (props) => {
                     <input
                       className="form-check-input"
                       type="radio"
-                      name="payment"
+                      name="paymentMethod"
                       id="exampleRadios1"
                       value="Direct Bank Transfer"
-                      // onChange={handleInputCheckoutChange}
+                      onChange={handleChange}
                     />
                     <label
                       className="form-check-label font-weight-bold"
@@ -274,10 +323,10 @@ const Checkout = (props) => {
                     <input
                       className="form-check-input"
                       type="radio"
-                      name="payment"
+                      name="paymentMethod"
                       id="exampleRadios1"
                       value="Cash on Delivery"
-                      // onChange={handleInputCheckoutChange}
+                      onChange={handleChange}
                     />
                     <label
                       className="form-check-label font-weight-bold"
@@ -315,6 +364,7 @@ const Checkout = (props) => {
                   type="submit"
                   className="btn btn-success w-100 py-3 mt-4"
                   style={{ borderRadius: "0" }}
+                  onClick={handleShowModal} // Show modal on click
                 >
                   PLACE ORDER
                 </button>
@@ -325,7 +375,11 @@ const Checkout = (props) => {
       </div>
       <CheckoutModal
         showCheckoutModal={showCheckoutModal}
-        subTotalPrice={props.subTotalPrice}
+        unDisplayCheckoutModal={handleCloseModal}
+        // userData={userData}
+        subTotalPrice={subTotal}
+        dataInputCheckout={orderDetails}
+        dataCart={dataCart}
       />
     </div>
   );
