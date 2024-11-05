@@ -32,7 +32,7 @@
   width: 130px;
   margin-bottom: 0.5rem;
 }
-.form-row{
+.form-row {
   display: flex;
   width: 100%;
 }
@@ -79,6 +79,41 @@
 
 .pl-3 {
   padding-left: 1rem !important;
+}
+
+.checkout-modal-logo {
+  width: 25%;
+}
+
+.checkout-modal-body {
+  padding: 2rem 4rem;
+}
+
+.checkout-message {
+  border: 2.5px dashed #009e7f;
+}
+
+.order-summary .divider {
+  border-left: 2px solid #e3e3e3;
+  height: 3rem;
+  margin: 0 1.5rem;
+}
+
+.email-info {
+  background-color: #e3e3e3;
+  padding: 1rem;
+  margin: 1.5rem 0;
+}
+
+.table-header {
+  background-color: #009e7f;
+  color: white;
+}
+
+.thank-you {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 2px solid #009e7f;
 }
 
 /* Responsive styles */
