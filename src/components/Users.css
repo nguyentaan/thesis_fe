@@ -628,3 +628,24 @@ td {
 .mg-b-5{
   margin-bottom: 5px;
 }
+
+.w-full{
+  width: 100% !important;
+}
+
+.relative{
+  position: relative !important;
+}
+
+.absolute{
+  position: absolute !important;
+}
+
+
+.w-40{
+  width: 40px; 
+}
+
+.h-40{
+  height: 40px; 
+}
