@@ -10,7 +10,7 @@ import Footer from "./Footer";
 import Carousel from "./Carousel";
 import ProductField from "./Products";
 import LoginModal from "./Login";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 import "../Users.css";
 
@@ -19,16 +19,16 @@ const Index = (props) => {
   const { isAuth, user } = useSelector((state) => state.auth);
   const [showLoginModal, setShowLoginModal] = useState(false);
   // const [NavLoginSuccess, setNavLoginSuccess] = useState(false);
-  const [searchInput, setSearchInput] = useState('');
+  const [searchInput, setSearchInput] = useState("");
   const [submitSearch, setSubmitSearch] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if(isAuth) {
+    if (isAuth) {
       setShowLoginModal(false);
       console.log("user data", user);
     }
-  }, [isAuth]);
+  }, [isAuth, user]);
 
   const noLoginCartNotification = () => {
     toast.error("Please login first to continue.", {
@@ -69,7 +69,7 @@ const Index = (props) => {
 
   const handleLoginSuccess = () => {
     setShowLoginModal(false);
-  }
+  };
 
   const Logout = () => {
     dispatch(logout());
@@ -148,6 +148,12 @@ const Index = (props) => {
                         {`Hello, ${user?.data?.name}`}
                       </button>
                       <div className="dropdown-menu t45">
+                        <Link
+                          to={`/userorders`} // Ensure the path is correct
+                          className="dropdown-item text-danger"
+                        >
+                          My Orders <i className="fas fa-box-open"></i>
+                        </Link>
                         <button
                           className="dropdown-item text-danger"
                           onClick={Logout}
