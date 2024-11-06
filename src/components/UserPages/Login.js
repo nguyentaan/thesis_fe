@@ -98,7 +98,7 @@ const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
                   value={email}
                   required
                   onChange={(e) => setEmail(e.target.value)}
-                  // required
+                  required
                 />
                 <div className="input-group mb-2">
                   <input
@@ -108,7 +108,7 @@ const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
                     value={password}
                     required
                     onChange={(e) => setPassword(e.target.value)}
-                    // required
+                    required
                   />
                   <div className="input-group-append">
                     <button

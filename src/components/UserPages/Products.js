@@ -40,10 +40,10 @@ const Products = () => {
       {!showDetailModel && !isProductLoading && (
         <div className="row">
           {dataProduct &&
-          dataProduct.products &&
-          dataProduct.products.length > 0 ? (
-            dataProduct.products.map((product) => (
-              <div key={product._id} className="col-md-4 mt-4">
+            dataProduct.products &&
+            dataProduct.products.length > 0 ? (
+            dataProduct.products.map((product, index) => (
+              <div key={`${product._id}-${index}`} className="col-md-4 mt-4">
                 <div className="card">
                   <div
                     className="product-showdetail"
@@ -69,10 +69,6 @@ const Products = () => {
                         <p className="my-0 text-success-s2 font-weight-bold">
                           ${product.price}
                         </p>
-                        {/* <button className="btn btn-outline-success d-flex d-row ml-auto">
-                          <i className="fas fa-cart-plus align-self-center mr-2 fa-sm" />
-                          <small className="font-weight-bold">Cart</small>
-                        </button> */}
                       </div>
                     </div>
                   </div>
@@ -82,6 +78,7 @@ const Products = () => {
           ) : (
             <p>No products available</p>
           )}
+
         </div>
       )}
 

@@ -1,16 +1,37 @@
 import { configureStore } from "@reduxjs/toolkit";
 import userReducer from "./UserSlice"; // Import the default export
-import authenReducer from "./AuthenSlice"; // Import the default export
+import authnReducer from "./AuthenSlice"; // Import the default export
 import cartReducer from "./CartSlice"; // Import the default export
 import orderReducer from "./OrderSlice";
+import { persistStore, persistReducer } from "redux-persist";
+import storage from "redux-persist/lib/storage";
 
-const store = configureStore({
+const persistConfig = {
+  key: "root",
+  storage,
+};
+
+const persistedUserReducer = persistReducer(persistConfig, userReducer);
+const persistedAuthnReducer = persistReducer(persistConfig, authnReducer);
+const persistedCartReducer = persistReducer(persistConfig, cartReducer);
+const persistedOrderReducer = persistReducer(persistConfig, orderReducer);
+
+export const store = configureStore({
   reducer: {
-    user: userReducer, // Correct reducer configuration
-    auth: authenReducer, // Correct reducer configuration
-    cart: cartReducer, // Correct reducer configuration
-    order: orderReducer,
+    user: persistedUserReducer, 
+    auth: persistedAuthnReducer, 
+    cart: persistedCartReducer,
+    order: persistedOrderReducer, 
   },
+  devTools: process.env.NODE_ENV !== "production",
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
+      },
+    }),
 });
+
+export const persistor = persistStore(store);
 
 export default store;

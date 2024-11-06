@@ -1,148 +1,160 @@
-import React, { useState } from "react";
-import { connect } from "react-redux";
+import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Modal, Alert } from "react-bootstrap";
+import { ToastContainer, toast } from "react-toastify"; // Added import for ToastContainer
+import "react-toastify/dist/ReactToastify.css"; // Ensure Toastify styles are imported
 import logo from "../../assets/logo.png";
 import "../Users.css";
+import { emailLogin } from "../../Slices/AuthenSlice"; // Adjust path if necessary
+import OtpVerification from "../UserPages/OtpVerification";
 
-import { loginAdmin } from "../../actionCreators/LoginAction";
-
-const AdminLogin = (props) => {
+const AdminLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [dataInput, setDataInput] = useState({
-    email: "",
-    password: "",
+    email: "20521920@gm.uit.edu.vn",
+    password: "12345678",
   });
-
-  const handleInputChange = (event) => {
-    setDataInput({
-      ...dataInput,
-      [event.currentTarget.name]: event.currentTarget.value,
-    });
-    // to cover every time input alert keeps true.
-    alert.show = false;
-  };
+  const [otpVisible, setOtpVisible] = useState(false);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  // if token is filled, move to admin dashboard.
-  if (props.tokenAdmin) {
-    navigate("/admin");
-  }
+  // Access auth state from Redux
+  const { isAuth, user, error } = useSelector((state) => state.auth);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log(dataInput);
-
-    props.loginAdmin(dataInput);
+  // Notifications
+  const successfulLoginNotification = () => {
+    toast.success("Login successful!", {
+      position: toast.POSITION.TOP_CENTER,
+    });
   };
 
-  const displayPassword = () => {
-    setShowPassword((prevShowPassword) => !prevShowPassword);
+  const unSuccessfulLoginNotification = () => {
+    toast.error("Login failed. Please try again.", {
+      position: toast.POSITION.TOP_CENTER,
+    });
   };
 
-  // in the first place, modal always true.
-  const showModal = true;
+  const unAuthoriaztionLoginNotification = () => {
+    toast.error("Unauthorized access. Admin only.", {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  };
 
-  const alert = props.alertData;
-
-  const AlertDismissible = () => {
-    const [alertShow, setAlertShow] = useState(alert.show);
-
-    if (alertShow) {
-      return (
-        <Alert
-          variant={alert.variant}
-          onClose={() => setAlertShow(false)}
-          dismissible
-        >
-          <Alert.Heading className="h6 my-0">{alert.message}</Alert.Heading>
-        </Alert>
-      );
+  // Redirect if authenticated and admin
+  useEffect(() => {
+    if (isAuth && user?.data?.isAdmin === true) {
+      navigate("/admin");
+    } else if (isAuth && user?.data?.isAdmin === false) {
+      unAuthoriaztionLoginNotification();
+      navigate("/");
     }
-    return <></>;
+  }, [isAuth, navigate, user]);
+
+  // Handle input changes
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setDataInput((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  // Handle login submission
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await dispatch(emailLogin(dataInput)).unwrap();
+      if (response.status === "OK") {
+        successfulLoginNotification();
+        setOtpVisible(true); // Show OTP verification step
+      } else {
+        unSuccessfulLoginNotification();
+      }
+    } catch (error) {
+      unSuccessfulLoginNotification();
+      console.error("Email login error:", error);
+    }
+  };
+
+  const handleBackToLogin = () => {
+    setOtpVisible(false);
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
   return (
     <div className="login-admin">
-      <Modal show={showModal}>
+      <Modal show={true}>
         <Modal.Header>
           <Modal.Title>
-            <img src={logo} alt="..." style={{ width: "40%" }} />
+            <img src={logo} alt="Admin Login" style={{ width: "40%" }} />
           </Modal.Title>
         </Modal.Header>
         <Modal.Body style={{ padding: "2rem 4rem", paddingBottom: "4rem" }}>
-          <Modal.Title>
-            <div className="text-center">
-              <h4 className="text-success-s2 font-weight-bold">
-                Welcome Back, Admin.
-              </h4>
-              <h6 className="text-secondary">
-                Login with your email & password
-              </h6>
+          <div className="text-center">
+            {otpVisible ? (
+              <OtpVerification
+                email={dataInput.email}
+                password={dataInput.password}
+                onBack={handleBackToLogin} 
+              />
+            ) : (
+              <>
+                <h4 className="text-success-s2 font-weight-bold">Welcome Back, Admin.</h4>
+                <h6 className="text-secondary">Login with your email & password</h6>
 
-              <AlertDismissible />
+                {error && (
+                  <Alert variant="danger">
+                    <Alert.Heading className="h6 my-0">{error}</Alert.Heading>
+                  </Alert>
+                )}
 
-              <div className="mt-4">
-                <form onSubmit={handleSubmit}>
-                  <input
-                    type="text"
-                    name="email"
-                    onChange={handleInputChange}
-                    className="form-control mb-2 py-4"
-                    placeholder="Admin's email"
-                    aria-label="Admin's email"
-                    aria-describedby="button-addon2"
-                  />
-                  <div className="input-group mb-2">
+                <div className="mt-4">
+                  <form onSubmit={handleSubmit}>
                     <input
-                      type={showPassword ? "text" : "password"}
-                      name="password"
+                      type="email"
+                      name="email"
+                      value={dataInput.email}
                       onChange={handleInputChange}
-                      className="form-control py-4"
-                      placeholder="Admin's password"
-                      aria-label="Admin's password"
-                      aria-describedby="button-addon2"
+                      className="form-control mb-2 py-4"
+                      placeholder="Admin's email"
+                      aria-label="Admin's email"
+                      required
                     />
-                    <div className="input-group-append">
+                    <div className="input-group mb-2">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        value={dataInput.password}
+                        onChange={handleInputChange}
+                        className="form-control py-4"
+                        placeholder="Admin's password"
+                        aria-label="Admin's password"
+                        required
+                      />
                       <button
-                        onClick={displayPassword}
-                        className="btn btn-outline-success"
+                        onClick={togglePasswordVisibility}
+                        className="btn btn-outline-success input-group-append"
                         type="button"
-                        id="button-addon2"
+                        aria-label={showPassword ? "Hide password" : "Show password"}
                       >
-                        <i
-                          className={
-                            showPassword ? "fas fa-eye-slash" : "fas fa-eye"
-                          }
-                        />
+                        <i className={showPassword ? "fas fa-eye-slash" : "fas fa-eye"} />
                       </button>
                     </div>
-                  </div>
-                  <button
-                    className="btn btn-success w-100"
-                    style={{ padding: "0.7rem 0.2rem" }}
-                    type="submit"
-                  >
-                    Login
-                  </button>
-                </form>
-              </div>
-            </div>
-          </Modal.Title>
+                    <button className="btn btn-success w-100" style={{ padding: "0.7rem 0.2rem" }} type="submit">
+                      Login
+                    </button>
+                  </form>
+                </div>
+              </>
+            )}
+          </div>
         </Modal.Body>
       </Modal>
+      <ToastContainer /> {/* Added ToastContainer here */}
     </div>
   );
 };
 
-const mapStateToProps = (state) => {
-  return {
-    alertData: state.LoginReducer.alert,
-    tokenAdmin: state.LoginReducer.tokenAdmin,
-  };
-};
-
-const mapDispatchToProps = { loginAdmin };
-
-export default connect(mapStateToProps, mapDispatchToProps)(AdminLogin);
+export default AdminLogin;

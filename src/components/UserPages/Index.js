@@ -10,8 +10,8 @@ import Footer from "./Footer";
 import Carousel from "./Carousel";
 import ProductField from "./Products";
 import LoginModal from "./Login";
-import { useNavigate } from "react-router-dom";
-
+import { useNavigate } from 'react-router-dom';
+import SearchDropdown from "./SearchDropdown";
 import "../Users.css";
 
 const Index = (props) => {
@@ -22,6 +22,7 @@ const Index = (props) => {
   const [searchInput, setSearchInput] = useState("");
   const [submitSearch, setSubmitSearch] = useState(false);
   const navigate = useNavigate();
+  const [value, setValue] = useState(""); // Used for managing dropdown state
 
   useEffect(() => {
     if (isAuth) {
@@ -41,12 +42,6 @@ const Index = (props) => {
       position: toast.POSITION.TOP_CENTER,
     });
   };
-
-  // const searchNotification = () => {
-  //   toast.success("Discover the clothe that you search below.", {
-  //     position: toast.POSITION.TOP_CENTER,
-  //   });
-  // };
 
   const handleSearchInput = (event) => {
     setSearchInput(event.target.value); // Update search input state
@@ -94,7 +89,6 @@ const Index = (props) => {
         backgroundColor: "#f8f9fa",
       }}
     >
-      {/* start header - part1 */}
       <div className="main-bg-height" style={picture(mainBg)}>
         <nav className="navbar fixed-top navbar-expand-lg navbar-light bg-light">
           <div className="container">
@@ -190,28 +184,13 @@ const Index = (props) => {
             Ready to wear dresses tailored for you from online. Hurry up while
             stock lasts.
           </p>
-          <div className="form-group mt-5">
-            <input
-              type="text"
-              className="search-box"
-              placeholder="Search the fashion name that you want here"
-              name="searchinput"
-              value={searchInput} // Bind input value to state
-              onChange={handleSearchInput}
-              required
-              onKeyPress={(event) =>
-                event.key === "Enter" ? handleSearchSubmit() : null
-              }
-            />
-            <button
-              className="btn-search"
-              type="button"
-              id="button-addon2"
-              onClick={handleSearchSubmit}
-            >
-              <i className="fas fa-search"></i>
-            </button>
-          </div>
+          
+          <SearchDropdown
+            options={user?.data?.search_history || []}
+            id="id"
+            selectedVal={value}
+            handleChange={setValue}
+          />
         </div>
       </div>
       {/* start header - part 1 */}
