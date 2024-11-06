@@ -7,7 +7,6 @@ const API_URL = `${process.env.REACT_APP_API_URL}`;
 const initialState = {
   dataCart: [],
   isCartLoading: false,
-  // cartTotal: 0,
   error: null,
 };
 

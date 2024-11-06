@@ -1,0 +1,160 @@
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { getOrdersByUserId } from "../../Slices/OrderSlice";
+import OrderDetailModal from "./OrderDetailModal";
+import logo from "../../assets/logo.png";
+
+const UserOrdersPage = () => {
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  const userId = user.data._id;
+  // Get order data and loading/error states from Redux store
+  const {
+    dataOrder = [], // Default to empty array if undefined
+    isOrderLoading,
+    error,
+  } = useSelector((state) => state.order);
+
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [selectedOrder, setSelectedOrder] = React.useState(null);
+
+  // Fetch orders on component mount
+  useEffect(() => {
+    dispatch(getOrdersByUserId(userId));
+  }, [dispatch, userId]);
+
+  // Open the modal and set selected order
+  const openModal = (order) => {
+    setSelectedOrder(order);
+    setIsModalOpen(true);
+  };
+
+  // Close the modal
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedOrder(null);
+  };
+
+  const convertDateFormate = (dateString) => {
+    const date = new Date(dateString);
+
+    // Format the date as dd/mm/yyyy
+    const day = String(date.getDate()).padStart(2, "0"); // Ensure two digits for day
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Get month (0-indexed, so add 1)
+    const year = date.getFullYear();
+
+    return `${day}/${month}/${year}`;
+  };
+
+  return (
+    <div>
+      {/* Navbar */}
+      <nav
+        id="top"
+        className="navbar fixed-top navbar-expand-lg navbar-light bg-light"
+      >
+        <div className="container">
+          <Link to="/" className="navbar-brand">
+            <img src={logo} className="logo-fx" alt="Logo" />
+          </Link>
+          <button
+            className="navbar-toggler"
+            type="button"
+            data-toggle="collapse"
+            data-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span className="navbar-toggler-icon"></span>
+          </button>
+          <div className="collapse navbar-collapse" id="navbarNav">
+            <ul className="navbar-nav ml-auto">
+              <li className="nav-item mx-4">
+                <h6 className="my-0 text-success-s2 d-flex d-row">
+                  <Link to="/" className="text-success-s2 mr-2">
+                    HOME
+                  </Link>
+                  <span className="text-success-s2 my-0">/ My Orders PAGE</span>
+                </h6>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+      {/* Orders Section */}
+      <div className="container mt-5 pt-5">
+        <h2 className="mb-4">My Orders</h2>
+
+        {/* Loading and Error Handling */}
+        {isOrderLoading ? (
+          <p>Loading orders...</p>
+        ) : error ? (
+          <p className="text-danger">Failed to load orders: {error}</p>
+        ) : (
+          <div className="table-responsive">
+            <table className="table table-striped">
+              <thead>
+                <tr>
+                  <th>Order Number</th>
+                  <th>Date</th>
+                  <th>Total Amount</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dataOrder.length > 0 ? (
+                  dataOrder.map((order) => (
+                    <tr key={order._id}>
+                      <td>{order._id}</td>
+                      <td>{convertDateFormate(order.createdAt)}</td>{" "}
+                      {/* Updated field name */}
+                      <td>{order.totalAmount}</td>
+                      <td>
+                        <span
+                          className={`badge ${
+                            order.status === "Delivered"
+                              ? "badge-success"
+                              : order.status === "Shipped"
+                              ? "badge-primary"
+                              : "badge-warning"
+                          }`}
+                        >
+                          {order.status}
+                        </span>
+                      </td>
+                      <td>
+                        <button
+                          className="btn btn-outline-info btn-sm"
+                          onClick={() => openModal(order)}
+                        >
+                          View Details
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="text-center">
+                      No orders found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+      <OrderDetailModal
+        order={selectedOrder}
+        isOpen={isModalOpen}
+        closeModal={closeModal}
+      />
+    </div>
+  );
+};
+
+export default UserOrdersPage;

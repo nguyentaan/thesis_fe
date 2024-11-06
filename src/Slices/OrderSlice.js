@@ -5,7 +5,7 @@ import axios from "axios";
 const API_URL = `${process.env.REACT_APP_API_URL}`;
 
 const initialState = {
-  dataOrder: [],
+  dataOrder: [], // Default empty array
   isOrderLoading: false,
   error: null,
 };
@@ -33,21 +33,21 @@ export const createOrderFromCart = createAsyncThunk(
   }
 );
 
-// Async action to fetch orders by user ID
 export const getOrdersByUserId = createAsyncThunk(
-  "orders/getOrdersByUserId",
+  "order/getOrdersByUserId",
   async (userId, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${API_URL}/api/order/${userId}`);
-      return response.data.orders;
+      return response.data.orders; // Return only the orders array, not the full response object
     } catch (error) {
+      console.error("Error fetching orders:", error.response.data);
       return rejectWithValue(error.response.data);
     }
   }
 );
 
 const orderSlice = createSlice({
-  name: "orders",
+  name: "order",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -71,7 +71,7 @@ const orderSlice = createSlice({
       })
       .addCase(getOrdersByUserId.fulfilled, (state, action) => {
         state.isOrderLoading = false;
-        state.dataOrder = action.payload;
+        state.dataOrder = action.payload; // Make sure payload is an array
       })
       .addCase(getOrdersByUserId.rejected, (state, action) => {
         state.isOrderLoading = false;

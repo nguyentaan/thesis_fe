@@ -13,6 +13,7 @@ const ProductDetailModal = ({
   const dispatch = useDispatch();
   const [selectedImage, setSelectedImage] = useState(selectedProduct.images[0]);
   const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedStock, setSelectedStock] = useState(null);
   const [openDescription, setOpenDescription] = useState(null);
   const modalRef = useRef(null);
   const user = useSelector((state) => state.auth.user);
@@ -75,6 +76,10 @@ const ProductDetailModal = ({
 
   const handleSelectSize = (size) => {
     setSelectedSize(size);
+    const sizeStock = selectedProduct.sizes.find(
+      (sizeItem) => sizeItem.size_name === size
+    )?.stock;
+    setSelectedStock(sizeStock);
   };
 
   if (!showDetailModel) return null; // Hide modal if not visible
@@ -146,6 +151,11 @@ const ProductDetailModal = ({
                   ))}
                 </div>
               </div>
+              {selectedStock !== null && (
+                <div className="stock-info">
+                  <p>Stock available: {selectedStock}</p>
+                </div>
+              )}
               <div className="product-color">
                 <p className="color-label">Color: </p>
                 <p className="color-value">{selectedProduct.color}</p>
