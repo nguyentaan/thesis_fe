@@ -7,6 +7,8 @@ const PYTHON_URL = `${process.env.REACT_APP_PYTHON_URL}`;
 
 const initialState = {
   isProductLoading: false,
+  isUserLoading: false,
+  dataUser: { users: [], total: 0 }, // Update initial state to include products and total
   dataProduct: { products: [], total: 0 }, // Update initial state to include products and total
   alert: {
     show: false,
@@ -62,6 +64,27 @@ export const addSearchKeyword = createAsyncThunk(
   }
 );
 
+export const getAllUser = createAsyncThunk(
+  "user/getAll",
+  async (
+    {} = {}, 
+    { rejectWithValue }
+  ) => {
+    try {
+      const res = await axios.get(`${API_URL}/api/users/profile/list`, {
+        // headers: {
+        //   Authorization: `Bearer ${refreshToken}`, // Send the refresh token in the Authorization header
+        // },
+      });
+      return res.data;
+    } catch (error) {
+      console.error("API error:", error);
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+
 const userSlice = createSlice({
   name: "user",
   initialState,
@@ -114,6 +137,26 @@ const userSlice = createSlice({
       })
       .addCase(getSearchProducts.rejected, (state, action) => {
         state.isProductLoading = false;
+      })
+      // Handle User-related actions
+      .addCase(getAllUser.pending, (state) => {
+        state.isUserLoading = true;
+      })
+      .addCase(getAllUser.fulfilled, (state, action) => {
+        const { data } = action.payload;
+        state.dataUser.users = data;
+        state.isUserLoading = false;
+        toast.success("Users loaded successfully!", {
+          position: toast.POSITION.TOP_CENTER,
+          autoClose: 3000,
+        });
+      })      
+      .addCase(getAllUser.rejected, (state, action) => {
+        state.isUserLoading = false;
+        toast.error(`Failed to load users: ${action.payload}`, {
+          position: toast.POSITION.TOP_CENTER,
+          autoClose: 3000,
+        });
       });
   },
 });

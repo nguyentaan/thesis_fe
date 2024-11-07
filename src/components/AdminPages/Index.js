@@ -1,5 +1,5 @@
 import React from "react";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
 import { Route, Routes, Navigate, Link } from "react-router-dom";
 
 import Login from "./AdminLogin";
@@ -7,14 +7,16 @@ import AdminDashboard from "./Dashboard";
 import AdminProductPage from "./AdminProduct";
 import AdminUsersPage from "./AdminUsers";
 
-const Index = (props) => {
+const Index = () => {
+  const { isAuth, user } = useSelector((state) => state.auth);
+
   return (
     <div>
       <Routes>
         <Route
           path=""
           element={
-            props.tokenAdmin ? (
+            isAuth && user?.data?.isAdmin ? (
               <div>
                 <h1 className="text-success-s2 text-center">
                   Welcome Admin, this is the dashboard Page.
@@ -43,7 +45,7 @@ const Index = (props) => {
         <Route
           path="/product"
           element={
-            props.tokenAdmin ? (
+            isAuth && user?.data?.isAdmin ? (
               <div>
                 <h1 className="text-success-s2 text-center">
                   Welcome Admin, this is the Product Page.
@@ -71,7 +73,7 @@ const Index = (props) => {
         <Route
           path="/users"
           element={
-            props.tokenAdmin ? (
+            isAuth && user?.data?.isAdmin ? (
               <div>
                 <h1 className="text-success-s2 text-center">
                   Welcome Admin, this is the Users Page.
@@ -101,9 +103,4 @@ const Index = (props) => {
   );
 };
 
-const mapStateToProps = (state) => {
-  return {
-    tokenAdmin: state.LoginReducer.tokenAdmin,
-  };
-};
-export default connect(mapStateToProps, null)(Index);
+export default Index;
