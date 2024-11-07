@@ -81,7 +81,6 @@ const Checkout = (props) => {
       toast.error("Failed to place order. Please try again.");
     }
   };
-  console.log("orderDetails", orderDetails);
 
   return (
     <div

@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { getOrdersByUserId } from "../../Slices/OrderSlice";
 import OrderDetailModal from "./OrderDetailModal";
 import logo from "../../assets/logo.png";
+import "../Order.css";
 
 const UserOrdersPage = () => {
   const dispatch = useDispatch();
@@ -86,7 +87,7 @@ const UserOrdersPage = () => {
 
       {/* Orders Section */}
       <div className="container mt-5 pt-5">
-        <h2 className="mb-4">My Orders</h2>
+        <h2 className="mb-4 title">My Orders</h2>
 
         {/* Loading and Error Handling */}
         {isOrderLoading ? (
@@ -112,7 +113,7 @@ const UserOrdersPage = () => {
                       <td>{order._id}</td>
                       <td>{convertDateFormate(order.createdAt)}</td>{" "}
                       {/* Updated field name */}
-                      <td>{order.totalAmount}</td>
+                      <td>${order.totalAmount}</td>
                       <td>
                         <span
                           className={`badge ${
@@ -127,12 +128,24 @@ const UserOrdersPage = () => {
                         </span>
                       </td>
                       <td>
-                        <button
-                          className="btn btn-outline-info btn-sm"
-                          onClick={() => openModal(order)}
-                        >
-                          View Details
-                        </button>
+                        <td>
+                          <div className="btn-group">
+                            <button
+                              className="icon-button btn btn-outline-info btn-sm"
+                              onClick={() => openModal(order)}
+                            >
+                              <i className="fas fa-eye"></i>{" "}
+                              {/* View Details icon */}
+                            </button>
+                            <button
+                              className="icon-button btn btn-outline-danger btn-sm ml-2"
+                              // onClick={() => handleCancel(order)}
+                            >
+                              <i className="fas fa-times"></i>{" "}
+                              {/* Cancel icon */}
+                            </button>
+                          </div>
+                        </td>
                       </td>
                     </tr>
                   ))
