@@ -25,7 +25,7 @@ const Cart = () => {
   // console.log(cartTotal);
 
   const { user } = useSelector((state) => state.auth);
-  const userId = user.data._id;
+  const userId = user._id;
 
   // Fetch the cart when the component mounts
   useEffect(() => {

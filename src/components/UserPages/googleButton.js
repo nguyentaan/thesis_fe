@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { googleLogin } from "../../Slices/AuthenSlice";
 
 const CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
-const GoogleButton = () => {  
+const GoogleButton = () => {
   const dispatch = useDispatch();
 
   const onSuccess = (response) => {

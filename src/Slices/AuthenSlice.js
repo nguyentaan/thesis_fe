@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { API_URL } from '../config';
+import { jwtDecode } from 'jwt-decode'; // Import the jwt-decode library
 
 const handleError = (error) => {
   return error.response && error.response.data.message
@@ -88,10 +89,23 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(googleLogin.fulfilled, (state, action) => {
-        state.user = action.payload;
-        state.isAuth = true; // Set to true on successful Google login
+        // Access the access_token from the response properly
+        const accessToken = action.payload.data.access_token;
+        const refreshToken = action.payload.data.refresh_token;
+
+        // Assuming you want to store the tokens or process them further:
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+
+        // Now decode the accessToken if you want to get the user details
+        const decodedToken = jwtDecode(accessToken);
+
+        // Set the decoded user and tokens in the state
+        state.user = decodedToken.user;
+        state.isAuth = true;
         state.isLoading = false;
       })
+
       .addCase(googleLogin.rejected, (state, action) => {
         state.error = action.payload; // Capture error message
         state.isLoading = false;
