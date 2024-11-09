@@ -62,7 +62,27 @@ const OrderDetailModal = ({ order, isOpen, closeModal }) => {
                   <tbody>
                     {order.items.map((item) => (
                       <tr key={item._id}>
-                        <td>{item.productId.name}</td>
+                        <td>
+                          {/* Container for image and product name */}
+                          <div
+                            style={{ display: "flex", alignItems: "center" }}
+                          >
+                            {/* Product Image */}
+                            <img
+                              src={item.productId.images[0]}
+                              alt={item.productId.name}
+                              className="img-thumbnail"
+                              style={{
+                                width: "50px",
+                                height: "70px",
+                                objectFit: "cover",
+                                marginRight: "10px", // Adds space between image and product name
+                              }}
+                            />
+                            {/* Product Name */}
+                            <p style={{ margin: 0 }}>{item.productId.name}</p>
+                          </div>
+                        </td>
                         <td>{item.quantity}</td>
                         <td>${item.price}</td>
                         <td>${item.price * item.quantity}</td>
@@ -93,6 +113,10 @@ const OrderDetailModal = ({ order, isOpen, closeModal }) => {
                         ? "badge-success"
                         : order.status === "Shipped"
                         ? "badge-primary"
+                        : order.status === "cancelled"
+                        ? "badge-danger" // Class for Cancelled status
+                        : order.status === "Pending"
+                        ? "badge-secondary" // Class for Pending status
                         : "badge-warning"
                     }`}
                   >
@@ -101,7 +125,7 @@ const OrderDetailModal = ({ order, isOpen, closeModal }) => {
                 </div>
               </div>
             </div>
-            <div className="column flex-grow-1">
+            <div className="column flex-grow-1 mw-300">
               <div className="order-summaries">
                 <h3 className="order-content">Order Summary</h3>
                 <div className="order-sumary">

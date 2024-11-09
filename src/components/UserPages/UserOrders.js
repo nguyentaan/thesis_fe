@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { getOrdersByUserId } from "../../Slices/OrderSlice";
+import { getOrdersByUserId, cancelOrder } from "../../Slices/OrderSlice";
 import OrderDetailModal from "./OrderDetailModal";
 import logo from "../../assets/logo.png";
 import "../Order.css";
@@ -29,6 +29,15 @@ const UserOrdersPage = () => {
   const openModal = (order) => {
     setSelectedOrder(order);
     setIsModalOpen(true);
+  };
+
+  const handleCancelOrder = (order) => {
+    console.log("Canceling order:", order._id);
+    if (window.confirm("Are you sure you want to cancel this order?")) {
+      // Log userId and order._id to check if they are correct
+      console.log("User ID:", userId, "Order ID:", order._id);
+      dispatch(cancelOrder(userId, order._id));
+    }
   };
 
   // Close the modal
@@ -77,7 +86,7 @@ const UserOrdersPage = () => {
                   <Link to="/" className="text-success-s2 mr-2">
                     HOME
                   </Link>
-                  <span className="text-success-s2 my-0">/ My Orders PAGE</span>
+                  <span className="text-success-s2 my-0">/ My Orders</span>
                 </h6>
               </li>
             </ul>
@@ -121,6 +130,10 @@ const UserOrdersPage = () => {
                               ? "badge-success"
                               : order.status === "Shipped"
                               ? "badge-primary"
+                              : order.status === "cancelled"
+                              ? "badge-danger" // Class for Cancelled status
+                              : order.status === "Pending"
+                              ? "badge-secondary" // Class for Pending status
                               : "badge-warning"
                           }`}
                         >
@@ -137,13 +150,16 @@ const UserOrdersPage = () => {
                               <i className="fas fa-eye"></i>{" "}
                               {/* View Details icon */}
                             </button>
-                            <button
-                              className="icon-button btn btn-outline-danger btn-sm ml-2"
-                              // onClick={() => handleCancel(order)}
-                            >
-                              <i className="fas fa-times"></i>{" "}
-                              {/* Cancel icon */}
-                            </button>
+                            {/* Only show Cancel button if the order is not cancelled */}
+                            {order.status !== "cancelled" && (
+                              <button
+                                className="icon-button btn btn-outline-danger btn-sm ml-2"
+                                onClick={() => handleCancelOrder(order)}
+                              >
+                                <i className="fas fa-times"></i>{" "}
+                                {/* Cancel icon */}
+                              </button>
+                            )}
                           </div>
                         </td>
                       </td>

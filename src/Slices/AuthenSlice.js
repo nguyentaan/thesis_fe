@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { API_URL } from '../config';
-import { jwtDecode } from 'jwt-decode'; // Import the jwt-decode library
+import { API_URL } from "../config";
+import { jwtDecode } from "jwt-decode"; // Import the jwt-decode library
 
 const handleError = (error) => {
   return error.response && error.response.data.message
@@ -29,7 +29,10 @@ export const emailLogin = createAsyncThunk(
   "authen/emailLogin",
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/api/auth/login`, { email, password });
+      const response = await axios.post(`${API_URL}/api/auth/login`, {
+        email,
+        password,
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(handleError(error));
@@ -41,7 +44,11 @@ export const verifyOTP = createAsyncThunk(
   "authen/verify-otp",
   async ({ email, password, otp }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/api/auth/verify-otp`, { email, password, otp });
+      const response = await axios.post(`${API_URL}/api/auth/verify-otp`, {
+        email,
+        password,
+        otp,
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(handleError(error));
@@ -53,7 +60,12 @@ export const createUser = createAsyncThunk(
   "authen/register",
   async ({ name, email, password, phoneNumber }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/api/auth/register`, { name, email, password, phoneNumber });
+      const response = await axios.post(`${API_URL}/api/auth/register`, {
+        name,
+        email,
+        password,
+        phoneNumber,
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(handleError(error));
@@ -74,13 +86,15 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.isAuth = false;
+      state.accessToken = localStorage.removeItem("accessToken");
+      state.refreshToken = localStorage.removeItem("refreshToken");
     },
     loginSuccess(state, action) {
       state.isAuth = true;
       state.user = { data: action.payload.user };
-      state.accessToken = action.payload.accessToken; 
+      state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
-  },
+    },
   },
   extraReducers: (builder) => {
     builder
