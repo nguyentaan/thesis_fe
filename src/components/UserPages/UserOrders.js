@@ -28,6 +28,8 @@ const UserOrdersPage = () => {
   // Open the modal and set selected order
   const openModal = (order) => {
     setSelectedOrder(order);
+    // console.log("Selected order:", order);
+
     setIsModalOpen(true);
   };
 
