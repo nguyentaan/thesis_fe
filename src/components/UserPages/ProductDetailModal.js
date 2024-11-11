@@ -16,10 +16,9 @@ const ProductDetailModal = ({
   const [selectedStock, setSelectedStock] = useState(null);
   const [openDescription, setOpenDescription] = useState(null);
   const modalRef = useRef(null);
-  const user = useSelector((state) => state.auth.user);
-
+  const { user, isAuth } = useSelector((state) => state.auth);  
   // Check if user is logged in
-  const isUserLoggedIn = user && user.data;
+  const isUserLoggedIn = isAuth;
 
   // Close modal when clicking outside of it
   useEffect(() => {
@@ -71,7 +70,7 @@ const ProductDetailModal = ({
     const size = selectedSize;
     const quantity = 1;
 
-    dispatch(addToCart({ userId: user.data._id, productId, quantity, size }));
+    dispatch(addToCart({ userId: user._id, productId, quantity, size }));
   };
 
   const handleSelectSize = (size) => {

@@ -40,8 +40,8 @@ const Products = () => {
       {!showDetailModel && !isProductLoading && (
         <div className="row">
           {dataProduct &&
-            dataProduct.products &&
-            dataProduct.products.length > 0 ? (
+          dataProduct.products &&
+          dataProduct.products.length > 0 ? (
             dataProduct.products.map((product, index) => (
               <div key={`${product._id}-${index}`} className="col-md-4 mt-4">
                 <div className="card">
@@ -78,12 +78,13 @@ const Products = () => {
           ) : (
             <p>No products available</p>
           )}
-
         </div>
       )}
 
+      {/* Show loading text only if new products are being loaded */}
       {isProductLoading && <p>Loading more products...</p>}
 
+      {/* Load More button logic */}
       {!isProductLoading &&
         dataProduct.products &&
         dataProduct.products.length < dataProduct.total && (
@@ -98,6 +99,7 @@ const Products = () => {
           </div>
         )}
 
+      {/* Product Detail Modal */}
       {showDetailModel && (
         <ProductDetailModal
           selectedProduct={selectedProduct}

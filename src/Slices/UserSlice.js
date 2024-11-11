@@ -9,7 +9,7 @@ const initialState = {
   isProductLoading: false,
   isUserLoading: false,
   dataUser: { users: [], total: 0 }, // Update initial state to include products and total
-  dataProduct: { products: [], total: 0 }, // Update initial state to include products and total
+  dataProduct: { products: [], total: 0, currentPage: 1, limit: 15 }, // Added currentPage and limit to state
   alert: {
     show: false,
     message: "",
@@ -19,15 +19,16 @@ const initialState = {
 
 export const getAllProducts = createAsyncThunk(
   "product/getall",
-  async ({ page, limit }, { rejectWithValue }) => {
+  async ({ page = 1, limit = 15 }, { rejectWithValue }) => {
     try {
       const res = await axios.get(`${API_URL}/api/products`, {
-        params: { page, limit }, // Send pagination params
+        params: { page, limit },
       });
-      return res.data;
+      const { products, total } = res.data; // Extract products and total from response
+      return { products, total, page }; // Include current page for pagination handling
     } catch (error) {
       console.error("API error:", error);
-      return rejectWithValue(error.response.data || error.message);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
@@ -66,10 +67,7 @@ export const addSearchKeyword = createAsyncThunk(
 
 export const getAllUser = createAsyncThunk(
   "user/getAll",
-  async (
-    {} = {}, 
-    { rejectWithValue }
-  ) => {
+  async ({} = {}, { rejectWithValue }) => {
     try {
       const res = await axios.get(`${API_URL}/api/users/profile/list`, {
         // headers: {
@@ -84,7 +82,6 @@ export const getAllUser = createAsyncThunk(
   }
 );
 
-
 const userSlice = createSlice({
   name: "user",
   initialState,
@@ -93,7 +90,7 @@ const userSlice = createSlice({
       state.isProductLoading = action.payload;
     },
     resetProducts(state) {
-      state.dataProduct = []; // Clear products when necessary
+      state.dataProduct = { products: [], total: 0, currentPage: 1, limit: 15 }; // Reset product state
     },
     updateSearchHistory(state, action) {
       state.searchHistory = action.payload;
@@ -108,17 +105,12 @@ const userSlice = createSlice({
         state.isProductLoading = true;
       })
       .addCase(getAllProducts.fulfilled, (state, action) => {
-        const { products, total } = action.payload; // Destructure the expected properties
-        state.dataProduct.products = [
-          ...state.dataProduct.products,
-          ...products,
-        ]; // Append new products
-        state.dataProduct.total = total; // Update total if necessary
-        state.isProductLoading = false; // Append new products
-        // toast.success("Products loaded successfully!", {
-        //   position: toast.POSITION.TOP_CENTER,
-        //   autoClose: 3000,
-        // });
+        const { products, total, page } = action.payload; // Destructure data from the action payload
+        state.dataProduct.products =
+          page === 1 ? products : [...state.dataProduct.products, ...products]; // If it's the first page, overwrite; else, append
+        state.dataProduct.total = total; // Update total number of products
+        state.dataProduct.currentPage = page; // Update current page
+        state.isProductLoading = false;
       })
       .addCase(getAllProducts.rejected, (state, action) => {
         state.isProductLoading = false;
@@ -150,7 +142,7 @@ const userSlice = createSlice({
           position: toast.POSITION.TOP_CENTER,
           autoClose: 3000,
         });
-      })      
+      })
       .addCase(getAllUser.rejected, (state, action) => {
         state.isUserLoading = false;
         toast.error(`Failed to load users: ${action.payload}`, {

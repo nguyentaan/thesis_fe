@@ -347,9 +347,9 @@ td {
   max-width: 1020px; /* Maximum width of modal */
   width: 90%; /* Responsive width */
   max-height: 90vh; /* Maximum height relative to viewport height */
+  overflow: hidden;
   overflow-y: auto; /* Enable vertical scrolling if content exceeds max-height */
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Soft shadow */
-  position: relative; /* Position relative for absolute elements inside */
   padding: 20px; /* Add padding to prevent content from touching edges */
 }
 
