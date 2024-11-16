@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { getOrdersByUserId, cancelOrder } from "../../Slices/OrderSlice";
 import OrderDetailModal from "./OrderDetailModal";
 import logo from "../../assets/logo.png";
+import WriteReview from "./WriteReview";
 import "../Order.css";
 
 const UserOrdersPage = () => {
@@ -19,6 +20,7 @@ const UserOrdersPage = () => {
 
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [selectedOrder, setSelectedOrder] = React.useState(null);
+  const [isReviewOpen, setIsReviewOpen] = React.useState(false); // State to control review modal
 
   // Fetch orders on component mount
   useEffect(() => {
@@ -57,6 +59,12 @@ const UserOrdersPage = () => {
     const year = date.getFullYear();
 
     return `${day}/${month}/${year}`;
+  };
+
+  const handleAddReview = (order) => {
+    console.log("Adding review for order:", order._id);
+    // Open review modal here (you can implement a separate modal for writing reviews)
+    setIsReviewOpen(true); // Open review form when button clicked
   };
 
   return (
@@ -152,14 +160,22 @@ const UserOrdersPage = () => {
                               <i className="fas fa-eye"></i>{" "}
                               {/* View Details icon */}
                             </button>
-                            {/* Only show Cancel button if the order is not cancelled */}
-                            {order.status !== "cancelled" && (
+                            {/* "Add Review" Button - Display only if status is "Delivered" */}
+                            {order.status === "Delivered" && (
+                              <button
+                                className="icon-button btn btn-outline-primary btn-sm ml-2"
+                                onClick={() => handleAddReview(order)}
+                              >
+                                <i className="fas fa-star"></i>
+                              </button>
+                            )}
+
+                            {order.status === "Pending" && (
                               <button
                                 className="icon-button btn btn-outline-danger btn-sm ml-2"
                                 onClick={() => handleCancelOrder(order)}
                               >
-                                <i className="fas fa-times"></i>{" "}
-                                {/* Cancel icon */}
+                                <i className="fas fa-times"></i>
                               </button>
                             )}
                           </div>
@@ -179,6 +195,14 @@ const UserOrdersPage = () => {
           </div>
         )}
       </div>
+      {/* Show WriteReview component if the state is open */}
+      {isReviewOpen && (
+        <WriteReview
+          order={selectedOrder}
+          closeReview={() => setIsReviewOpen(false)} // Close review form
+        />
+      )}
+
       <OrderDetailModal
         order={selectedOrder}
         isOpen={isModalOpen}

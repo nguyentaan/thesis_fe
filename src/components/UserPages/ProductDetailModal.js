@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../../Slices/CartSlice";
 import { toast, ToastContainer } from "react-toastify"; // Import toast
 import "react-toastify/dist/ReactToastify.css"; // Import CSS
+import Reviews from "./Review";
 
 const ProductDetailModal = ({
   selectedProduct,
@@ -16,7 +17,7 @@ const ProductDetailModal = ({
   const [selectedStock, setSelectedStock] = useState(null);
   const [openDescription, setOpenDescription] = useState(null);
   const modalRef = useRef(null);
-  const { user, isAuth } = useSelector((state) => state.auth);  
+  const { user, isAuth } = useSelector((state) => state.auth);
   // Check if user is logged in
   const isUserLoggedIn = isAuth;
 
@@ -193,6 +194,8 @@ const ProductDetailModal = ({
                 </div>
               ))}
             </div>
+            {/* Reviews Section */}
+            <Reviews />
           </div>
         </div>
       </div>

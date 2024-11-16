@@ -201,14 +201,10 @@
 }
 /* Rewrite Bootstrap class */
 
-/* My Own Class */
-html {
-  height: 100%;
+.row{
+  justify-content: center;
 }
 
-body {
-  font-family: "Karla", sans-serif !important;
-}
 .product-showdetail {
   position: relative;
   /* text-align: center; */

@@ -6,7 +6,6 @@ import { logout } from "../../Slices/AuthenSlice";
 import "react-toastify/dist/ReactToastify.css";
 import mainBg from "../../assets/mainBackground.png";
 import logo from "../../assets/logo.png";
-import Footer from "./Footer";
 import Carousel from "./Carousel";
 import ProductField from "./Products";
 import LoginModal from "./Login";
@@ -208,7 +207,7 @@ const handleLoginSuccess = () => {
       {/* part 3 - content */}
       <div className="container">
         <div className="row mb-5">
-          {/* Sidebar */}
+          {/* Sidebar 
           <div className="col-md-3 mt-3">
             <div className="list-group">
               <button
@@ -262,8 +261,6 @@ const handleLoginSuccess = () => {
 
       {/* Footer */}
       <hr className="horizontal-line" />
-      <Footer />
-      {/* Footer */}
 
       {/* Modals */}
       <LoginModal
