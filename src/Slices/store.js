@@ -3,6 +3,7 @@ import userReducer from "./UserSlice"; // Import the default export
 import authnReducer from "./AuthenSlice"; // Import the default export
 import cartReducer from "./CartSlice"; // Import the default export
 import orderReducer from "./OrderSlice";
+import reviewReducer from "./ReviewSlice";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
@@ -15,13 +16,15 @@ const persistedUserReducer = persistReducer(persistConfig, userReducer);
 const persistedAuthnReducer = persistReducer(persistConfig, authnReducer);
 const persistedCartReducer = persistReducer(persistConfig, cartReducer);
 const persistedOrderReducer = persistReducer(persistConfig, orderReducer);
+const persistedReviewReducer = persistReducer(persistConfig, reviewReducer);
 
 export const store = configureStore({
   reducer: {
-    user: persistedUserReducer, 
-    auth: persistedAuthnReducer, 
+    user: persistedUserReducer,
+    auth: persistedAuthnReducer,
     cart: persistedCartReducer,
-    order: persistedOrderReducer, 
+    order: persistedOrderReducer,
+    review: persistedReviewReducer,
   },
   devTools: process.env.NODE_ENV !== "production",
   middleware: (getDefaultMiddleware) =>

@@ -201,7 +201,7 @@
 }
 /* Rewrite Bootstrap class */
 
-.row{
+.row {
   justify-content: center;
 }
 
@@ -361,6 +361,15 @@ td {
 
 .modal-content-tab::-webkit-scrollbar-track {
   background-color: #f0f0f0;
+}
+
+.clr-rating {
+  display: flex;
+  justify-content: space-between;
+}
+
+.product-rating {
+  margin: 10px 0;
 }
 
 .close-button {
@@ -603,45 +612,44 @@ td {
   transition: max-height 0.3s ease-in-out;
 }
 
-.m-b-20{
+.m-b-20 {
   margin-bottom: 20px;
 }
 
-.text-right{
+.text-right {
   text-align: right;
 }
 
-.jc-c{
+.jc-c {
   justify-content: center;
 }
-.df{
+.df {
   display: flex;
 }
-.fd-r{
+.fd-r {
   flex-direction: row;
 }
 
-.mg-b-5{
+.mg-b-5 {
   margin-bottom: 5px;
 }
 
-.w-full{
+.w-full {
   width: 100% !important;
 }
 
-.relative{
+.relative {
   position: relative !important;
 }
 
-.absolute{
+.absolute {
   position: absolute !important;
 }
 
-
-.w-40{
-  width: 40px; 
+.w-40 {
+  width: 40px;
 }
 
-.h-40{
-  height: 40px; 
+.h-40 {
+  height: 40px;
 }

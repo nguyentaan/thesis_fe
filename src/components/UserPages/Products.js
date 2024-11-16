@@ -3,6 +3,7 @@ import "../Users.css";
 import { getAllProducts } from "../../Slices/UserSlice";
 import { useDispatch, useSelector } from "react-redux";
 import ProductDetailModal from "./ProductDetailModal";
+import RatingDisplay from "./RatingDisplay";
 import Loader from "./Loader";
 
 const Products = () => {
@@ -25,6 +26,8 @@ const Products = () => {
 
   const openProductDetail = (product) => {
     setSelectedProduct(product);
+    console.log("product", product);
+
     setShowDetailModel(true);
   };
 
@@ -69,6 +72,7 @@ const Products = () => {
                         <p className="my-0 text-success-s2 font-weight-bold">
                           ${product.price}
                         </p>
+                        <RatingDisplay rating={product.avg_rating} />
                       </div>
                     </div>
                   </div>
