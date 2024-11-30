@@ -1,12 +1,11 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { Route, Routes, Navigate, Link } from "react-router-dom";
-
 import Login from "./AdminLogin";
 import AdminDashboard from "./Dashboard";
 import AdminProductPage from "./AdminProduct";
 import AdminUsersPage from "./AdminUsers";
-
+import AdminLayout from "./AdminLayout";
 const Index = () => {
   const { isAuth, user } = useSelector((state) => state.auth);
 
@@ -14,28 +13,12 @@ const Index = () => {
     <div>
       <Routes>
         <Route
-          path=""
+          path="/dashboard"
           element={
             isAuth && user?.data?.isAdmin ? (
-              <div>
-                <h1 className="text-success-s2 text-center">
-                  Welcome Admin, this is the dashboard Page.
-                </h1>
-                <div className="d-flex d-row justify-content-center">
-                  <Link to="/admin">
-                    <h4 className="text-success-s2 admin-nav">Home</h4>
-                  </Link>
-                  <hr className="vertical-line mx-4 my-0" />
-                  <Link to="/admin/users">
-                    <h4 className="text-success-s2 admin-nav">Users</h4>
-                  </Link>
-                  <hr className="vertical-line mx-4 my-0" />
-                  <Link to="/admin/product">
-                    <h4 className="text-success-s2 admin-nav">Products</h4>
-                  </Link>
-                </div>
-                <AdminDashboard />
-              </div>
+              <AdminLayout>
+                  <AdminDashboard />
+                </AdminLayout>
             ) : (
               <Navigate to="/admin/login" />
             )
@@ -46,25 +29,9 @@ const Index = () => {
           path="/product"
           element={
             isAuth && user?.data?.isAdmin ? (
-              <div>
-                <h1 className="text-success-s2 text-center">
-                  Welcome Admin, this is the Product Page.
-                </h1>
-                <div className="d-flex d-row justify-content-center">
-                  <Link to="/admin">
-                    <h4 className="text-success-s2 admin-nav">Home</h4>
-                  </Link>
-                  <hr className="vertical-line mx-4 my-0" />
-                  <Link to="/admin/users">
-                    <h4 className="text-success-s2 admin-nav">Users</h4>
-                  </Link>
-                  <hr className="vertical-line mx-4 my-0" />
-                  <Link to="/admin/product">
-                    <h4 className="text-success-s2 admin-nav">Products</h4>
-                  </Link>
-                </div>
-                <AdminProductPage />
-              </div>
+                <AdminLayout>
+                  <AdminProductPage />
+                </AdminLayout>
             ) : (
               <Navigate to="/login" />
             )
@@ -74,25 +41,9 @@ const Index = () => {
           path="/users"
           element={
             isAuth && user?.data?.isAdmin ? (
-              <div>
-                <h1 className="text-success-s2 text-center">
-                  Welcome Admin, this is the Users Page.
-                </h1>
-                <div className="d-flex d-row justify-content-center">
-                  <Link to="/admin">
-                    <h4 className="text-success-s2 admin-nav">Home</h4>
-                  </Link>
-                  <hr className="vertical-line mx-4 my-0" />
-                  <Link to="/admin/users">
-                    <h4 className="text-success-s2 admin-nav">Users</h4>
-                  </Link>
-                  <hr className="vertical-line mx-4 my-0" />
-                  <Link to="/admin/product">
-                    <h4 className="text-success-s2 admin-nav">Products</h4>
-                  </Link>
-                </div>
-                <AdminUsersPage />
-              </div>
+                <AdminLayout>
+                  <AdminUsersPage />
+                </AdminLayout>
             ) : (
               <Navigate to="/login" />
             )

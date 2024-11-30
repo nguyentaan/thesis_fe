@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Table, Thead, Tbody, Tr, Th, Td } from "react-super-responsive-table";
 import { Modal, Button } from "react-bootstrap";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { getAllUser } from "../../Slices/UserSlice";
-import Loader from "../UserPages/Loader";
-import "../Users.css";
+import ContentLayout  from "../admin-panel/content-layout";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from "../ui/breadcrumb";
+import { Link } from "react-router-dom";
+import PlaceholderContent from "../misc/placeholder-content";
 
 const AdminUsers = () => {
   const dispatch = useDispatch();
@@ -73,53 +81,82 @@ const AdminUsers = () => {
   );
 
   return (
-    <div className="text-center container">
-      {isUserLoading ? (
-        <Loader />
-      ) : (
-        <Table className="table table-success">
-          <Thead>
-            <Tr>
-              <Th>#</Th>
-              <Th>Name</Th>
-              <Th>Email</Th>
-              <Th>Phone Number</Th>
-              <Th>Total Order</Th>
-              <Th>
-                <i className="far fa-trash-alt fa-lg"></i>
-              </Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {dataUser?.users?.map((item, index) => (
-              <Tr key={item.email}>
-                <Td className="text-justify text-center">
-                  <img
-                    src={item?.avatar || "https://gravatar.com/avatar/681924887c514c786b5f3fe4e1e1695b?s=400&d=robohash&r=x"}
-                    alt={"avatar"}
-                    className="h-40 w-40"
-                  />
-                </Td>
-                <Td className="text-justify text-center">{item?.name}</Td>
-                <Td className="text-justify text-center">{item?.email}</Td>
-                <Td className="text-justify text-center">0{item?.phone}</Td>
-                <Td className="text-justify text-center">{item?.order_lists.length}</Td>
+    <ContentLayout title="User management">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/admin/dashboard" className="no-underline text-black">Home</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/admin/dashboard" className="no-underline text-black">Dashboard</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>User management</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+      <PlaceholderContent>
+        {/* <DataTable
+          columns={hotspotColumns}
+          data={logData?.data ?? []}
+          pagination={logData?.pagination ?? { pageIndex: 0, pageSize: 10 }}
+          pageCount={logData?.pageCount ?? 0}
+        /> */}
+      </PlaceholderContent>
+    </ContentLayout>
+    // <div className="text-center container">
+    //   {isUserLoading ? (
+    //     <Loader />
+    //   ) : (
+    //     <Table className="table table-success">
+    //       <Thead>
+    //         <Tr>
+    //           <Th>#</Th>
+    //           <Th>Name</Th>
+    //           <Th>Email</Th>
+    //           <Th>Phone Number</Th>
+    //           <Th>Total Order</Th>
+    //           <Th>
+    //             <i className="far fa-trash-alt fa-lg"></i>
+    //           </Th>
+    //         </Tr>
+    //       </Thead>
+    //       <Tbody>
+    //         {dataUser?.users?.map((item, index) => (
+    //           <Tr key={item.email}>
+    //             <Td className="text-justify text-center">
+    //               <img
+    //                 src={item?.avatar || "https://gravatar.com/avatar/681924887c514c786b5f3fe4e1e1695b?s=400&d=robohash&r=x"}
+    //                 alt={"avatar"}
+    //                 className="h-40 w-40"
+    //               />
+    //             </Td>
+    //             <Td className="text-justify text-center">{item?.name}</Td>
+    //             <Td className="text-justify text-center">{item?.email}</Td>
+    //             <Td className="text-justify text-center">0{item?.phone}</Td>
+    //             <Td className="text-justify text-center">{item?.order_lists.length}</Td>
 
-                <Td>
-                  <button
-                    className="btn btn-danger"
-                    onClick={() => displayDeleteModal(item)}
-                  >
-                    <i className="far fa-trash-alt fa-lg"></i>
-                  </button>
-                </Td>
-              </Tr>
-            ))}
-          </Tbody>
-        </Table>
-      )}
-      <DeleteProductModal />
-    </div>
+    //             <Td>
+    //               <button
+    //                 className="btn btn-danger"
+    //                 onClick={() => displayDeleteModal(item)}
+    //               >
+    //                 <i className="far fa-trash-alt fa-lg"></i>
+    //               </button>
+    //             </Td>
+    //           </Tr>
+    //         ))}
+    //       </Tbody>
+    //     </Table>
+    //   )}
+    //   <DeleteProductModal />
+    // </div>
   );
 };
 
