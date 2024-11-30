@@ -1,14 +1,15 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { getOrdersByUserId } from "../../Slices/OrderSlice";
+import { getOrdersByUserId, cancelOrder } from "../../Slices/OrderSlice";
 import OrderDetailModal from "./OrderDetailModal";
 import logo from "../../assets/logo.png";
+import "../Order.css";
 
 const UserOrdersPage = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-  const userId = user.data._id;
+  const userId = user._id;
   // Get order data and loading/error states from Redux store
   const {
     dataOrder = [], // Default to empty array if undefined
@@ -27,7 +28,18 @@ const UserOrdersPage = () => {
   // Open the modal and set selected order
   const openModal = (order) => {
     setSelectedOrder(order);
+    // console.log("Selected order:", order);
+
     setIsModalOpen(true);
+  };
+
+  const handleCancelOrder = (order) => {
+    console.log("Canceling order:", order._id);
+    if (window.confirm("Are you sure you want to cancel this order?")) {
+      // Log userId and order._id to check if they are correct
+      console.log("User ID:", userId, "Order ID:", order._id);
+      dispatch(cancelOrder(userId, order._id));
+    }
   };
 
   // Close the modal
@@ -76,7 +88,7 @@ const UserOrdersPage = () => {
                   <Link to="/" className="text-success-s2 mr-2">
                     HOME
                   </Link>
-                  <span className="text-success-s2 my-0">/ My Orders PAGE</span>
+                  <span className="text-success-s2 my-0">/ My Orders</span>
                 </h6>
               </li>
             </ul>
@@ -86,7 +98,7 @@ const UserOrdersPage = () => {
 
       {/* Orders Section */}
       <div className="container mt-5 pt-5">
-        <h2 className="mb-4">My Orders</h2>
+        <h2 className="mb-4 title">My Orders</h2>
 
         {/* Loading and Error Handling */}
         {isOrderLoading ? (
@@ -112,7 +124,7 @@ const UserOrdersPage = () => {
                       <td>{order._id}</td>
                       <td>{convertDateFormate(order.createdAt)}</td>{" "}
                       {/* Updated field name */}
-                      <td>{order.totalAmount}</td>
+                      <td>${order.totalAmount}</td>
                       <td>
                         <span
                           className={`badge ${
@@ -120,6 +132,10 @@ const UserOrdersPage = () => {
                               ? "badge-success"
                               : order.status === "Shipped"
                               ? "badge-primary"
+                              : order.status === "cancelled"
+                              ? "badge-danger" // Class for Cancelled status
+                              : order.status === "Pending"
+                              ? "badge-secondary" // Class for Pending status
                               : "badge-warning"
                           }`}
                         >
@@ -127,12 +143,27 @@ const UserOrdersPage = () => {
                         </span>
                       </td>
                       <td>
-                        <button
-                          className="btn btn-outline-info btn-sm"
-                          onClick={() => openModal(order)}
-                        >
-                          View Details
-                        </button>
+                        <td>
+                          <div className="btn-group">
+                            <button
+                              className="icon-button btn btn-outline-info btn-sm"
+                              onClick={() => openModal(order)}
+                            >
+                              <i className="fas fa-eye"></i>{" "}
+                              {/* View Details icon */}
+                            </button>
+                            {/* Only show Cancel button if the order is not cancelled */}
+                            {order.status !== "cancelled" && (
+                              <button
+                                className="icon-button btn btn-outline-danger btn-sm ml-2"
+                                onClick={() => handleCancelOrder(order)}
+                              >
+                                <i className="fas fa-times"></i>{" "}
+                                {/* Cancel icon */}
+                              </button>
+                            )}
+                          </div>
+                        </td>
                       </td>
                     </tr>
                   ))

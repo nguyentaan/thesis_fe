@@ -23,7 +23,7 @@ const Checkout = (props) => {
   });
   const total = subTotal + 5;
   const { user } = useSelector((state) => state.auth);
-  const userId = user.data._id;
+  const userId = user._id;
 
   const handleShowModal = () => setShowCheckoutModal(true);
   const handleCloseModal = () => {
@@ -81,7 +81,6 @@ const Checkout = (props) => {
       toast.error("Failed to place order. Please try again.");
     }
   };
-  console.log("orderDetails", orderDetails);
 
   return (
     <div

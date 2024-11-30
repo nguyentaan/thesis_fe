@@ -27,7 +27,8 @@ const Index = (props) => {
   useEffect(() => {
     if (isAuth) {
       setShowLoginModal(false);
-      console.log("user data", user);
+      console.log("user", user);
+      
     }
   }, [isAuth, user]);
 
@@ -62,9 +63,12 @@ const Index = (props) => {
     setShowLoginModal(boolean);
   };
 
-  const handleLoginSuccess = () => {
-    setShowLoginModal(false);
-  };
+const handleLoginSuccess = () => {
+  setShowLoginModal(false);
+  // Optionally, handle additional logic for the logged-in user
+  console.log(user?.data); // Access user data after login
+};
+
 
   const Logout = () => {
     dispatch(logout());
@@ -139,7 +143,7 @@ const Index = (props) => {
                         aria-haspopup="true"
                         aria-expanded="false"
                       >
-                        {`Hello, ${user?.data?.name}`}
+                        {`Hello, ${user.name}`}
                       </button>
                       <div className="dropdown-menu t45">
                         <Link
@@ -186,7 +190,7 @@ const Index = (props) => {
           </p>
           
           <SearchDropdown
-            options={user?.data?.search_history || []}
+            options={user?.search_history || []}
             id="id"
             selectedVal={value}
             handleChange={setValue}

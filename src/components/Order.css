@@ -1,0 +1,250 @@
+/* Table row styles */
+tbody tr {
+  border-bottom: 1px solid #ddd;
+}
+
+tbody td {
+  padding: 8px;
+  /* text-align: center; */
+  vertical-align: middle;
+}
+
+.title {
+  font-weight: bold;
+}
+
+/* Default badge styles */
+.badge {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 1rem;
+  display: inline-block;
+}
+
+/* Success (Delivered) */
+.badge-success {
+  background-color: #28a745;
+  color: white;
+}
+
+/* Primary (Shipped) */
+.badge-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Danger (Cancelled) */
+.badge-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* Warning (Default if no match) */
+.badge-warning {
+  background-color: #ffc107;
+  color: black;
+}
+
+/* Secondary (Pending) */
+.badge-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px; /* Set a consistent button size */
+  height: 30px;
+  margin-right: 5px;
+  padding: 0; /* Remove padding to make button fit the icon */
+}
+
+.icon-button i {
+  font-size: 0.8rem;
+  margin: 0; /* Remove any default margin */
+  line-height: 1; /* Align icon vertically */
+}
+
+/* Adjust the button border colors for each type, if needed */
+.btn-outline-info {
+  border-color: #17a2b8;
+}
+
+.btn-outline-warning {
+  border-color: #ffc107;
+}
+
+.btn-outline-danger {
+  border-color: #dc3545;
+}
+
+/* Button styles */
+.btn-outline-info {
+  color: #17a2b8;
+  border: 1px solid #17a2b8;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  border-radius: 0.2rem;
+  text-transform: uppercase;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-outline-info:hover {
+  background-color: #17a2b8;
+  color: #fff;
+}
+/*Order Details Modal*/
+/* Modal backdrop */
+.modal1 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1050;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black backdrop */
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-dialog1 {
+  max-width: 1100px;
+  max-height: 700px;
+  /* width: 100%; */
+  background-color: #fcf9f6;
+  padding: 40px;
+  border-radius: 18px;
+}
+
+.close {
+  background-color: transparent;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333; /* Default close button color */
+  cursor: pointer;
+  outline: none;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.close:hover {
+  color: #ff5a5f; /* Hover color, like red */
+  transform: scale(1.2); /* Slight scaling on hover for emphasis */
+}
+
+.close:focus {
+  color: #ff5a5f;
+  outline: none; /* Removes the outline when focused */
+}
+
+.modal-content {
+  border-radius: 8px;
+}
+
+.modal-header {
+  /* background-color: #f8f9fa; */
+  border-bottom: 1px solid #dee2e6;
+}
+
+.modal-title {
+  font-weight: bold;
+}
+
+.mr-5 {
+  margin-right: 20px;
+}
+
+.mw-300 {
+  max-width: 350px;
+}
+
+.df {
+  display: flex;
+}
+.table-container {
+  margin-top: 20px;
+  border-radius: 8px; /* Adjust the radius as needed */
+  overflow: hidden;
+  max-height: 300px; /* Set max height as needed */
+  overflow-y: auto;
+  border: 1px solid #dee2e6;
+  background-color: #ffffff;
+}
+
+table.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+table.table th,
+table.table td {
+  padding: 12px;
+  border: none;
+}
+
+/* Optional: add a border for the table rows or cells */
+table.table tr {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.order-details {
+  padding: 20px;
+  border: 1px solid #dee2e6;
+  background: #ffffff;
+  border-radius: 10px;
+  margin: 10px 0;
+}
+
+.order-detail {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-top: 1px solid #dee2e6;
+}
+
+.order-content {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.label {
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.order-summaries {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+  padding: 10px 20px;
+  border: 1px solid #dee2e6;
+  background: #ffffff;
+  border-radius: 10px;
+}
+
+.order-sumary {
+  display: flex;
+  justify-content: space-between;
+}
+
+.order-total {
+  margin-top: 20px;
+  padding: 10px 20px;
+  border: 1px solid #dee2e6;
+  background: #ffffff;
+  border-radius: 10px;
+}
+
+.order-address {
+  margin-top: 20px;
+  padding: 10px 20px;
+  border: 1px solid #dee2e6;
+  background: #ffffff;
+  border-radius: 10px;
+}
