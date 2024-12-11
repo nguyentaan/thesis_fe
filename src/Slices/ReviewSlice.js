@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const API_URL = `${process.env.REACT_APP_API_URL}`;
 
@@ -16,20 +17,22 @@ export const fetchReviews = createAsyncThunk(
   }
 );
 
-// export const addReview = createAsyncThunk(
-//   "reviews/addReview",
-//   async ({ productId, reviewData }, { rejectWithValue }) => {
-//     try {
-//       const response = await axios.post(
-//         `/api/reviews/${productId}`,
-//         reviewData
-//       );
-//       return response.data; // Assuming API returns the created review
-//     } catch (error) {
-//       return rejectWithValue(error.response?.data || error.message);
-//     }
-//   }
-// );
+export const writeReview = createAsyncThunk(
+  "reviews/writeReview",
+  async ({ productId, rating, reviewText, userId }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${API_URL}/api/review/write`, {
+        productId,
+        rating,
+        reviewText,
+        userId,
+      });
+      return response.data.review;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
 
 const reviewSlice = createSlice({
   name: "reviews",
@@ -57,6 +60,26 @@ const reviewSlice = createSlice({
       .addCase(fetchReviews.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
+      })
+      .addCase(writeReview.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(writeReview.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.reviews.push(action.payload);
+        toast.success("Review added successfully!", {
+          position: toast.POSITION.TOP_CENTER,
+          autoClose: 3000,
+        });
+      })
+      .addCase(writeReview.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+        toast.error(`Failed to add review: ${action.payload}`, {
+          position: toast.POSITION.TOP_CENTER,
+          autoClose: 3000,
+        });
       });
   },
 });
