@@ -7,7 +7,7 @@ import "react-toastify/dist/ReactToastify.css"; // Ensure Toastify styles are im
 import logo from "../../assets/logo.png";
 import "../Users.css";
 import { emailLogin } from "../../Slices/AuthenSlice"; // Adjust path if necessary
-import OtpVerification from "../UserPages/OtpVerification";
+import OtpVerification from "./OtpVerification";
 
 const AdminLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -45,7 +45,7 @@ const AdminLogin = () => {
   // Redirect if authenticated and admin
   useEffect(() => {
     if (isAuth && user?.data?.isAdmin === true) {
-      navigate("/admin");
+      navigate("/admin/dashboard");
     } else if (isAuth && user?.data?.isAdmin === false) {
       unAuthoriaztionLoginNotification();
       navigate("/");
