@@ -28,6 +28,7 @@
   align-items: center;
   border-radius: 6px;
   overflow: hidden;
+  margin: 0 20px;
   width: 700px;
   color: rgb(119, 121, 140);
   background-color: rgb(255, 255, 255);
@@ -652,4 +653,58 @@ td {
 
 .h-40 {
   height: 40px;
+}
+
+h2 {
+  margin-top: 40px;
+  margin-bottom: 20px;
+  font-size: 1.6rem !important;
+  color: #333;
+  text-transform: uppercase;
+}
+
+h2.font-weight-bold {
+  font-weight: bold;
+  border-bottom: 2px solid #198754; /* Adds a blue underline */
+  padding-bottom: 5px;
+}
+
+/* Recommended Products Section */
+.recommended-products-section {
+  border-radius: 10px;
+  margin-bottom: 40px;
+}
+
+.loading-spinner {
+  font-size: 1.5rem;
+  color: #007bff;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.rank-products-container {
+  background-color: #f5f5f5; /* Light background color to highlight */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.highlighted-section-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ff5733; /* Highlight color */
+  margin-bottom: 15px;
+}
+
+.refined-products-container {
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.standard-section-title {
+  font-size: 1.3rem;
+  color: #333;
+  margin-bottom: 15px;
 }

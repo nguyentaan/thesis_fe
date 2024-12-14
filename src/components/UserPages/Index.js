@@ -9,9 +9,11 @@ import logo from "../../assets/logo.png";
 import Carousel from "./Carousel";
 import ProductField from "./Products";
 import LoginModal from "./Login";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import SearchDropdown from "./SearchDropdown";
 import "../Users.css";
+import RecommendedProduct from "./RecommendedProduct";
+import ModelDropdown from "./ModelDropdown";
 
 const Index = (props) => {
   const dispatch = useDispatch();
@@ -26,19 +28,12 @@ const Index = (props) => {
   useEffect(() => {
     if (isAuth) {
       setShowLoginModal(false);
-      console.log("user", user);
-      
+      // console.log("user", user);
     }
   }, [isAuth, user]);
 
   const noLoginCartNotification = () => {
     toast.error("Please login first to continue.", {
-      position: toast.POSITION.TOP_CENTER,
-    });
-  };
-
-  const comingSoonNotification = () => {
-    toast.success("This Feature will coming soon, Stay tune!", {
       position: toast.POSITION.TOP_CENTER,
     });
   };
@@ -62,12 +57,11 @@ const Index = (props) => {
     setShowLoginModal(boolean);
   };
 
-const handleLoginSuccess = () => {
-  setShowLoginModal(false);
-  // Optionally, handle additional logic for the logged-in user
-  console.log(user?.data); // Access user data after login
-};
-
+  const handleLoginSuccess = () => {
+    setShowLoginModal(false);
+    // Optionally, handle additional logic for the logged-in user
+    // console.log(user?.data); // Access user data after login
+  };
 
   const Logout = () => {
     dispatch(logout());
@@ -187,7 +181,7 @@ const handleLoginSuccess = () => {
             Ready to wear dresses tailored for you from online. Hurry up while
             stock lasts.
           </p>
-          
+          {/* <ModelDropdown /> */}
           <SearchDropdown
             options={user?.search_history || []}
             id="id"
@@ -207,49 +201,12 @@ const handleLoginSuccess = () => {
       {/* part 3 - content */}
       <div className="container">
         <div className="row mb-5">
-          {/* Sidebar 
-          <div className="col-md-3 mt-3">
-            <div className="list-group">
-              <button
-                onClick={comingSoonNotification}
-                type="button"
-                className="list-group-item list-group-item-action d-flex d-row mb-2"
-              >
-                Face
-              </button>
-              <button
-                onClick={comingSoonNotification}
-                type="button"
-                className="list-group-item list-group-item-action d-flex d-row mb-2"
-              >
-                Eyes
-              </button>
-              <button
-                onClick={comingSoonNotification}
-                type="button"
-                className="list-group-item list-group-item-action d-flex d-row mb-4"
-              >
-                Lips
-              </button>
-              <button
-                onClick={comingSoonNotification}
-                type="button"
-                className="list-group-item list-group-item-action d-flex d-row mb-2"
-              >
-                Accessories
-              </button>
-              <button
-                onClick={comingSoonNotification}
-                type="button"
-                className="list-group-item list-group-item-action d-flex d-row mb-2"
-              >
-                Shaving Needs
-              </button>
-            </div>
-          </div>
-          {/* Sidebar */}
-
           <div className="col-md-9">
+            <div className="recommended-products-section">
+              <h2 className="font-weight-bold">Recommended Products</h2>
+              <RecommendedProduct />
+            </div>
+            <h2 className="font-weight-bold">Our Products</h2>
             <ProductField
               searchInput={searchInput}
               submitSearch={submitSearch}

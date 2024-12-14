@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "../Users.css";
 import ProductDetailModal from "./ProductDetailModal";
 import Loader from "./Loader";
+import RatingDisplay from "./RatingDisplay";
 
 const ProductsRender = ({ dataProduct, isProductLoading }) => {
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -23,7 +24,9 @@ const ProductsRender = ({ dataProduct, isProductLoading }) => {
       {/* Render product list only if modal is not visible */}
       {!showDetailModel && !isProductLoading && (
         <div className="row">
-          {dataProduct && dataProduct.products && dataProduct.products.length > 0 ? (
+          {dataProduct &&
+          dataProduct.products &&
+          dataProduct.products.length > 0 ? (
             dataProduct.products.map((product) => (
               <div key={product._id} className="col-md-4 mt-4">
                 <div className="card">
@@ -51,10 +54,7 @@ const ProductsRender = ({ dataProduct, isProductLoading }) => {
                         <p className="my-0 text-success-s2 font-weight-bold">
                           ${product.price}
                         </p>
-                        <button className="btn btn-outline-success d-flex d-row ml-auto">
-                          <i className="fas fa-cart-plus align-self-center mr-2 fa-sm" />
-                          <small className="font-weight-bold">Cart</small>
-                        </button>
+                        <RatingDisplay rating={product.avg_rating} />
                       </div>
                     </div>
                   </div>
@@ -69,18 +69,24 @@ const ProductsRender = ({ dataProduct, isProductLoading }) => {
 
       {isProductLoading && <p>Loading more products...</p>}
 
-      {dataProduct && dataProduct.products && dataProduct.products.length < dataProduct.total && (
-        <div className="btn-wrapper">
-          <button
-            className="btn-loadmore"
-            // The load more functionality should be implemented by the parent component
-            onClick={() => console.log("Load more products functionality should be handled in parent")}
-            disabled={isProductLoading}
-          >
-            Load More
-          </button>
-        </div>
-      )}
+      {dataProduct &&
+        dataProduct.products &&
+        dataProduct.products.length < dataProduct.total && (
+          <div className="btn-wrapper">
+            <button
+              className="btn-loadmore"
+              // The load more functionality should be implemented by the parent component
+              onClick={() =>
+                console.log(
+                  "Load more products functionality should be handled in parent"
+                )
+              }
+              disabled={isProductLoading}
+            >
+              Load More
+            </button>
+          </div>
+        )}
 
       {showDetailModel && (
         <ProductDetailModal

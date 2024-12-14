@@ -21,7 +21,8 @@ const ProductDetailModal = ({
   const { user, isAuth } = useSelector((state) => state.auth);
   // Check if user is logged in
   const isUserLoggedIn = isAuth;
-
+  console.log("selectedProduct", selectedProduct);
+  
   // Close modal when clicking outside of it
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -71,6 +72,8 @@ const ProductDetailModal = ({
     const productId = selectedProduct._id;
     const size = selectedSize;
     const quantity = 1;
+    console.log("Adding to cart:", { productId, size, quantity });
+    
 
     dispatch(addToCart({ userId: user._id, productId, quantity, size }));
   };

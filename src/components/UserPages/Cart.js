@@ -29,7 +29,19 @@ const Cart = () => {
 
   // Fetch the cart when the component mounts
   useEffect(() => {
-    dispatch(fetchCart(userId));
+    const fetchData = async () => {
+      if (!userId) {
+        console.error("User ID is missing, cannot fetch cart.");
+        return;
+      }
+      try {
+        await dispatch(fetchCart(userId));
+      } catch (error) {
+        console.error("Error fetching cart:", error);
+      }
+    };
+
+    fetchData();
   }, [dispatch, userId]);
 
   useEffect(() => {
@@ -41,6 +53,8 @@ const Cart = () => {
       }, 0)
     );
   }, [dataCart]);
+  console.log(dataCart);
+  console.log("userId", userId);
 
   // Enhanced parsePrice function to handle different invalid cases
   const parsePrice = (price) => {
@@ -58,6 +72,7 @@ const Cart = () => {
   }
 
   if (error) {
+    console.error("Error details:", error);
     return <div>Error: {error.message || "Something went wrong"}</div>;
   }
 

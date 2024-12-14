@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import { connect } from "react-redux";
 import { Modal, Button } from "react-bootstrap";
-import { addDataProduct } from "../../actionCreators/AdminAction";
 
 const AdminProductAdd = (props) => {
   const [imageLink, setImageLink] = useState("");
@@ -173,8 +171,4 @@ const AdminProductAdd = (props) => {
   );
 };
 
-const mapDispatchToProps = {
-  addDataProduct,
-};
-
-export default connect(null, mapDispatchToProps)(AdminProductAdd);
+export default AdminProductAdd;

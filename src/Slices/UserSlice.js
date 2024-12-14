@@ -41,6 +41,8 @@ export const getSearchProducts = createAsyncThunk(
         query,
         session_context, // Send query and session_context in the body
       });
+      console.log("res", res.data);
+      
       return res.data;
     } catch (error) {
       console.error("API error:", error);
