@@ -1,8 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { connect } from "react-redux";
-import {
-  deleteDataProduct,
-} from "../../actionCreators/AdminAction";
 import { useDispatch } from "react-redux";
 
 import { Modal, Button, Alert } from "react-bootstrap";
@@ -54,7 +50,7 @@ const AdminProduct = (props) => {
   };
   const handleDelete = () => {
     console.log("Deleting product with productid:", dataDelete.product_id);
-    dispatch(deleteDataProduct(dataDelete.product_id.S));
+    // dispatch(deleteDataProduct(dataDelete.product_id.S));
     setShowDeleteModal(false);
   
     setShowDeleteModal(false);
@@ -216,11 +212,5 @@ const AdminProduct = (props) => {
   );
 };
 
-const mapStateToProps = (state) => {
-  return {
-    alertData: state.AdminProductReducer.alert,
-    dataProduct: state.AdminProductReducer.dataProduct,
-  };
-};
 
-export default connect(mapStateToProps)(AdminProduct);
+export default AdminProduct;

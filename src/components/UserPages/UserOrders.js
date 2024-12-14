@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { getOrdersByUserId, cancelOrder } from "../../Slices/OrderSlice";
 import OrderDetailModal from "./OrderDetailModal";
 import logo from "../../assets/logo.png";
+import WriteReview from "./WriteReview";
 import "../Order.css";
 
 const UserOrdersPage = () => {
@@ -19,6 +20,7 @@ const UserOrdersPage = () => {
 
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [selectedOrder, setSelectedOrder] = React.useState(null);
+  const [isReviewOpen, setIsReviewOpen] = React.useState(false); // State to control review modal
 
   // Fetch orders on component mount
   useEffect(() => {
@@ -28,7 +30,7 @@ const UserOrdersPage = () => {
   // Open the modal and set selected order
   const openModal = (order) => {
     setSelectedOrder(order);
-    // console.log("Selected order:", order);
+    console.log("Selected order:", order);
 
     setIsModalOpen(true);
   };
@@ -57,6 +59,16 @@ const UserOrdersPage = () => {
     const year = date.getFullYear();
 
     return `${day}/${month}/${year}`;
+  };
+
+  const handleAddReview = (product) => {
+    console.log("Adding review for product:", product._id);
+    console.log("Product:", product);
+    
+    setSelectedOrder(product); // Update to set the product instead of the order
+    setIsReviewOpen(true); // Open the review modal
+    console.log("Is Review Open:", isReviewOpen);
+
   };
 
   return (
@@ -121,9 +133,33 @@ const UserOrdersPage = () => {
                 {dataOrder.length > 0 ? (
                   dataOrder.map((order) => (
                     <tr key={order._id}>
-                      <td>{order._id}</td>
-                      <td>{convertDateFormate(order.createdAt)}</td>{" "}
-                      {/* Updated field name */}
+                      <td>
+                        {order.items.map((item) => (
+                          <div key={item._id} className="product-info1">
+                            <img
+                              src={item.productId.images[0]}
+                              alt={item.productId.name}
+                              className="product-image-small"
+                            />
+                            <div>
+                              <p className="mb-1">
+                                <strong>{item.productId.name}</strong>
+                              </p>
+                              {order.status === "Delivered" && (
+                                <button
+                                  className="btn btn-sm btn-outline-primary"
+                                  onClick={() =>
+                                    handleAddReview(item.productId)
+                                  }
+                                >
+                                  Write Review
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </td>
+                      <td>{convertDateFormate(order.createdAt)}</td>
                       <td>${order.totalAmount}</td>
                       <td>
                         <span
@@ -133,9 +169,9 @@ const UserOrdersPage = () => {
                               : order.status === "Shipped"
                               ? "badge-primary"
                               : order.status === "cancelled"
-                              ? "badge-danger" // Class for Cancelled status
+                              ? "badge-danger"
                               : order.status === "Pending"
-                              ? "badge-secondary" // Class for Pending status
+                              ? "badge-secondary"
                               : "badge-warning"
                           }`}
                         >
@@ -143,27 +179,22 @@ const UserOrdersPage = () => {
                         </span>
                       </td>
                       <td>
-                        <td>
-                          <div className="btn-group">
+                        <div className="btn-group">
+                          <button
+                            className="icon-button btn btn-outline-info btn-sm"
+                            onClick={() => openModal(order)}
+                          >
+                            <i className="fas fa-eye"></i>
+                          </button>
+                          {order.status === "Pending" && (
                             <button
-                              className="icon-button btn btn-outline-info btn-sm"
-                              onClick={() => openModal(order)}
+                              className="icon-button btn btn-outline-danger btn-sm ml-2"
+                              onClick={() => handleCancelOrder(order)}
                             >
-                              <i className="fas fa-eye"></i>{" "}
-                              {/* View Details icon */}
+                              <i className="fas fa-times"></i>
                             </button>
-                            {/* Only show Cancel button if the order is not cancelled */}
-                            {order.status !== "cancelled" && (
-                              <button
-                                className="icon-button btn btn-outline-danger btn-sm ml-2"
-                                onClick={() => handleCancelOrder(order)}
-                              >
-                                <i className="fas fa-times"></i>{" "}
-                                {/* Cancel icon */}
-                              </button>
-                            )}
-                          </div>
-                        </td>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -179,6 +210,15 @@ const UserOrdersPage = () => {
           </div>
         )}
       </div>
+      {/* Show WriteReview component if the state is open */}
+      {isReviewOpen && (
+        <WriteReview
+          product={selectedOrder}
+          userId={userId}
+          closeReview={() => setIsReviewOpen(false)}
+        />
+      )}
+
       <OrderDetailModal
         order={selectedOrder}
         isOpen={isModalOpen}

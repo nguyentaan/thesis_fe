@@ -1,0 +1,60 @@
+/* Container for the dropdown button */
+.model-dropdown-container {
+  position: relative;
+  display: inline-block;
+  font-family: Arial, sans-serif;
+}
+
+/* Style for the dropdown button */
+.dropdown-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #4caf50;  /* Green background */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 200px;
+}
+
+/* Change button color when hovered */
+.dropdown-button:hover {
+  background-color: #45a049;
+}
+
+/* Style for the dropdown menu */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;  /* Position directly below the button */
+  left: 0;
+  width: 100%;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;  /* Ensure dropdown appears above other content */
+  max-height: 250px;
+  overflow-y: auto;
+  font-size: 16px;
+  padding: 5px 0;
+}
+
+/* Style for individual items in the dropdown */
+.dropdown-item {
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Change background when hovered */
+.dropdown-item:hover {
+  background-color: #f1f1f1;
+}
+
+/* Icon for the dropdown */
+.fas {
+  margin-left: 10px;
+}
