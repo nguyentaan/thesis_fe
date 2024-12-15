@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../../Slices/AuthenSlice";
+import { logout, loginSuccess } from "../../Slices/AuthenSlice";
 import "react-toastify/dist/ReactToastify.css";
 import mainBg from "../../assets/mainBackground.png";
 import logo from "../../assets/logo.png";
@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import SearchDropdown from "./SearchDropdown";
 import "../Users.css";
 import RecommendedProduct from "./RecommendedProduct";
-import ModelDropdown from "./ModelDropdown";
+// import ModelDropdown from "./ModelDropdown";
 
 const Index = (props) => {
   const dispatch = useDispatch();
@@ -60,7 +60,8 @@ const Index = (props) => {
   const handleLoginSuccess = () => {
     setShowLoginModal(false);
     // Optionally, handle additional logic for the logged-in user
-    // console.log(user?.data); // Access user data after login
+    // console.log(user?.data); // Access user data after login// Save user info
+    dispatch(loginSuccess({ user: user }));
   };
 
   const Logout = () => {

@@ -3,7 +3,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { useSelector, useDispatch } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
 import ProductsRender from "./ProductsRender";
-import LoginModal from "./Login";
+// import LoginModal from "./Login";
 import { useParams } from "react-router-dom";
 import {
   getSearchProducts,
@@ -15,6 +15,7 @@ import "../Users.css";
 import "../Search.css";
 import logo from "../../assets/logo.png";
 import { Link } from "react-router-dom";
+import SearchDropdown from "./SearchDropdown";
 const Search = () => {
   const { keyword } = useParams();
   const dispatch = useDispatch();
@@ -25,10 +26,12 @@ const Search = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [sessionContext, setSessionContext] = useState([]);
-  const [searchHistory, setSearchHistory] = useState([]);
+  // const [searchHistory, setSearchHistory] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
-  const [isFocused, setIsFocused] = useState(false);
+  // const [isFocused, setIsFocused] = useState(false);
+
+  console.log("searchInput", searchInput);
 
   const noLoginCartNotification = () => {
     toast.error("Please login first to continue.", {
@@ -51,6 +54,11 @@ const Search = () => {
   const fetchSearchProducts = useCallback(
     async (updatedSessionContext, page = currentPage) => {
       setIsLoading(true);
+      console.log("Fetching search products for:", {
+        query: searchInput,
+        session_context: updatedSessionContext,
+        page,
+      });
       try {
         const response = await dispatch(
           getSearchProducts({
@@ -60,12 +68,12 @@ const Search = () => {
             limit: 20,
           })
         ).unwrap();
-
+        console.log("Search Response:", response); // Debug
         setSearchResults(response || []);
         setCurrentPage(page);
         setTotalResults(response?.total_results || 0);
       } catch (error) {
-        console.error("Failed to fetch search products:", error);
+        console.error("Failed to fetch search products:", error); // Debug
         setSearchResults([]);
       } finally {
         setIsLoading(false);
@@ -74,34 +82,13 @@ const Search = () => {
     [dispatch, searchInput, currentPage]
   );
 
-  const handleSearchSubmit = useCallback(async () => {
+  const handleSearchSubmit = useCallback(() => {
     if (searchInput.trim() && !sessionContext.includes(searchInput)) {
       const updatedSessionContext = [...sessionContext, searchInput];
       setSessionContext(updatedSessionContext);
-
-      await fetchSearchProducts(updatedSessionContext); // Pass updated session context directly
-
-      if (isAuth) {
-        try {
-          const response = await dispatch(
-            addSearchKeyword({ query: searchInput, user_id: user?._id })
-          ).unwrap();
-          const newHistory = response.data;
-          dispatch(updateSearchHistory(newHistory));
-          setSearchHistory(newHistory);
-        } catch (error) {
-          console.error("Failed to add search keyword:", error);
-        }
-      }
+      fetchSearchProducts(updatedSessionContext);
     }
-  }, [
-    searchInput,
-    sessionContext,
-    fetchSearchProducts,
-    dispatch,
-    isAuth,
-    user,
-  ]);
+  }, [searchInput, sessionContext, fetchSearchProducts]);
 
   const handlePageChange = useCallback(
     (newPage) => {
@@ -112,9 +99,9 @@ const Search = () => {
 
   const openLoginModal = () => setShowLoginModal(true);
 
-  const closeLoginModal = (boolean) => setShowLoginModal(boolean);
+  // const closeLoginModal = (boolean) => setShowLoginModal(boolean);
 
-  const handleLoginSuccess = () => setShowLoginModal(false);
+  // const handleLoginSuccess = () => setShowLoginModal(false);
 
   const totalPages = Math.ceil(totalResults / 20);
 
@@ -139,6 +126,13 @@ const Search = () => {
     }
   }, [dispatch, isAuth, searchInput, user?._id]);
 
+  useEffect(() => {
+    if (keyword) {
+      setSearchInput(keyword);
+      fetchSearchProducts([keyword]);
+    }
+  }, [keyword, fetchSearchProducts]); // Include fetchSearchProducts as dependency
+
   return (
     <div
       style={{ fontFamily: "Karla, sans-serif", backgroundColor: "#f8f9fa" }}
@@ -148,45 +142,14 @@ const Search = () => {
           <a className="navbar-brand" href="/">
             <img src={logo} className="logo-fx" alt="Logo" />
           </a>
-          <div className="form-group">
-            <div className="search-box-container">
-              <input
-                type="text"
-                className="search-box1"
-                placeholder="Search the fashion name that you want here"
-                name="searchinput"
-                value={searchInput}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
-                onChange={handleSearchInput}
-                required
-                onKeyPress={(event) =>
-                  event.key === "Enter" && handleSearchSubmit()
-                }
-              />
-              <button
-                className="btn-search1"
-                type="button"
-                onClick={handleSearchSubmit}
-              >
-                <i className="fas fa-search"></i>
-              </button>
-            </div>
-            {isFocused && searchHistory?.length > 0 && (
-              <div className="search-history-dropdown">
-                {searchHistory?.map((keyword, index) => (
-                  <div
-                    key={index}
-                    className="search-history-item"
-                    onMouseDown={() => setSearchInput(keyword)}
-                  >
-                    {keyword}
-                  </div>
-                ))}
-              </div>
-            )}
+          <div className="search-container">
+            <SearchDropdown
+              options={user?.search_history || []}
+              searchInput={searchInput}
+              setSearchInput={handleSearchInput}
+              handleSearchSubmit={handleSearchSubmit}
+            />
           </div>
-
           <button
             className="navbar-toggler"
             type="button"
