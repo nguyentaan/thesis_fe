@@ -136,6 +136,7 @@ const Search = () => {
   return (
     <div
       style={{ fontFamily: "Karla, sans-serif", backgroundColor: "#f8f9fa" }}
+      className="search-page"
     >
       <nav className="navbar fixed-top navbar-expand-lg navbar-light bg-light">
         <div className="container">
@@ -267,17 +268,19 @@ const Search = () => {
               </>
             )}
 
-            <div className="pagination">
+            <div className="pagination-container">
               <button
+                className="pagination-button"
                 disabled={currentPage === 1}
                 onClick={() => handlePageChange(currentPage - 1)}
               >
                 Previous
               </button>
-              <span>
+              <span className="pagination-info">
                 Page {currentPage} of {totalPages}
               </span>
               <button
+                className="pagination-button"
                 disabled={currentPage === totalPages}
                 onClick={() => handlePageChange(currentPage + 1)}
               >

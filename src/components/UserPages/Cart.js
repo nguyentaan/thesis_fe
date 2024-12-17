@@ -18,7 +18,6 @@ const Cart = () => {
     dataCart = [],
     // cartTotal,
     isCartLoading,
-    error,
   } = useSelector((state) => state.cart);
   const [subTotal, setSubTotal] = React.useState(0);
   const total = subTotal + 5;
@@ -69,11 +68,6 @@ const Cart = () => {
 
   if (isCartLoading) {
     return <div>Loading...</div>;
-  }
-
-  if (error) {
-    console.error("Error details:", error);
-    return <div>Error: {error.message || "Something went wrong"}</div>;
   }
 
   const handleIncreaseQty = async (item) => {

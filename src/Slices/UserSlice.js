@@ -96,9 +96,9 @@ const userSlice = createSlice({
     },
     updateSearchHistory(state, action) {
       state.searchHistory = action.payload;
-      toast.success("Search history updated successfully!", {
-        position: toast.POSITION.TOP_CENTER,
-      });
+      // toast.success("Search history updated successfully!", {
+      //   position: toast.POSITION.TOP_CENTER,
+      // });
     },
   },
   extraReducers: (builder) => {

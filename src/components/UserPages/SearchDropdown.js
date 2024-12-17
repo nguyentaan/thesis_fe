@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { useNavigate } from 'react-router-dom';
-import "../Users.css";
+import { useNavigate } from "react-router-dom";
+import "../Search.css";
 
 const SearchDropdown = ({
   options = [],
   id = "dropdown",
   selectedVal = "",
-  handleChange = () => { }
+  handleChange = () => {},
 }) => {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -74,15 +74,15 @@ const SearchDropdown = ({
     [handleSearchSubmit]
   );
 
-  if (!options) return null;  
+  if (!options) return null;
 
   return (
-    <div className="relative cursor-default">
-      <div className="form-group relative w-full">
+    <div className="search-container-content">
+      <div className="search-wrapper">
         <input
           ref={inputRef}
           type="text"
-          className="search-box"
+          className="search-input"
           placeholder="Search the fashion name that you want here"
           name="searchinput"
           value={searchInput}
@@ -93,7 +93,7 @@ const SearchDropdown = ({
           autoComplete="off"
         />
         <button
-          className="btn-search"
+          className="search-button"
           type="button"
           id="button-addon2"
           onClick={handleSearchSubmit}
@@ -102,27 +102,21 @@ const SearchDropdown = ({
         </button>
       </div>
       {isOpen && (
-        <div
-          ref={dropdownRef}
-          className="dropdown-menu absolute top-full left-0 w-full bg-white border border-gray-300 shadow-lg max-h-52 overflow-y-auto z-50 mt-1"
-          style={{ maxHeight: "200px", display: "block" }} // Ensure visibility
-        >
+        <div ref={dropdownRef} className="search-dropdown">
           {filterOptions().length > 0 ? (
             filterOptions().map((option, index) => (
               <div
                 key={`${id}-${index}`}
                 onClick={() => selectOption(option)}
-                className={`dropdown-item p-2 px-4 cursor-pointer ${
-                  option === selectedVal
-                    ? "selected"
-                    : "hover:bg-indigo-100 hover:text-gray-900"
+                className={`search-dropdown-item ${
+                  option === selectedVal ? "active" : ""
                 }`}
               >
                 {option}
               </div>
             ))
           ) : (
-            <div className="p-2">No matches found</div> // Display a message if no options
+            <div className="search-dropdown-empty">No matches found</div>
           )}
         </div>
       )}
