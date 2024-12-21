@@ -38,7 +38,7 @@ const Products = () => {
 
   return (
     <div style={{ fontFamily: "Karla,sans-serif" }}>
-      {isProductLoading && <Loader />}
+      <Loader isProductLoading={isProductLoading} />
       {/* Render product list only if modal is not visible */}
       {!showDetailModel && !isProductLoading && (
         <div className="row">

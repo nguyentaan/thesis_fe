@@ -16,6 +16,8 @@ import "../Search.css";
 import logo from "../../assets/logo.png";
 import { Link } from "react-router-dom";
 import SearchDropdown from "./SearchDropdown";
+import Loader from "./Loader";
+
 const Search = () => {
   const { keyword } = useParams();
   const dispatch = useDispatch();
@@ -232,42 +234,32 @@ const Search = () => {
       <div className="container mt-5 pt-5">
         <div className="row mb-5">
           <div className="col-md-9">
-            {isLoading ? (
-              <div className="loading-spinner">Loading...</div>
-            ) : (
-              <>
-                {/* Render rank_product_llm first with special styling */}
-                {searchResults?.rank_product_llm?.length > 0 && (
-                  <div className="rank-products-container">
-                    <h2 className="highlighted-section-title">
-                      Featured Products
-                    </h2>
-                    <ProductsRender
-                      dataProduct={{
-                        products: searchResults.rank_product_llm,
-                        total: searchResults.rank_product_llm.length,
-                      }}
-                      isProductLoading={isLoading}
-                    />
-                  </div>
-                )}
-
-                {/* Render refined_products normally */}
-                {searchResults?.refined_products?.length > 0 && (
-                  <div className="refined-products-container">
-                    <h2 className="standard-section-title">Refined Products</h2>
-                    <ProductsRender
-                      dataProduct={{
-                        products: searchResults.refined_products,
-                        total: searchResults.refined_products.length,
-                      }}
-                      isProductLoading={isLoading}
-                    />
-                  </div>
-                )}
-              </>
+            {searchResults?.rank_product_llm?.length > 0 && (
+              <div className="rank-products-container">
+                <h2 className="highlighted-section-title">Featured Products</h2>
+                <ProductsRender
+                  dataProduct={{
+                    products: searchResults.rank_product_llm,
+                    total: searchResults.rank_product_llm.length,
+                  }}
+                  isProductLoading={isLoading}
+                />
+              </div>
             )}
 
+            {/* Render refined_products normally */}
+            {searchResults?.refined_products?.length > 0 && (
+              <div className="refined-products-container">
+                <h2 className="standard-section-title">Refined Products</h2>
+                <ProductsRender
+                  dataProduct={{
+                    products: searchResults.refined_products,
+                    total: searchResults.refined_products.length,
+                  }}
+                  isProductLoading={isLoading}
+                />
+              </div>
+            )}
             <div className="pagination-container">
               <button
                 className="pagination-button"
