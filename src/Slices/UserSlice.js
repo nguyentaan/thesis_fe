@@ -41,9 +41,7 @@ export const getSearchProducts = createAsyncThunk(
         query,
         session_context, // Send query and session_context in the body
       });
-      console.log("res", res.data);
-      
-      return res.data;
+      return res?.data;
     } catch (error) {
       console.error("API error:", error);
       return rejectWithValue(error.response?.data || error.message);
@@ -69,12 +67,9 @@ export const addSearchKeyword = createAsyncThunk(
 
 export const getAllUser = createAsyncThunk(
   "user/getAll",
-  async ({} = {}, { rejectWithValue }) => {
+  async ({ } = {}, { rejectWithValue }) => {
     try {
       const res = await axios.get(`${API_URL}/api/users/profile/list`, {
-        // headers: {
-        //   Authorization: `Bearer ${refreshToken}`, // Send the refresh token in the Authorization header
-        // },
       });
       return res.data;
     } catch (error) {
@@ -159,3 +154,5 @@ const userSlice = createSlice({
 export const { setIsProductLoading, resetProducts, updateSearchHistory } =
   userSlice.actions;
 export default userSlice.reducer;
+
+

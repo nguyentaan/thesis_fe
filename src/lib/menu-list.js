@@ -17,7 +17,7 @@ export function getMenuList(pathname) {
             groupRole: ["admin", "manager"],
             menus: [
                 {
-                    href: "/dashboard",
+                    href: "/admin/dashboard",
                     label: "Dashboard",
                     active: pathname.includes("/dashboard"),
                     icon: LayoutGrid,
@@ -30,26 +30,31 @@ export function getMenuList(pathname) {
             groupRole: ["admin", "manager"],
             menus: [
                 {
-                    href: "",
+                    href: "/admin/users",
                     label: "Users",
                     active: pathname.includes("/users"),
                     icon: Group,
                     submenus: [
                         {
-                            href: "/users",
+                            href: "/admin/users",
                             label: "All Users",
                             active: pathname === "/users",
+                        },
+                        {
+                            href: "/admin/users/new",
+                            label: "New Users",
+                            active: pathname === "/users/new",
                         },
                     ],
                 },
                 {
-                    href: "",
+                    href: "/admin/products",
                     label: "Products",
                     active: pathname.includes("/products"),
                     icon: Router,
                     submenus: [
                         {
-                            href: "/products",
+                            href: "/admin/products",
                             label: "All Products",
                             active: pathname === "/products",
                         },

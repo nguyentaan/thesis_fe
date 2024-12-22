@@ -61,7 +61,7 @@ export function Menu({ isOpen }) {
                                   className="w-full justify-start h-10 mb-1"
                                   asChild
                                 >
-                                  <Link href={href}>
+                                  <Link to={href} className="no-underline text-black">
                                     <span
                                       className={cn(isOpen === false ? "" : "mr-4")}
                                     >
@@ -116,7 +116,7 @@ export function Menu({ isOpen }) {
                     </span>
                     <p
                       className={cn(
-                        "whitespace-nowrap",
+                        "whitespace-nowrap mb-0",
                         isOpen === false ? "opacity-0 hidden" : "opacity-100"
                       )}
                     >

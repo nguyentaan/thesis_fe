@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Modal, Button } from "react-bootstrap";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { getAllUser } from "../../Slices/UserSlice";
-import ContentLayout  from "../admin-panel/content-layout";
+import ContentLayout from "../admin-panel/content-layout";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,7 +14,14 @@ import {
 } from "../ui/breadcrumb";
 import { Link } from "react-router-dom";
 import PlaceholderContent from "../misc/placeholder-content";
-
+import { TableActionProvider } from "../../providers/table-action-provider";
+import {
+  SkeletonCard
+} from "../ui/skeleton-card"
+import { DataTable } from "../ui/data-table";
+import { CustomDialog } from "../ui/custom-dialog";
+import {SearchFilterCustom} from "../misc/search-filter-custom";
+import {userColumns} from "../misc/model/user-column";
 const AdminUsers = () => {
   const dispatch = useDispatch();
   const { dataUser, isUserLoading } = useSelector((state) => state.user);
@@ -27,9 +34,9 @@ const AdminUsers = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (isAuth && refreshToken) {
+        if (isAuth) {
           const response = await dispatch(getAllUser()).unwrap();
-          console.log("Response get user:", response);  // Log the response here
+          console.log("Response get user:", dataUser);  // Log the response here
         }
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -81,7 +88,7 @@ const AdminUsers = () => {
   );
 
   return (
-    <ContentLayout title="User management">
+    <ContentLayout title="User Management">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -97,66 +104,54 @@ const AdminUsers = () => {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>User management</BreadcrumbPage>
+            <BreadcrumbPage>User Management</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
       <PlaceholderContent>
-        {/* <DataTable
-          columns={hotspotColumns}
-          data={logData?.data ?? []}
-          pagination={logData?.pagination ?? { pageIndex: 0, pageSize: 10 }}
-          pageCount={logData?.pageCount ?? 0}
-        /> */}
+        <TableActionProvider
+          initialValues={{
+            // onEdit: handleEdit,
+            // setSorting,
+            // onDelete: handleDelete,
+          }}
+        >
+          {isUserLoading ? (
+            <SkeletonCard />
+          ) : (
+            <DataTable
+              extra={
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 w-full h-full">
+                  <CustomDialog
+                    button={<Button>Add User</Button>}
+                    title="New Campaign"
+                    noFooter
+                  >
+                    {({ close }) => (
+                      <div>
+                        Ongoing
+                      </div>
+                    )}
+                  </CustomDialog>
+                  <SearchFilterCustom
+                    // search={search.filter}
+                    // setSearch={setSearch}
+                    searchPlaceholder="Search by name"
+                  />
+                </div>
+              }
+              isLoading={isUserLoading}
+              columns={userColumns}
+              data={dataUser?.users || []}
+              // pagination={{
+              //   ...pagination,
+              //   total: data?.total ?? 0,
+              // }}
+            />
+          )}
+        </TableActionProvider>
       </PlaceholderContent>
     </ContentLayout>
-    // <div className="text-center container">
-    //   {isUserLoading ? (
-    //     <Loader />
-    //   ) : (
-    //     <Table className="table table-success">
-    //       <Thead>
-    //         <Tr>
-    //           <Th>#</Th>
-    //           <Th>Name</Th>
-    //           <Th>Email</Th>
-    //           <Th>Phone Number</Th>
-    //           <Th>Total Order</Th>
-    //           <Th>
-    //             <i className="far fa-trash-alt fa-lg"></i>
-    //           </Th>
-    //         </Tr>
-    //       </Thead>
-    //       <Tbody>
-    //         {dataUser?.users?.map((item, index) => (
-    //           <Tr key={item.email}>
-    //             <Td className="text-justify text-center">
-    //               <img
-    //                 src={item?.avatar || "https://gravatar.com/avatar/681924887c514c786b5f3fe4e1e1695b?s=400&d=robohash&r=x"}
-    //                 alt={"avatar"}
-    //                 className="h-40 w-40"
-    //               />
-    //             </Td>
-    //             <Td className="text-justify text-center">{item?.name}</Td>
-    //             <Td className="text-justify text-center">{item?.email}</Td>
-    //             <Td className="text-justify text-center">0{item?.phone}</Td>
-    //             <Td className="text-justify text-center">{item?.order_lists.length}</Td>
-
-    //             <Td>
-    //               <button
-    //                 className="btn btn-danger"
-    //                 onClick={() => displayDeleteModal(item)}
-    //               >
-    //                 <i className="far fa-trash-alt fa-lg"></i>
-    //               </button>
-    //             </Td>
-    //           </Tr>
-    //         ))}
-    //       </Tbody>
-    //     </Table>
-    //   )}
-    //   <DeleteProductModal />
-    // </div>
   );
 };
 

@@ -3,15 +3,16 @@ import { Modal } from "react-bootstrap";
 import logo from "../../assets/logo.png";
 import { useDispatch, useSelector } from "react-redux";
 import { emailLogin } from "../../Slices/AuthenSlice";
-import OtpVerification from "./OtpVerification";
+// import OtpVerification from "./OtpVerification";
 import SignUp from "./SignUp";
 import GoogleButton from "./googleButton";
+import { loginSuccess } from "../../Slices/AuthenSlice";
 
 const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
   const dispatch = useDispatch();
 
-  const { isLoading } = useSelector((state) =>state.auth);
-  const [email, setEmail] = useState("20521920@gm.uit.edu.vn"); 
+  const { isLoading } = useSelector((state) => state.auth);
+  const [email, setEmail] = useState("20521920@gm.uit.edu.vn");
   const [password, setPassword] = useState("12345678");
   const [otpVisible, setOtpVisible] = useState(false);
   const [signUpVisible, setSignUpVisible] = useState(false);
@@ -36,9 +37,10 @@ const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
     e.preventDefault();
     try {
       const response = await dispatch(emailLogin({ email, password })).unwrap();
-      console.log("response: ", response);
       if (response.status === "OK") {
-        setOtpVisible(true); 
+        const { data, access_token, refresh_token } = response; // Destructure the result
+        dispatch(loginSuccess({ user: data, accessToken: access_token, refreshToken: refresh_token }));
+        alert("Login sucessfully!");
       } else {
         console.error("Login failed:", response.message);
       }
@@ -46,16 +48,16 @@ const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
       console.error("Email login error:", error);
     }
   };
-  
+
 
   const handleBackToLogin = () => {
-    setOtpVisible(false);
-    setSignUpVisible(false);
+    // setOtpVisible(false);
+    // setSignUpVisible(false);
   };
 
   const handleCloseModal = () => {
     closeLoginModal(false);
-    setOtpVisible(false);
+    // setOtpVisible(false);
     setSignUpVisible(false);
     setEmail("");
     setPassword("");
@@ -70,13 +72,7 @@ const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
       </Modal.Header>
       <Modal.Body style={{ padding: "2rem 4rem" }}>
         <div className="text-center">
-          {otpVisible ? (
-            <OtpVerification
-              email={email}
-              password={password}
-              onBack={handleBackToLogin}
-            />
-          ) : signUpVisible ? (
+          {signUpVisible ? (
             <SignUp
               showLoginModal={showLoginModal}
               closeLoginModal={closeLoginModal}

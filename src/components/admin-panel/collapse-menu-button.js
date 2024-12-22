@@ -60,7 +60,7 @@ export function CollapseMenuButton({ icon: Icon, label, active, submenus, isOpen
             </div>
             <div
               className={cn(
-                "whitespace-nowrap",
+                "whitespace-nowrap mb-0",
                 isOpen
                   ? "translate-x-0 opacity-100"
                   : "-translate-x-96 opacity-0"
@@ -82,7 +82,7 @@ export function CollapseMenuButton({ icon: Icon, label, active, submenus, isOpen
             className="w-full justify-start h-10 mb-1"
             asChild
           >
-            <Link href={href} className="no-underline text-black">
+            <Link to={href} className="no-underline text-black">
               <span className="mr-4 ml-2">
                 <Dot size={18} />
               </span>

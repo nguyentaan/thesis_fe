@@ -80,7 +80,6 @@ const Search = () => {
       setSessionContext(updatedSessionContext);
 
       await fetchSearchProducts(updatedSessionContext); // Pass updated session context directly
-
       if (isAuth) {
         try {
           const response = await dispatch(
@@ -186,7 +185,6 @@ const Search = () => {
               </div>
             )}
           </div>
-
           <button
             className="navbar-toggler"
             type="button"
