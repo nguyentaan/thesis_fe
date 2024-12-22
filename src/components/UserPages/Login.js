@@ -92,7 +92,6 @@ const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
                   placeholder="Email"
                   aria-label="Email"
                   value={email}
-                  required
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
@@ -104,7 +103,6 @@ const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
                     value={password}
                     required
                     onChange={(e) => setPassword(e.target.value)}
-                    required
                   />
                   <div className="input-group-append">
                     <button

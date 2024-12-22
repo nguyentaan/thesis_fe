@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../../Slices/CartSlice";
 import { toast, ToastContainer } from "react-toastify"; // Import toast
 import "react-toastify/dist/ReactToastify.css"; // Import CSS
+import Reviews from "./Review";
+import RatingDisplay from "./RatingDisplay";
 
 const ProductDetailModal = ({
   selectedProduct,
@@ -16,10 +18,11 @@ const ProductDetailModal = ({
   const [selectedStock, setSelectedStock] = useState(null);
   const [openDescription, setOpenDescription] = useState(null);
   const modalRef = useRef(null);
-  const { user, isAuth } = useSelector((state) => state.auth);  
+  const { user, isAuth } = useSelector((state) => state.auth);
   // Check if user is logged in
   const isUserLoggedIn = isAuth;
-
+  console.log("selectedProduct", selectedProduct);
+  
   // Close modal when clicking outside of it
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -69,6 +72,8 @@ const ProductDetailModal = ({
     const productId = selectedProduct._id;
     const size = selectedSize;
     const quantity = 1;
+    console.log("Adding to cart:", { productId, size, quantity });
+    
 
     dispatch(addToCart({ userId: user._id, productId, quantity, size }));
   };
@@ -155,9 +160,14 @@ const ProductDetailModal = ({
                   <p>Stock available: {selectedStock}</p>
                 </div>
               )}
-              <div className="product-color">
-                <p className="color-label">Color: </p>
-                <p className="color-value">{selectedProduct.color}</p>
+              <div className="clr-rating">
+                <div className="product-color">
+                  <p className="color-label">Color: </p>
+                  <p className="color-value">{selectedProduct.color}</p>
+                </div>
+                <div className="product-rating">
+                  <RatingDisplay rating={selectedProduct.avg_rating} />
+                </div>
               </div>
               <div className="product-wrapper">
                 <p className="product-price">${selectedProduct.price}</p>
@@ -193,6 +203,8 @@ const ProductDetailModal = ({
                 </div>
               ))}
             </div>
+            {/* Reviews Section */}
+            <Reviews productId={selectedProduct._id} />
           </div>
         </div>
       </div>

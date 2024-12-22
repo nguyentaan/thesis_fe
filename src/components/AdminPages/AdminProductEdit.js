@@ -1,8 +1,5 @@
 import React, { useState } from "react";
-import { connect } from "react-redux";
 import { Modal, Button } from "react-bootstrap";
-
-import { editDataProduct } from "../../actionCreators/AdminAction";
 
 const AdminProductEdit = (props) => {
   const [selectedFileName, setSelectedFileName] = useState("");
@@ -171,8 +168,5 @@ const AdminProductEdit = (props) => {
     </Modal>
   );
 };
-const mapDispatchToProps = {
-  editDataProduct,
-};
 
-export default connect(null, mapDispatchToProps)(AdminProductEdit);
+export default AdminProductEdit;

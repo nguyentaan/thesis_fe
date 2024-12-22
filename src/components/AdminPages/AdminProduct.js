@@ -1,21 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { Modal, Button } from "react-bootstrap";
-import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
-import { getAllUser } from "../../Slices/UserSlice";
-import ContentLayout  from "../admin-panel/content-layout";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator
-} from "../ui/breadcrumb";
-import { Link } from "react-router-dom";
-import PlaceholderContent from "../misc/placeholder-content";
+import { useDispatch } from "react-redux";
 
-const AdminProductPage = () => {
+import { Modal, Button, Alert } from "react-bootstrap";
+import EditProductModal from "./AdminProductEdit";
+import AddProductModal from "./AdminProductAdd";
+
+const AdminProduct = (props) => {
+  const urlLocalhost = `${process.env.REACT_APP_API_URL}`;
   const dispatch = useDispatch();
   const { dataUser, isUserLoading } = useSelector((state) => state.user);
   const { isAuth, refreshToken } = useSelector((state) => state.auth);
@@ -54,7 +45,8 @@ const AdminProductPage = () => {
   };
 
   const handleDelete = () => {
-    // Add delete logic here (e.g., dispatching deleteUser action)
+    console.log("Deleting product with productid:", dataDelete.product_id);
+    // dispatch(deleteDataProduct(dataDelete.product_id.S));
     setShowDeleteModal(false);
   };
 
@@ -113,4 +105,4 @@ const AdminProductPage = () => {
   );
 };
 
-export default AdminProductPage;
+export default AdminProduct;
