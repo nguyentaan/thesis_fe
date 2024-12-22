@@ -28,7 +28,7 @@ const Index = (props) => {
     if (isAuth) {
       setShowLoginModal(false);
       console.log("user", user);
-      
+
     }
   }, [isAuth, user]);
 
@@ -63,11 +63,11 @@ const Index = (props) => {
     setShowLoginModal(boolean);
   };
 
-const handleLoginSuccess = () => {
-  setShowLoginModal(false);
-  // Optionally, handle additional logic for the logged-in user
-  console.log(user?.data); // Access user data after login
-};
+  const handleLoginSuccess = () => {
+    setShowLoginModal(false);
+    // Optionally, handle additional logic for the logged-in user
+    console.log(user?.data); // Access user data after login
+  };
 
 
   const Logout = () => {
@@ -188,7 +188,7 @@ const handleLoginSuccess = () => {
             Ready to wear dresses tailored for you from online. Hurry up while
             stock lasts.
           </p>
-          
+
           <SearchDropdown
             options={user?.search_history || []}
             id="id"
@@ -272,7 +272,7 @@ const handleLoginSuccess = () => {
         onLoginSuccess={handleLoginSuccess} // Pass the callback here
       />
       {/* Modals */}
-    </div>
+    </div >
   );
 };
 export default Index;

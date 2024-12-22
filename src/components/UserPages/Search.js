@@ -18,7 +18,7 @@ const Search = () => {
   const { keyword } = useParams();
   const dispatch = useDispatch();
   const { isAuth, user } = useSelector((state) => state.auth);
-  
+
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [searchInput, setSearchInput] = useState(keyword || "");
   const [searchResults, setSearchResults] = useState([]);
@@ -40,7 +40,7 @@ const Search = () => {
       }
 
       await fetchSearchProducts(sessionContext);
-      
+
       if (isAuth) {
         try {
           const response = await dispatch(addSearchKeyword({ query: searchInput, user_id: user?.data?._id })).unwrap();
@@ -63,8 +63,9 @@ const Search = () => {
         page,
         limit: 20,
       })).unwrap();
-      
+
       setSearchResults(response?.refined_products || []);
+      console.log("fetchSearchProducts -> response", searchResults)
       setCurrentPage(page);
       setTotalResults(response?.total_results || 0);
     } catch (error) {
@@ -124,21 +125,48 @@ const Search = () => {
   };
 
   const totalPages = Math.ceil(totalResults / 20);
-  const backgroundStyle = {
-    backgroundImage: `url(${mainBg})`,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    height: "100vh",
-  };
+
 
   return (
-    <div style={{ fontFamily: "Karla,sans-serif", backgroundColor: "#f8f9fa" }}>
-      <div className="main-bg-height" style={backgroundStyle}>
+    <div style={{ fontFamily: "Karla,sans-serif", backgroundColor: "#f8f9fa", height: "100vh", }}>
+      <div className="">
         <nav className="navbar fixed-top navbar-expand-lg navbar-light bg-light">
           <div className="container">
             <a className="navbar-brand" href="/">
               <img src={logo} className="logo-fx" alt="Logo" />
             </a>
+            <div className="vertical-center">
+              <div className="form-group mt-5">
+                <input
+                  type="text"
+                  className="search-box"
+                  placeholder="Search the fashion name that you want here"
+                  name="searchinput"
+                  value={searchInput}
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={() => setIsFocused(false)}
+                  onChange={handleSearchInput}
+                  required
+                  onKeyPress={(event) => event.key === "Enter" && handleSearchSubmit()}
+                />
+                <button className="btn-search" type="button" id="button-addon2" onClick={handleSearchSubmit}>
+                  <i className="fas fa-search"></i>
+                </button>
+              </div>
+              {isFocused && searchHistory?.length > 0 && (
+                <div className="search-history-dropdown">
+                  {searchHistory?.map((keyword, index) => (
+                    <div
+                      key={index}
+                      className="search-history-item"
+                      onMouseDown={() => setSearchInput(keyword)}
+                    >
+                      {keyword}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             <button
               className="navbar-toggler"
               type="button"
@@ -182,71 +210,11 @@ const Search = () => {
         </nav>
 
         <ToastContainer />
-
-        <div className="vertical-center">
-          <h1 className="display-4 font-weight-bold text-center" style={{ fontFamily: "Poppins, sans-serif" }}>
-            Shop your designer dresses
-          </h1>
-          <p className="text-center text-secondary">
-            Ready to wear dresses tailored for you from online. Hurry up while stock lasts.
-          </p>
-          <div className="form-group mt-5">
-            <input
-              type="text"
-              className="search-box"
-              placeholder="Search the fashion name that you want here"
-              name="searchinput"
-              value={searchInput}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-              onChange={handleSearchInput}
-              required
-              onKeyPress={(event) => event.key === "Enter" && handleSearchSubmit()}
-            />
-            <button className="btn-search" type="button" id="button-addon2" onClick={handleSearchSubmit}>
-              <i className="fas fa-search"></i>
-            </button>
-          </div>
-          {isFocused && searchHistory?.length > 0 && (
-            <div className="search-history-dropdown">
-              {searchHistory?.map((keyword, index) => (
-                <div
-                  key={index}
-                  className="search-history-item"
-                  onMouseDown={() => setSearchInput(keyword)}
-                >
-                  {keyword}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Carousel */}
-      <div className="container my-5">
-        <Carousel />
       </div>
 
       {/* Products Section */}
       <div className="container">
         <div className="row mb-5">
-          {/* Sidebar */}
-          <div className="col-md-3 mt-3">
-            <div className="list-group">
-              {["Face", "Eyes", "Lips", "Accessories", "Shaving Needs"].map((item) => (
-                <button
-                  key={item}
-                  onClick={comingSoonNotification}
-                  type="button"
-                  className="list-group-item list-group-item-action d-flex d-row mb-2"
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Products Render */}
           <div className="col-md-9">
             {isLoading ? (

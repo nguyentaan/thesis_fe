@@ -11,7 +11,7 @@ export default function PlaceholderContent({
         <Card className="rounded-lg border-none mt-4">
             <CardContent className="p-4">
                 <div
-                    className={`flex ${justifyCenter && "justify-center items-center"
+                    className={`flex ${justifyCenter && "justify-center "
                         } min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] w-full`}
                 >
                     <div className="flex flex-col relative w-full">

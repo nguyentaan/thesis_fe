@@ -69,7 +69,7 @@ const SearchDropdown = ({
   if (!options) return null;
 
   return (
-    <div className="relative cursor-default">
+    <div className="relative cursor-default width-responsive">
       <div className="form-group relative w-full">
         <input
           ref={inputRef}
