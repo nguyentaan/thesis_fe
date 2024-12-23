@@ -9,28 +9,20 @@ import logo from "../../assets/logo.png";
 import Carousel from "./Carousel";
 import ProductField from "./Products";
 import LoginModal from "./Login";
-import { useNavigate } from "react-router-dom";
 import SearchDropdown from "./SearchDropdown";
 import "../Users.css";
 import RecommendedProduct from "./RecommendedProduct";
-// import ModelDropdown from "./ModelDropdown";
 
 const Index = (props) => {
   const dispatch = useDispatch();
   const { isAuth, user } = useSelector((state) => state.auth);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  // const [NavLoginSuccess, setNavLoginSuccess] = useState(false);
-  const [searchInput, setSearchInput] = useState("");
-  const [submitSearch, setSubmitSearch] = useState(false);
-  const navigate = useNavigate();
-  const [value, setValue] = useState(""); // Used for managing dropdown state
 
   useEffect(() => {
     if (isAuth) {
       setShowLoginModal(false);
-      // console.log("user", user);
     }
-  }, [isAuth, user]);
+  }, [isAuth]);
 
   const noLoginCartNotification = () => {
     toast.error("Please login first to continue.", {
@@ -38,19 +30,8 @@ const Index = (props) => {
     });
   };
 
-  const handleSearchInput = (event) => {
-    setSearchInput(event.target.value); // Update search input state
-  };
-
-  const handleSearchSubmit = () => {
-    if (searchInput.trim()) {
-      navigate(`/search/${encodeURIComponent(searchInput)}`);
-    }
-  };
-
   const openLoginModal = () => {
     setShowLoginModal(true);
-    // cause warning but needed to stop logout alert shows 2 times.
   };
 
   const closeLoginModal = (boolean) => {
@@ -183,12 +164,7 @@ const Index = (props) => {
             stock lasts.
           </p>
           {/* <ModelDropdown /> */}
-          <SearchDropdown
-            options={user?.search_history || []}
-            id="id"
-            selectedVal={value}
-            handleChange={setValue}
-          />
+          <SearchDropdown />
         </div>
       </div>
       {/* start header - part 1 */}
@@ -204,13 +180,13 @@ const Index = (props) => {
         <div className="row mb-5">
           <div className="col-md-9">
             <div className="recommended-products-section">
-              <h2 className="font-weight-bold">Recommended Products</h2>
+              <h2 className="font-weight-bold">For You</h2>
               <RecommendedProduct />
             </div>
             <h2 className="font-weight-bold">Our Products</h2>
             <ProductField
-              searchInput={searchInput}
-              submitSearch={submitSearch}
+            // searchInput={searchInput}
+            // submitSearch={submitSearch}
             />
           </div>
         </div>

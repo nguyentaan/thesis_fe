@@ -18,6 +18,8 @@ export const googleLogin = createAsyncThunk(
       const response = await axios.post(`${API_URL}/api/auth/google-signin`, {
         credential: token,
       });
+      console.log("response", response.data);
+      
       return response.data;
     } catch (error) {
       return rejectWithValue(handleError(error));
@@ -81,6 +83,8 @@ const authSlice = createSlice({
     isAuth: false,
     isLoading: false,
     error: null,
+    accessToken: localStorage.getItem("accessToken"), // Load from localStorage
+    refreshToken: localStorage.getItem("refreshToken"), // Load from localStorage
   },
   reducers: {
     logout: (state) => {
@@ -94,6 +98,8 @@ const authSlice = createSlice({
       state.user = { data: action.payload.user };
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
+      localStorage.setItem("accessToken", action.payload.accessToken);
+      localStorage.setItem("refreshToken", action.payload.refreshToken);
     },
   },
   extraReducers: (builder) => {
@@ -155,7 +161,7 @@ const authSlice = createSlice({
       .addCase(createUser.rejected, (state, action) => {
         state.error = action.payload; // Capture error message
         state.isLoading = false;
-      });
+      })
   },
 });
 export const { logout, loginSuccess } = authSlice.actions;

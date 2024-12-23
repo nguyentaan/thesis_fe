@@ -1,13 +1,10 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux"; // Import useDispatch and useSelector
+import { addSearchKeyword } from "../../Slices/UserSlice"; // Import the action
 import "../Search.css";
 
-const SearchDropdown = ({
-  options = [],
-  id = "dropdown",
-  selectedVal = "",
-  handleChange = () => {},
-}) => {
+const SearchDropdown = () => {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
@@ -15,13 +12,22 @@ const SearchDropdown = ({
   const inputRef = useRef(null);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const dispatch = useDispatch(); // Dispatch hook for Redux actions
+  const { user } = useSelector((state) => state.auth); // Get the user info from Redux store
+
+  // If the user is logged in, get the search history from the user object
+  const searchHistory = useMemo(() => user?.search_history || [], [user]);
 
   // Handle search submit
   const handleSearchSubmit = useCallback(() => {
     if (searchInput.trim()) {
+      // Dispatch to save the search keyword to the user's search history
+      dispatch(
+        addSearchKeyword({ query: searchInput, user_id: user?._id }) // Use the user ID from Redux
+      );
       navigate(`/search/${encodeURIComponent(searchInput)}`);
     }
-  }, [searchInput, navigate]);
+  }, [dispatch, navigate, searchInput, user]);
 
   // Handle search input changes
   const handleSearchInput = useCallback((event) => {
@@ -51,18 +57,15 @@ const SearchDropdown = ({
 
   // Select an option from the dropdown
   const selectOption = (option) => {
-    setQuery("");
-    handleChange(option);
     setSearchInput(option);
+    setQuery("");
     setIsOpen(false);
+    if (user?.id) {
+      // Dispatch addSearchKeyword when a suggestion is selected
+      dispatch(addSearchKeyword({ query: option, user_id: user.id }));
+    }
+    navigate(`/search/${encodeURIComponent(option)}`);
   };
-
-  // Filter options based on the search query
-  const filterOptions = useCallback(() => {
-    return options.filter((option) =>
-      option.toLowerCase().includes(query.toLowerCase())
-    );
-  }, [options, query]);
 
   // Handle Enter key press
   const handleKeyPress = useCallback(
@@ -74,7 +77,12 @@ const SearchDropdown = ({
     [handleSearchSubmit]
   );
 
-  if (!options) return null;
+  // Filter search history based on the search query
+  const filterSearchHistory = useCallback(() => {
+    return searchHistory.filter((historyItem) =>
+      historyItem.toLowerCase().includes(query.toLowerCase())
+    );
+  }, [searchHistory, query]);
 
   return (
     <div className="search-container-content">
@@ -103,20 +111,18 @@ const SearchDropdown = ({
       </div>
       {isOpen && (
         <div ref={dropdownRef} className="search-dropdown">
-          {filterOptions().length > 0 ? (
-            filterOptions().map((option, index) => (
+          {filterSearchHistory().length > 0 ? (
+            filterSearchHistory().map((historyItem, index) => (
               <div
-                key={`${id}-${index}`}
-                onClick={() => selectOption(option)}
-                className={`search-dropdown-item ${
-                  option === selectedVal ? "active" : ""
-                }`}
+                key={`history-item-${index}`}
+                onClick={() => selectOption(historyItem)}
+                className="search-dropdown-item"
               >
-                {option}
+                {historyItem}
               </div>
             ))
           ) : (
-            <div className="search-dropdown-empty">No matches found</div>
+            <div className="search-dropdown-empty">No items</div>
           )}
         </div>
       )}

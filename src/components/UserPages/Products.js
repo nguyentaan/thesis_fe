@@ -85,9 +85,6 @@ const Products = () => {
         </div>
       )}
 
-      {/* Show loading text only if new products are being loaded */}
-      {isProductLoading && <p>Loading more products...</p>}
-
       {/* Load More button logic */}
       {!isProductLoading &&
         dataProduct.products &&

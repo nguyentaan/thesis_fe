@@ -43,7 +43,7 @@ export const getSearchProducts = createAsyncThunk(
         query,
         session_context, // Send query and session_context in the body
       });
-      console.log("res", res.data);
+      // console.log("res", res.data);
 
       return res.data;
     } catch (error) {
@@ -57,24 +57,34 @@ export const getRecommendProducts = createAsyncThunk(
   "product/recommend",
   async ({ user_id }, { rejectWithValue }) => {
     try {
-      const res = await axios.post(`${PYTHON_URL}/recommend`, {
-        user_id,
-      });
-      console.log("res", res.data);
-      
-      return res.data.recommendations;
+      // Check if user_id is provided (optional API scenario)
+      if (!user_id) {
+        console.warn("User is not authenticated. Skipping recommendation API.");
+        return []; // Return an empty array or fallback recommendations
+      }
+
+      // Call the recommendation API
+      const res = await axios.post(`${PYTHON_URL}/recommend`, { user_id });
+      // console.log("Recommendation API response:", res.data);
+
+      return res.data.recommendations; // Return recommendations if the call is successful
     } catch (error) {
-      console.error("API error:", error);
-      return rejectWithValue(error.response?.data || error.message);
+      console.error("Recommendation API error:", error);
+
+      // Handle API failure gracefully
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch recommendations."
+      );
     }
   }
 );
+
 
 export const addSearchKeyword = createAsyncThunk(
   "user/search",
   async ({ query, user_id }, { rejectWithValue }) => {
     try {
-      const res = await axios.put(`${API_URL}/api/users/keyword/add`, {
+      const res = await axios.post(`${API_URL}/api/user/keyword/add`, {
         query,
         user_id,
       });
@@ -186,8 +196,9 @@ const userSlice = createSlice({
         state.recommendedProducts = action.payload; // Populate recommendations
       })
       .addCase(getRecommendProducts.rejected, (state, action) => {
-        state.isProductLoading = false;
-        state.error = action.payload || "Failed to fetch recommendations";
+        state.loading = false;
+        state.error = action.payload; // Capture error message
+        state.recommendations = []; // Optional: Clear recommendations on failure
       });
   },
 });

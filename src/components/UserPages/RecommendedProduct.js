@@ -7,7 +7,9 @@ import Loader from "./Loader";
 const RecommendedProduct = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth); // Get the logged-in user
-  const user_id = user._id;
+
+  // Check if user exists before accessing user._id
+  const user_id = user?._id;
 
   const { recommendedProducts, isProductLoading } = useSelector(
     (state) => state.user
@@ -19,6 +21,10 @@ const RecommendedProduct = () => {
       dispatch(getRecommendProducts({ user_id }));
     }
   }, [dispatch, user_id]);
+
+  if (!user) {
+    return <p>Please log in to see personalized recommendations.</p>;
+  }
 
   return (
     <div>

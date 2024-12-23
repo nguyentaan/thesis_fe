@@ -3,43 +3,59 @@ import { ToastContainer, toast } from "react-toastify";
 import { useSelector, useDispatch } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
 import ProductsRender from "./ProductsRender";
-// import LoginModal from "./Login";
+import LoginModal from "./Login";
 import { useParams } from "react-router-dom";
 import {
   getSearchProducts,
-  addSearchKeyword,
-  updateSearchHistory,
+  // addSearchKeyword,
+  // updateSearchHistory,
 } from "../../Slices/UserSlice";
-import { logout } from "../../Slices/AuthenSlice";
+import { logout, loginSuccess } from "../../Slices/AuthenSlice";
 import "../Users.css";
 import "../Search.css";
 import logo from "../../assets/logo.png";
 import { Link } from "react-router-dom";
 import SearchDropdown from "./SearchDropdown";
-import Loader from "./Loader";
 
 const Search = () => {
   const { keyword } = useParams();
   const dispatch = useDispatch();
   const { isAuth, user } = useSelector((state) => state.auth);
-
+  const { isProductLoading } = useSelector((state) => state.user);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [searchInput, setSearchInput] = useState(keyword || "");
   const [searchResults, setSearchResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [sessionContext, setSessionContext] = useState([]);
-  // const [searchHistory, setSearchHistory] = useState([]);
+  // const [sessionContext, setSessionContext] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalResults, setTotalResults] = useState(0);
-  // const [isFocused, setIsFocused] = useState(false);
+  // const [totalResults, setTotalResults] = useState(0);
 
-  console.log("searchInput", searchInput);
+  useEffect(() => {
+    if (isAuth) {
+      setShowLoginModal(false);
+    }
+  }, [isAuth]);
 
   const noLoginCartNotification = () => {
     toast.error("Please login first to continue.", {
       position: toast.POSITION.TOP_CENTER,
     });
   };
+
+  const openLoginModal = () => {
+    setShowLoginModal(true);
+  };
+
+  const closeLoginModal = (boolean) => {
+    setShowLoginModal(boolean);
+  };
+
+    const handleLoginSuccess = () => {
+      setShowLoginModal(false);
+      // Optionally, handle additional logic for the logged-in user
+      // console.log(user?.data); // Access user data after login// Save user info
+      dispatch(loginSuccess({ user: user }));
+    };
 
   const Logout = () => {
     dispatch(logout());
@@ -49,18 +65,14 @@ const Search = () => {
     });
   };
 
-  const handleSearchInput = useCallback((event) => {
-    setSearchInput(event.target.value);
-  }, []);
-
   const fetchSearchProducts = useCallback(
     async (updatedSessionContext, page = currentPage) => {
       setIsLoading(true);
-      console.log("Fetching search products for:", {
-        query: searchInput,
-        session_context: updatedSessionContext,
-        page,
-      });
+      // console.log("Fetching search products for:", {
+      //   query: searchInput,
+      //   session_context: updatedSessionContext,
+      //   page,
+      // });
       try {
         const response = await dispatch(
           getSearchProducts({
@@ -70,10 +82,10 @@ const Search = () => {
             limit: 20,
           })
         ).unwrap();
-        console.log("Search Response:", response); // Debug
+        // console.log("Search Response:", response); // Debug
         setSearchResults(response || []);
         setCurrentPage(page);
-        setTotalResults(response?.total_results || 0);
+        // setTotalResults(response?.total_results || 0);
       } catch (error) {
         console.error("Failed to fetch search products:", error); // Debug
         setSearchResults([]);
@@ -84,54 +96,25 @@ const Search = () => {
     [dispatch, searchInput, currentPage]
   );
 
-  const handleSearchSubmit = useCallback(() => {
-    if (searchInput.trim() && !sessionContext.includes(searchInput)) {
-      const updatedSessionContext = [...sessionContext, searchInput];
-      setSessionContext(updatedSessionContext);
-      fetchSearchProducts(updatedSessionContext);
-    }
-  }, [searchInput, sessionContext, fetchSearchProducts]);
+  // const handlePageChange = useCallback(
+  //   (newPage) => {
+  //     fetchSearchProducts(sessionContext, newPage);
+  //   },
+  //   [sessionContext, fetchSearchProducts]
+  // );
 
-  const handlePageChange = useCallback(
-    (newPage) => {
-      fetchSearchProducts(sessionContext, newPage);
-    },
-    [sessionContext, fetchSearchProducts]
-  );
-
-  const openLoginModal = () => setShowLoginModal(true);
 
   // const closeLoginModal = (boolean) => setShowLoginModal(boolean);
 
   // const handleLoginSuccess = () => setShowLoginModal(false);
 
-  const totalPages = Math.ceil(totalResults / 20);
-
-  useEffect(() => {
-    if (isAuth) {
-      setShowLoginModal(false);
-    }
-  }, [isAuth]);
-
-  useEffect(() => {
-    if (searchInput) {
-      if (isAuth) {
-        dispatch(addSearchKeyword({ query: searchInput, user_id: user?._id }))
-          .unwrap()
-          .then((response) => {
-            dispatch(updateSearchHistory(response.data));
-          })
-          .catch((error) =>
-            console.error("Failed to add search keyword:", error)
-          );
-      }
-    }
-  }, [dispatch, isAuth, searchInput, user?._id]);
+  // const totalPages = Math.ceil(totalResults / 20);
 
   useEffect(() => {
     if (keyword) {
       setSearchInput(keyword);
-      fetchSearchProducts([keyword]);
+      // setSessionContext([keyword]); // Clear session context and start fresh
+      fetchSearchProducts([keyword], 1);
     }
   }, [keyword, fetchSearchProducts]); // Include fetchSearchProducts as dependency
 
@@ -146,12 +129,7 @@ const Search = () => {
             <img src={logo} className="logo-fx" alt="Logo" />
           </a>
           <div className="search-container">
-            <SearchDropdown
-              options={user?.search_history || []}
-              searchInput={searchInput}
-              setSearchInput={handleSearchInput}
-              handleSearchSubmit={handleSearchSubmit}
-            />
+            <SearchDropdown />
           </div>
           <button
             className="navbar-toggler"
@@ -236,13 +214,15 @@ const Search = () => {
           <div className="col-md-9">
             {searchResults?.rank_product_llm?.length > 0 && (
               <div className="rank-products-container">
-                <h2 className="highlighted-section-title">Featured Products</h2>
+                <h2 className="highlighted-section-title font-weight-bold">
+                  Featured Products
+                </h2>
                 <ProductsRender
                   dataProduct={{
                     products: searchResults.rank_product_llm,
                     total: searchResults.rank_product_llm.length,
                   }}
-                  isProductLoading={isLoading}
+                  isProductLoading={isProductLoading}
                 />
               </div>
             )}
@@ -260,7 +240,7 @@ const Search = () => {
                 />
               </div>
             )}
-            <div className="pagination-container">
+            {/* <div className="pagination-container">
               <button
                 className="pagination-button"
                 disabled={currentPage === 1}
@@ -278,10 +258,15 @@ const Search = () => {
               >
                 Next
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
+      <LoginModal
+        showLoginModal={showLoginModal}
+        closeLoginModal={closeLoginModal}
+        onLoginSuccess={handleLoginSuccess} // Pass the callback here
+      />
     </div>
   );
 };
