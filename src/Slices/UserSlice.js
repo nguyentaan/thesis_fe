@@ -10,11 +10,13 @@ const initialState = {
   isUserLoading: false,
   dataUser: { users: [], total: 0 }, // Update initial state to include products and total
   dataProduct: { products: [], total: 0, currentPage: 1, limit: 15 }, // Added currentPage and limit to state
+  recommendedProducts:[],
   alert: {
     show: false,
     message: "",
     variant: "light",
   },
+  error: null,
 };
 
 export const getAllProducts = createAsyncThunk(
@@ -41,7 +43,8 @@ export const getSearchProducts = createAsyncThunk(
         query,
         session_context, // Send query and session_context in the body
       });
-      return res?.data;
+      // console.log("res", res.data);
+      return res.data;
     } catch (error) {
       console.error("API error:", error);
       return rejectWithValue(error.response?.data || error.message);
@@ -49,11 +52,38 @@ export const getSearchProducts = createAsyncThunk(
   }
 );
 
+export const getRecommendProducts = createAsyncThunk(
+  "product/recommend",
+  async ({ user_id }, { rejectWithValue }) => {
+    try {
+      // Check if user_id is provided (optional API scenario)
+      if (!user_id) {
+        console.warn("User is not authenticated. Skipping recommendation API.");
+        return []; // Return an empty array or fallback recommendations
+      }
+
+      // Call the recommendation API
+      const res = await axios.post(`${PYTHON_URL}/recommend`, { user_id });
+      // console.log("Recommendation API response:", res.data);
+
+      return res.data.recommendations; // Return recommendations if the call is successful
+    } catch (error) {
+      console.error("Recommendation API error:", error);
+
+      // Handle API failure gracefully
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch recommendations."
+      );
+    }
+  }
+);
+
+
 export const addSearchKeyword = createAsyncThunk(
   "user/search",
   async ({ query, user_id }, { rejectWithValue }) => {
     try {
-      const res = await axios.put(`${API_URL}/api/users/keyword/add`, {
+      const res = await axios.post(`${API_URL}/api/user/keyword/add`, {
         query,
         user_id,
       });
@@ -91,9 +121,9 @@ const userSlice = createSlice({
     },
     updateSearchHistory(state, action) {
       state.searchHistory = action.payload;
-      toast.success("Search history updated successfully!", {
-        position: toast.POSITION.TOP_CENTER,
-      });
+      // toast.success("Search history updated successfully!", {
+      //   position: toast.POSITION.TOP_CENTER,
+      // });
     },
   },
   extraReducers: (builder) => {
@@ -111,10 +141,6 @@ const userSlice = createSlice({
       })
       .addCase(getAllProducts.rejected, (state, action) => {
         state.isProductLoading = false;
-        // toast.error(`Failed to load products: ${action.payload}`, {
-        //   position: toast.POSITION.TOP_CENTER,
-        //   autoClose: 3000,
-        // });
       })
       .addCase(getSearchProducts.pending, (state) => {
         state.isProductLoading = true;
@@ -146,6 +172,29 @@ const userSlice = createSlice({
           position: toast.POSITION.TOP_CENTER,
           autoClose: 3000,
         });
+      })
+      .addCase(addSearchKeyword.pending, (state) => {
+        state.isUserLoading = true;
+      })
+      .addCase(addSearchKeyword.fulfilled, (state, action) => {
+        state.isUserLoading = false;
+      })
+      .addCase(addSearchKeyword.rejected, (state, action) => {
+        state.isUserLoading = false;
+      })
+      .addCase(getRecommendProducts.pending, (state) => {
+        state.isProductLoading = true;
+        state.recommendedProducts = []; // Clear recommendations while loading
+        state.error = null; // Reset error
+      })
+      .addCase(getRecommendProducts.fulfilled, (state, action) => {
+        state.isProductLoading = false;
+        state.recommendedProducts = action.payload; // Populate recommendations
+      })
+      .addCase(getRecommendProducts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload; // Capture error message
+        state.recommendations = []; // Optional: Clear recommendations on failure
       });
   },
 });

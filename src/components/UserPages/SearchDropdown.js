@@ -1,33 +1,43 @@
-import { useEffect, useRef, useState } from "react";
-import { useNavigate } from 'react-router-dom';
-import "../Users.css";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux"; // Import useDispatch and useSelector
+import { addSearchKeyword } from "../../Slices/UserSlice"; // Import the action
+import "../Search.css";
 
-const SearchDropdown = ({
-  options = [],
-  id = "dropdown",
-  selectedVal = "",
-  handleChange = () => { }
-}) => {
+const SearchDropdown = () => {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState("");
 
   const inputRef = useRef(null);
   const dropdownRef = useRef(null);
+  const navigate = useNavigate();
+  const dispatch = useDispatch(); // Dispatch hook for Redux actions
+  const { user } = useSelector((state) => state.auth); // Get the user info from Redux store
 
-  const handleSearchSubmit = () => {
+  // If the user is logged in, get the search history from the user object
+  const searchHistory = useMemo(() => user?.search_history || [], [user]);
+
+  // Handle search submit
+  const handleSearchSubmit = useCallback(() => {
     if (searchInput.trim()) {
+      // Dispatch to save the search keyword to the user's search history
+      dispatch(
+        addSearchKeyword({ query: searchInput, user_id: user?._id }) // Use the user ID from Redux
+      );
       navigate(`/search/${encodeURIComponent(searchInput)}`);
     }
-  };
+  }, [dispatch, navigate, searchInput, user]);
 
-  const handleSearchInput = (event) => {
-    setSearchInput(event.target.value);
-    setQuery(event.target.value);
+  // Handle search input changes
+  const handleSearchInput = useCallback((event) => {
+    const value = event.target.value;
+    setSearchInput(value);
+    setQuery(value);
     setIsOpen(true); // Open dropdown when typing
-  };
+  }, []);
 
+  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (
@@ -45,47 +55,53 @@ const SearchDropdown = ({
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
+  // Select an option from the dropdown
   const selectOption = (option) => {
-    setQuery("");
-    handleChange(option);
     setSearchInput(option);
+    setQuery("");
     setIsOpen(false);
+    if (user?.id) {
+      // Dispatch addSearchKeyword when a suggestion is selected
+      dispatch(addSearchKeyword({ query: option, user_id: user.id }));
+    }
+    navigate(`/search/${encodeURIComponent(option)}`);
   };
 
-  const toggle = () => {
-    setIsOpen((prev) => !prev);
-  };
+  // Handle Enter key press
+  const handleKeyPress = useCallback(
+    (event) => {
+      if (event.key === "Enter") {
+        handleSearchSubmit();
+      }
+    },
+    [handleSearchSubmit]
+  );
 
-  const getDisplayValue = () => {
-    return query || selectedVal || "";
-  };
-
-  const filter = (options) => {
-    return options.filter((option) =>
-      option?.toLowerCase().includes(query.toLowerCase())
+  // Filter search history based on the search query
+  const filterSearchHistory = useCallback(() => {
+    return searchHistory.filter((historyItem) =>
+      historyItem.toLowerCase().includes(query.toLowerCase())
     );
-  };
-
-  if (!options) return null;
+  }, [searchHistory, query]);
 
   return (
-    <div className="relative cursor-default width-responsive">
-      <div className="form-group relative w-full">
+    <div className="search-container-content">
+      <div className="search-wrapper">
         <input
           ref={inputRef}
           type="text"
-          className="search-box"
+          className="search-input"
           placeholder="Search the fashion name that you want here"
           name="searchinput"
           value={searchInput}
           onChange={handleSearchInput}
-          onClick={toggle}
+          onClick={() => setIsOpen(true)}
+          onKeyPress={handleKeyPress}
           required
-          autoComplete="off" 
-          onKeyPress={(event) => event.key === "Enter" && handleSearchSubmit()}
+          autoComplete="off"
         />
         <button
-          className="btn-search"
+          className="search-button"
           type="button"
           id="button-addon2"
           onClick={handleSearchSubmit}
@@ -94,27 +110,22 @@ const SearchDropdown = ({
         </button>
       </div>
       {isOpen && (
-        <div
-          ref={dropdownRef}
-          className="absolute top-full left-0 w-full bg-white border border-gray-300 shadow-lg max-h-52 overflow-y-auto z-50 mt-1"
-          style={{ maxHeight: '200px' }} // Adjust height to fit approximately 5 items
-        >
-          {filter(options).map((option, index) => (
-            <div
-              onClick={() => selectOption(option)}
-              className={`p-2 px-4 cursor-pointer ${option === selectedVal
-                  ? "bg-indigo-100 text-gray-900"
-                  : "hover:bg-indigo-100 hover:text-gray-900"
-                }`}
-              key={`${id}-${index}`}
-            >
-              {option}
-            </div>
-          ))}
+        <div ref={dropdownRef} className="search-dropdown">
+          {filterSearchHistory().length > 0 ? (
+            filterSearchHistory().map((historyItem, index) => (
+              <div
+                key={`history-item-${index}`}
+                onClick={() => selectOption(historyItem)}
+                className="search-dropdown-item"
+              >
+                {historyItem}
+              </div>
+            ))
+          ) : (
+            <div className="search-dropdown-empty">No items</div>
+          )}
         </div>
       )}
-
-
     </div>
   );
 };

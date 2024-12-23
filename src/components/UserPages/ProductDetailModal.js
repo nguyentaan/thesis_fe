@@ -21,7 +21,7 @@ const ProductDetailModal = ({
   const { user, isAuth } = useSelector((state) => state.auth);
   // Check if user is logged in
   const isUserLoggedIn = isAuth;
-  console.log("selectedProduct", selectedProduct);
+  // console.log("selectedProduct", selectedProduct);
   
   // Close modal when clicking outside of it
   useEffect(() => {
@@ -72,7 +72,7 @@ const ProductDetailModal = ({
     const productId = selectedProduct._id;
     const size = selectedSize;
     const quantity = 1;
-    console.log("Adding to cart:", { productId, size, quantity });
+    // console.log("Adding to cart:", { productId, size, quantity });
     
 
     dispatch(addToCart({ userId: user._id, productId, quantity, size }));
@@ -190,19 +190,20 @@ const ProductDetailModal = ({
                     }`}
                     onClick={() => toggleDescription(index)}
                   >
-                    {Object.keys(item)[1]}{" "}
+                    {Object.keys(item)[0]}{" "}
                     <span className="toggle-icon">
                       {openDescription === index ? "▲" : "▼"}
                     </span>
                   </div>
                   {openDescription === index && (
                     <div className="description-content">
-                      <p>{Object.values(item)[1]}</p>
+                      <p>{Object.values(item)[0]}</p>
                     </div>
                   )}
                 </div>
               ))}
             </div>
+
             {/* Reviews Section */}
             <Reviews productId={selectedProduct._id} />
           </div>
