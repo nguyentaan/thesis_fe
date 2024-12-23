@@ -7,7 +7,8 @@ import "react-toastify/dist/ReactToastify.css"; // Ensure Toastify styles are im
 import logo from "../../assets/logo.png";
 import "../Users.css";
 import { emailLogin } from "../../Slices/AuthenSlice"; // Adjust path if necessary
-import OtpVerification from "./OtpVerification";
+// import OtpVerification from "./OtpVerification";
+import { loginSuccess } from "../../Slices/AuthenSlice";
 
 const AdminLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -15,7 +16,7 @@ const AdminLogin = () => {
     email: "20521920@gm.uit.edu.vn",
     password: "12345678",
   });
-  const [otpVisible, setOtpVisible] = useState(false);
+  // const [otpVisible, setOtpVisible] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -65,7 +66,10 @@ const AdminLogin = () => {
       const response = await dispatch(emailLogin(dataInput)).unwrap();
       if (response.status === "OK") {
         successfulLoginNotification();
-        setOtpVisible(true); // Show OTP verification step
+        const { data, access_token, refresh_token } = response; // Destructure the result
+        dispatch(loginSuccess({ user: data, accessToken: access_token, refreshToken: refresh_token }));
+        alert("Login sucessfully!");
+        // setOtpVisible(true); // Show OTP verification step
       } else {
         unSuccessfulLoginNotification();
       }
@@ -76,7 +80,7 @@ const AdminLogin = () => {
   };
 
   const handleBackToLogin = () => {
-    setOtpVisible(false);
+    // setOtpVisible(false);
   };
 
   const togglePasswordVisibility = () => {
@@ -93,62 +97,52 @@ const AdminLogin = () => {
         </Modal.Header>
         <Modal.Body style={{ padding: "2rem 4rem", paddingBottom: "4rem" }}>
           <div className="text-center">
-            {otpVisible ? (
-              <OtpVerification
-                email={dataInput.email}
-                password={dataInput.password}
-                onBack={handleBackToLogin} 
-              />
-            ) : (
-              <>
-                <h4 className="text-success-s2 font-weight-bold">Welcome Back, Admin.</h4>
-                <h6 className="text-secondary">Login with your email & password</h6>
+            <h4 className="text-success-s2 font-weight-bold">Welcome Back, Admin.</h4>
+            <h6 className="text-secondary">Login with your email & password</h6>
 
-                {error && (
-                  <Alert variant="danger">
-                    <Alert.Heading className="h6 my-0">{error}</Alert.Heading>
-                  </Alert>
-                )}
-
-                <div className="mt-4">
-                  <form onSubmit={handleSubmit}>
-                    <input
-                      type="email"
-                      name="email"
-                      value={dataInput.email}
-                      onChange={handleInputChange}
-                      className="form-control mb-2 py-4"
-                      placeholder="Admin's email"
-                      aria-label="Admin's email"
-                      required
-                    />
-                    <div className="input-group mb-2">
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        name="password"
-                        value={dataInput.password}
-                        onChange={handleInputChange}
-                        className="form-control py-4"
-                        placeholder="Admin's password"
-                        aria-label="Admin's password"
-                        required
-                      />
-                      <button
-                        onClick={togglePasswordVisibility}
-                        className="btn btn-outline-success input-group-append"
-                        type="button"
-                        aria-label={showPassword ? "Hide password" : "Show password"}
-                      >
-                        <i className={showPassword ? "fas fa-eye-slash" : "fas fa-eye"} />
-                      </button>
-                    </div>
-                    <button className="btn btn-success w-100" style={{ padding: "0.7rem 0.2rem" }} type="submit">
-                      Login
-                    </button>
-                  </form>
-                </div>
-              </>
+            {error && (
+              <Alert variant="danger">
+                <Alert.Heading className="h6 my-0">{error}</Alert.Heading>
+              </Alert>
             )}
+
+            <div className="mt-4">
+              <form onSubmit={handleSubmit}>
+                <input
+                  type="email"
+                  name="email"
+                  value={dataInput.email}
+                  onChange={handleInputChange}
+                  className="form-control mb-2 py-4"
+                  placeholder="Admin's email"
+                  aria-label="Admin's email"
+                  required
+                />
+                <div className="input-group mb-2">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={dataInput.password}
+                    onChange={handleInputChange}
+                    className="form-control py-4"
+                    placeholder="Admin's password"
+                    aria-label="Admin's password"
+                    required
+                  />
+                  <button
+                    onClick={togglePasswordVisibility}
+                    className="btn btn-outline-success input-group-append"
+                    type="button"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    <i className={showPassword ? "fas fa-eye-slash" : "fas fa-eye"} />
+                  </button>
+                </div>
+                <button className="btn btn-success w-100" style={{ padding: "0.7rem 0.2rem" }} type="submit">
+                  Login
+                </button>
+              </form>
+            </div>
           </div>
         </Modal.Body>
       </Modal>

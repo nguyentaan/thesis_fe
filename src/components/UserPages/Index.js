@@ -203,7 +203,7 @@ const Index = (props) => {
         onLoginSuccess={handleLoginSuccess} // Pass the callback here
       />
       {/* Modals */}
-    </div>
+    </div >
   );
 };
 export default Index;

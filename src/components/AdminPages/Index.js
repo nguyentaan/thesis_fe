@@ -26,7 +26,7 @@ const Index = () => {
         />
         <Route path="/login" element={<Login />} />
         <Route
-          path="/product"
+          path="/products"
           element={
             isAuth && user?.data?.isAdmin ? (
                 <AdminLayout>

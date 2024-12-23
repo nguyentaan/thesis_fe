@@ -50,12 +50,12 @@ const Search = () => {
     setShowLoginModal(boolean);
   };
 
-    const handleLoginSuccess = () => {
-      setShowLoginModal(false);
-      // Optionally, handle additional logic for the logged-in user
-      // console.log(user?.data); // Access user data after login// Save user info
-      dispatch(loginSuccess({ user: user }));
-    };
+  const handleLoginSuccess = () => {
+    setShowLoginModal(false);
+    // Optionally, handle additional logic for the logged-in user
+    // console.log(user?.data); // Access user data after login// Save user info
+    dispatch(loginSuccess({ user: user }));
+  };
 
   const Logout = () => {
     dispatch(logout());
@@ -102,7 +102,6 @@ const Search = () => {
   //   },
   //   [sessionContext, fetchSearchProducts]
   // );
-
 
   // const closeLoginModal = (boolean) => setShowLoginModal(boolean);
 

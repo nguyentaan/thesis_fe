@@ -5,6 +5,8 @@ import { cva } from "class-variance-authority";
 
 import { cn } from "../../lib/utils";
 
+import PropTypes from 'prop-types';
+
 const Sheet = SheetPrimitive.Root;
 
 const SheetTrigger = SheetPrimitive.Trigger;
@@ -13,12 +15,13 @@ const SheetClose = SheetPrimitive.Close;
 
 const SheetPortal = SheetPrimitive.Portal;
 
+
 class SheetOverlay extends Component {
   render() {
-    const { className, ...props } = this.props;
+    const { className, forwardedRef, ...props } = this.props;
     return (
       <SheetPrimitive.Overlay
-        ref={this.props.forwardedRef}
+        ref={forwardedRef}
         className={cn(
           "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
           className
@@ -30,6 +33,14 @@ class SheetOverlay extends Component {
 }
 
 SheetOverlay.displayName = SheetPrimitive.Overlay.displayName;
+
+SheetOverlay.propTypes = {
+  className: PropTypes.string,
+  forwardedRef: PropTypes.oneOfType([
+    PropTypes.func, 
+    PropTypes.shape({ current: PropTypes.instanceOf(Element) })
+  ]),
+};
 
 const sheetVariants = cva(
   "fixed z-50 gap-4 bg-background p-6 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out",

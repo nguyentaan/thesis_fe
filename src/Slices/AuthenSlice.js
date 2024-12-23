@@ -31,7 +31,7 @@ export const emailLogin = createAsyncThunk(
   "authen/emailLogin",
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/api/auth/login`, {
+      const response = await axios.post(`${API_URL}/api/auth/normal-login`, {
         email,
         password,
       });
@@ -42,21 +42,21 @@ export const emailLogin = createAsyncThunk(
   }
 );
 
-export const verifyOTP = createAsyncThunk(
-  "authen/verify-otp",
-  async ({ email, password, otp }, { rejectWithValue }) => {
-    try {
-      const response = await axios.post(`${API_URL}/api/auth/verify-otp`, {
-        email,
-        password,
-        otp,
-      });
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(handleError(error));
-    }
-  }
-);
+// export const verifyOTP = createAsyncThunk(
+//   "authen/verify-otp",
+//   async ({ email, password, otp }, { rejectWithValue }) => {
+//     try {
+//       const response = await axios.post(`${API_URL}/api/auth/verify-otp`, {
+//         email,
+//         password,
+//         otp,
+//       });
+//       return response.data;
+//     } catch (error) {
+//       return rejectWithValue(handleError(error));
+//     }
+//   }
+// );
 
 export const createUser = createAsyncThunk(
   "authen/register",
@@ -139,15 +139,15 @@ const authSlice = createSlice({
         state.error = action.payload; // Capture error message
         state.isLoading = false;
       })
-      // OTP Verification Cases
-      .addCase(verifyOTP.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(verifyOTP.rejected, (state, action) => {
-        state.error = action.payload; // Capture error message
-        state.isLoading = false;
-      })
+      // // OTP Verification Cases
+      // .addCase(verifyOTP.pending, (state) => {
+      //   state.isLoading = true;
+      //   state.error = null;
+      // })
+      // .addCase(verifyOTP.rejected, (state, action) => {
+      //   state.error = action.payload; // Capture error message
+      //   state.isLoading = false;
+      // })
       // User Registration Cases
       .addCase(createUser.pending, (state) => {
         state.isLoading = true;
