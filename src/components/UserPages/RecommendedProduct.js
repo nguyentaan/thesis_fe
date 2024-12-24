@@ -17,14 +17,15 @@ const RecommendedProduct = () => {
 
   // Fetch recommendations on component mount
   useEffect(() => {
-    if (user_id) {
-      dispatch(getRecommendProducts({ user_id }));
-    }
+    const payload = { user_id: user_id || "" }; // Send "" if user_id is undefined or null
+    console.log(payload);
+    
+    dispatch(getRecommendProducts(payload));
   }, [dispatch, user_id]);
 
-  if (!user) {
-    return <p>Please log in to see personalized recommendations.</p>;
-  }
+  // if (!user) {
+  //   return <p>Please log in to see personalized recommendations.</p>;
+  // }
 
   return (
     <div>

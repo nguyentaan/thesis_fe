@@ -58,12 +58,6 @@ export const getRecommendProducts = createAsyncThunk(
   "product/recommend",
   async ({ user_id }, { rejectWithValue }) => {
     try {
-      // Check if user_id is provided (optional API scenario)
-      if (!user_id) {
-        console.warn("User is not authenticated. Skipping recommendation API.");
-        return []; // Return an empty array or fallback recommendations
-      }
-
       // Call the recommendation API
       const res = await axios.post(`${PYTHON_URL}/recommend`, { user_id });
       // console.log("Recommendation API response:", res.data);

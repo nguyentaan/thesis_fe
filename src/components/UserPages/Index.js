@@ -12,6 +12,7 @@ import LoginModal from "./Login";
 import SearchDropdown from "./SearchDropdown";
 import "../Users.css";
 import RecommendedProduct from "./RecommendedProduct";
+import Footer from "./Footer";
 
 const Index = () => {
   const dispatch = useDispatch();
@@ -194,7 +195,7 @@ const Index = () => {
 
       {/* Footer */}
       <hr className="horizontal-line" />
-
+      <Footer />
       {/* Modals */}
       <LoginModal
         showLoginModal={showLoginModal}
