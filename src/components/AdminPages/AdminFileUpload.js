@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Modal, Button } from "react-bootstrap";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
-import { getAllProducts } from "../../Slices/UserSlice";
+import { getAllFile } from "../../Slices/UserSlice";
 import ContentLayout from "../admin-panel/content-layout";
 import {
   Breadcrumb,
@@ -21,27 +21,30 @@ import {
 import { DataTable } from "../ui/data-table";
 import { CustomDialog } from "../ui/custom-dialog";
 import { SearchFilterCustom } from "../misc/search-filter-custom";
-import { productColumn } from "../misc/model/product-column";
-const AdminProducts = () => {
+import { fileColumn } from "../misc/model/file-column";
+import SingleFileUploader from "../ui/upload_form";
+const AdminFileUpload = () => {
   const dispatch = useDispatch();
-  const { dataProduct, isProductLoading } = useSelector((state) => state.user);
+  const { dataFileUpload, isFileLoading } = useSelector((state) => state.user);
   const { isAuth, refreshToken } = useSelector((state) => state.auth);
 
+  const [showSuccessToast, setShowSuccessToast] = useState(false); // state for showing success toast
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [dataDelete, setDataDelete] = useState({});
 
 
   useEffect(() => {
     if (isAuth) {
-      dispatch(getAllProducts({}));
+      dispatch(getAllFile({}));
     }
   }, [dispatch]);
 
   useEffect(() => {
-    if (isAuth &&dataProduct?.products) {
-      console.log("Products: ", dataProduct);
+    if (isAuth && dataFileUpload?.files) {
+      console.log("Updated File List: ", dataFileUpload);
     }
-  }, [dataProduct])
+  }, [dataFileUpload]);
+
 
   const displayDeleteModal = (data) => {
     setDataDelete(data);
@@ -57,12 +60,20 @@ const AdminProducts = () => {
     setShowDeleteModal(false);
   };
 
+  const handleUploadSuccess = () => {
+    setShowSuccessToast(true); // Show success toast
+    dispatch(getAllFile({}));
+    setTimeout(() => {
+      setShowSuccessToast(false); // Hide toast after a few seconds
+    }, 3000);
+  };
+
   const DeleteProductModal = () => (
     <Modal show={showDeleteModal} onHide={closeDeleteModal}>
       <Modal.Header closeButton>
         <Modal.Title>
           <p>
-            Are you sure you want to delete this products from your account?
+            Are you sure you want to delete this file
             <span className="text-success-s2"> "{dataDelete.username}"</span>?
           </p>
         </Modal.Title>
@@ -80,7 +91,7 @@ const AdminProducts = () => {
   );
 
   return (
-    <ContentLayout title="Product Management">
+    <ContentLayout title="File Management">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -96,49 +107,55 @@ const AdminProducts = () => {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Product Management</BreadcrumbPage>
+            <BreadcrumbPage>FIle Management</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
       <PlaceholderContent>
         <TableActionProvider
           initialValues={{
-            // onEdit: handleEdit,
-            // setSorting,
-            // onDelete: handleDelete,
           }}
         >
-          {isProductLoading ? (
+          {isFileLoading ? (
             <SkeletonCard />
           ) : (
             <DataTable
               extra={
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 w-full h-full">
                   <CustomDialog
-                    button={<Button>Add Product</Button>}
-                    title="New Campaign"
+                    button={<Button>Add File</Button>}
                     noFooter
+                    title="Add File Form"
                   >
                     {({ close }) => (
-                      <div>
-                        Ongoing
-                      </div>
+                      <SingleFileUploader onUploadSuccess={handleUploadSuccess} />
                     )}
                   </CustomDialog>
                   <SearchFilterCustom
+                    // search={search.filter}
+                    // setSearch={setSearch}
                     searchPlaceholder="Search by name"
                   />
                 </div>
               }
-              isLoading={isProductLoading}
-              columns={productColumn}
-              data={dataProduct?.products || []}
+              isLoading={isFileLoading}
+              columns={fileColumn}
+              data={dataFileUpload?.files || []}
+            // pagination={{
+            //   ...pagination,
+            //   total: data?.total ?? 0,
+            // }}
             />
           )}
         </TableActionProvider>
       </PlaceholderContent>
+      {showSuccessToast && (
+        <div className="toast toast-success">
+          File uploaded successfully!
+        </div>
+      )}
     </ContentLayout>
   );
 };
 
-export default AdminProducts;
+export default AdminFileUpload;

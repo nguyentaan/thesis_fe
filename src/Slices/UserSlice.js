@@ -8,8 +8,10 @@ const PYTHON_URL = `${process.env.REACT_APP_PYTHON_URL}`;
 const initialState = {
   isProductLoading: false,
   isUserLoading: false,
-  dataUser: { users: [], total: 0 }, // Update initial state to include products and total
-  dataProduct: { products: [], total: 0, currentPage: 1, limit: 15 }, // Added currentPage and limit to state
+  isFileLoading: false,
+  dataUser: { users: [], total: 0 },
+  dataFileUpload: { files: [], total: 0 },
+  dataProduct: { products: [], total: 0, currentPage: 1, limit: 15 },
   alert: {
     show: false,
     message: "",
@@ -24,8 +26,8 @@ export const getAllProducts = createAsyncThunk(
       const res = await axios.get(`${API_URL}/api/products`, {
         params: { page, limit },
       });
-      const { products, total } = res.data; // Extract products and total from response
-      return { products, total, page }; // Include current page for pagination handling
+      const { products, total } = res.data;
+      return { products, total, page };
     } catch (error) {
       console.error("API error:", error);
       return rejectWithValue(error.response?.data || error.message);
@@ -39,7 +41,7 @@ export const getSearchProducts = createAsyncThunk(
     try {
       const res = await axios.post(`${PYTHON_URL}/search/`, {
         query,
-        session_context, // Send query and session_context in the body
+        session_context,
       });
       return res?.data;
     } catch (error) {
@@ -67,10 +69,44 @@ export const addSearchKeyword = createAsyncThunk(
 
 export const getAllUser = createAsyncThunk(
   "user/getAll",
-  async ({ } = {}, { rejectWithValue }) => {
+  async (_arg, { rejectWithValue }) => {
     try {
-      const res = await axios.get(`${API_URL}/api/users/profile/list`, {
+      const res = await axios.get(`${API_URL}/api/users/profile/list`);
+      return res.data;
+    } catch (error) {
+      console.error("API error:", error);
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+export const getAllFile = createAsyncThunk(
+  "file/getAll",
+  async (_arg, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`${API_URL}/api/files/`);
+      return res.data;
+    } catch (error) {
+      console.error("API error:", error);
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+export const uploadFile = createAsyncThunk(
+  "file/upload",
+  async ({ file, file_type }, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append("files", file);
+      formData.append("file_type", file_type);
+
+      const res = await axios.post(`${PYTHON_URL}/chunking/`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
+
       return res.data;
     } catch (error) {
       console.error("API error:", error);
@@ -87,7 +123,7 @@ const userSlice = createSlice({
       state.isProductLoading = action.payload;
     },
     resetProducts(state) {
-      state.dataProduct = { products: [], total: 0, currentPage: 1, limit: 15 }; // Reset product state
+      state.dataProduct = { products: [], total: 0, currentPage: 1, limit: 15 };
     },
     updateSearchHistory(state, action) {
       state.searchHistory = action.payload;
@@ -102,19 +138,15 @@ const userSlice = createSlice({
         state.isProductLoading = true;
       })
       .addCase(getAllProducts.fulfilled, (state, action) => {
-        const { products, total, page } = action.payload; // Destructure data from the action payload
+        const { products, total, page } = action.payload;
         state.dataProduct.products =
-          page === 1 ? products : [...state.dataProduct.products, ...products]; // If it's the first page, overwrite; else, append
-        state.dataProduct.total = total; // Update total number of products
-        state.dataProduct.currentPage = page; // Update current page
+          page === 1 ? products : [...state.dataProduct.products, ...products];
+        state.dataProduct.total = total;
+        state.dataProduct.currentPage = page;
         state.isProductLoading = false;
       })
-      .addCase(getAllProducts.rejected, (state, action) => {
+      .addCase(getAllProducts.rejected, (state) => {
         state.isProductLoading = false;
-        // toast.error(`Failed to load products: ${action.payload}`, {
-        //   position: toast.POSITION.TOP_CENTER,
-        //   autoClose: 3000,
-        // });
       })
       .addCase(getSearchProducts.pending, (state) => {
         state.isProductLoading = true;
@@ -124,10 +156,9 @@ const userSlice = createSlice({
         state.dataProduct.total = action.payload.total;
         state.isProductLoading = false;
       })
-      .addCase(getSearchProducts.rejected, (state, action) => {
+      .addCase(getSearchProducts.rejected, (state) => {
         state.isProductLoading = false;
       })
-      // Handle User-related actions
       .addCase(getAllUser.pending, (state) => {
         state.isUserLoading = true;
       })
@@ -146,13 +177,42 @@ const userSlice = createSlice({
           position: toast.POSITION.TOP_CENTER,
           autoClose: 3000,
         });
+      })
+      .addCase(getAllFile.pending, (state) => {
+        state.isFileLoading = true;
+      })
+      .addCase(getAllFile.fulfilled, (state, action) => {
+        state.dataFileUpload.files = action.payload.fileUploads; // Ensure `fileUploads` matches the API response
+        state.dataFileUpload.total = action.payload.total;
+        state.isFileLoading = false;
+      })
+      .addCase(getAllFile.rejected, (state, action) => {
+        state.isFileLoading = false;
+        toast.error(`Failed to load files: ${action.payload}`, {
+          position: toast.POSITION.TOP_CENTER,
+          autoClose: 3000,
+        });
+      })
+      .addCase(uploadFile.pending, (state) => {
+        state.isFileLoading = true;
+      })
+      .addCase(uploadFile.fulfilled, (state, action) => {
+        state.isFileLoading = false;
+        toast.success("File uploaded successfully!", {
+          position: toast.POSITION.TOP_CENTER,
+          autoClose: 3000,
+        });
+      })
+      .addCase(uploadFile.rejected, (state, action) => {
+        state.isFileLoading = false;
+        toast.error(`Failed to upload file: ${action.payload}`, {
+          position: toast.POSITION.TOP_CENTER,
+          autoClose: 3000,
+        });
       });
   },
 });
 
-// Correctly export the reducer and actions separately
 export const { setIsProductLoading, resetProducts, updateSearchHistory } =
   userSlice.actions;
 export default userSlice.reducer;
-
-

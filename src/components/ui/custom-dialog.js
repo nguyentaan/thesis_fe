@@ -48,7 +48,7 @@ const DialogCustom = (
       </DialogTrigger>
       <DialogContent
         className={cn(
-          "overflow-y-auto hover:overflow--scroll overflow-x-hidden inline-block max-w-screen-xl",
+          "bg-white overflow-y-auto hover:overflow--scroll overflow-x-hidden inline-block max-w-screen-xl",
           size === "sm" && "w-[640px]",
           size === "md" && "w-[768px]",
           size === "lg" && "w-[1024px]",

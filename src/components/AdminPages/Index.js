@@ -6,6 +6,8 @@ import AdminDashboard from "./Dashboard";
 import AdminProductPage from "./AdminProduct";
 import AdminUsersPage from "./AdminUsers";
 import AdminLayout from "./AdminLayout";
+import AdminFileUpload from "./AdminFileUpload";
+
 const Index = () => {
   const { isAuth, user } = useSelector((state) => state.auth);
 
@@ -43,6 +45,18 @@ const Index = () => {
             isAuth && user?.data?.isAdmin ? (
                 <AdminLayout>
                   <AdminUsersPage />
+                </AdminLayout>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/files"
+          element={
+            isAuth && user?.data?.isAdmin ? (
+                <AdminLayout>
+                  <AdminFileUpload />
                 </AdminLayout>
             ) : (
               <Navigate to="/login" />

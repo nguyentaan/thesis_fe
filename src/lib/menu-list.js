@@ -73,14 +73,9 @@ export function getMenuList(pathname) {
                     icon: ImageIcon,
                     submenus: [
                         {
-                            href: "/files",
+                            href: "/admin/files",
                             label: "All Uploaded Files",
-                            active: pathname === "/files",
-                        },
-                        {
-                            href: "/files/upload",
-                            label: "Upload New File",
-                            active: pathname === "/files/upload",
+                            active: pathname === "/admin/files",
                         },
                     ],
                 },
