@@ -30,7 +30,6 @@ const AdminProducts = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [dataDelete, setDataDelete] = useState({});
 
-
   useEffect(() => {
     if (isAuth) {
       dispatch(getAllProducts({}));
@@ -85,13 +84,17 @@ const AdminProducts = () => {
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link to="/admin/dashboard" className="no-underline text-black">Home</Link>
+              <Link to="/admin/dashboard" className="no-underline text-black">
+                Home
+              </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link to="/admin/dashboard" className="no-underline text-black">Dashboard</Link>
+              <Link to="/admin/dashboard" className="no-underline text-black">
+                Dashboard
+              </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />

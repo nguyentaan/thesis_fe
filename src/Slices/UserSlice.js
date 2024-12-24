@@ -12,11 +12,15 @@ const initialState = {
   dataUser: { users: [], total: 0 },
   dataFileUpload: { files: [], total: 0 },
   dataProduct: { products: [], total: 0, currentPage: 1, limit: 15 },
+  recommendedProducts:[],
   alert: {
     show: false,
     message: "",
     variant: "light",
   },
+  error: null,
+  searchQuery:'',
+  searchHistory: [], // Initialize search history state
 };
 
 export const getAllProducts = createAsyncThunk(
@@ -43,7 +47,8 @@ export const getSearchProducts = createAsyncThunk(
         query,
         session_context,
       });
-      return res?.data;
+      // console.log("res", res.data);
+      return res.data;
     } catch (error) {
       console.error("API error:", error);
       return rejectWithValue(error.response?.data || error.message);
@@ -51,11 +56,32 @@ export const getSearchProducts = createAsyncThunk(
   }
 );
 
+export const getRecommendProducts = createAsyncThunk(
+  "product/recommend",
+  async ({ user_id }, { rejectWithValue }) => {
+    try {
+      // Call the recommendation API
+      const res = await axios.post(`${PYTHON_URL}/recommend`, { user_id });
+      // console.log("Recommendation API response:", res.data);
+
+      return res.data.recommendations; // Return recommendations if the call is successful
+    } catch (error) {
+      console.error("Recommendation API error:", error);
+
+      // Handle API failure gracefully
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch recommendations."
+      );
+    }
+  }
+);
+
+
 export const addSearchKeyword = createAsyncThunk(
   "user/search",
   async ({ query, user_id }, { rejectWithValue }) => {
     try {
-      const res = await axios.put(`${API_URL}/api/users/keyword/add`, {
+      const res = await axios.post(`${API_URL}/api/user/keyword/add`, {
         query,
         user_id,
       });
@@ -66,6 +92,36 @@ export const addSearchKeyword = createAsyncThunk(
     }
   }
 );
+
+export const removeSearchHistoryItem = createAsyncThunk(
+  "user/search/remove",
+  async ({ query, user_id }, { rejectWithValue }) => {
+    try {
+      const res = await axios.delete(`${API_URL}/api/user/keyword/remove`, {
+        data: { query, user_id },
+      });
+      return res.data;
+    } catch (error) {
+      console.error("API error:", error);
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+)
+
+export const clearAllSearchHistory = createAsyncThunk(
+  "user/search/clear-all",
+  async ({ user_id }, { rejectWithValue }) => {
+    try {
+      const res = await axios.delete(`${API_URL}/api/user/keyword/remove-all`, {
+        data: { user_id },
+      });
+      return res.data;
+    } catch (error) {
+      console.error("API error:", error);
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+)
 
 export const getAllUser = createAsyncThunk(
   "user/getAll",
@@ -127,10 +183,13 @@ const userSlice = createSlice({
     },
     updateSearchHistory(state, action) {
       state.searchHistory = action.payload;
-      toast.success("Search history updated successfully!", {
-        position: toast.POSITION.TOP_CENTER,
-      });
     },
+    setSearchQuery(state, action) {
+      state.searchQuery = action.payload
+    },
+    resetSearchHistory(state) {
+      state.searchHistory = [];
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -178,7 +237,48 @@ const userSlice = createSlice({
           autoClose: 3000,
         });
       })
-      .addCase(getAllFile.pending, (state) => {
+      .addCase(addSearchKeyword.pending, (state) => {
+        state.isUserLoading = true;
+      })
+      .addCase(addSearchKeyword.fulfilled, (state, action) => {
+        state.isUserLoading = false;
+      })
+      .addCase(addSearchKeyword.rejected, (state, action) => {
+        state.isUserLoading = false;
+      })
+      .addCase(removeSearchHistoryItem.pending, (state) => {
+        state.isUserLoading = true;
+      })
+      .addCase(removeSearchHistoryItem.fulfilled, (state, action) => {
+        state.isUserLoading = false;
+      })
+      .addCase(removeSearchHistoryItem.rejected, (state, action) => {
+        state.isUserLoading = false;
+      })
+      .addCase(clearAllSearchHistory.pending, (state) => {
+        state.isUserLoading = true;
+      })
+      .addCase(clearAllSearchHistory.fulfilled, (state, action) => {
+        state.isUserLoading = false;
+      })
+      .addCase(clearAllSearchHistory.rejected, (state, action) => {
+        state.isUserLoading = false;
+      })
+      .addCase(getRecommendProducts.pending, (state) => {
+        state.isProductLoading = true;
+        state.recommendedProducts = []; // Clear recommendations while loading
+        state.error = null; // Reset error
+      })
+      .addCase(getRecommendProducts.fulfilled, (state, action) => {
+        state.isProductLoading = false;
+        state.recommendedProducts = action.payload; // Populate recommendations
+      })
+      .addCase(getRecommendProducts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload; // Capture error message
+        state.recommendations = []; // Optional: Clear recommendations on failure
+      })
+    .addCase(getAllFile.pending, (state) => {
         state.isFileLoading = true;
       })
       .addCase(getAllFile.fulfilled, (state, action) => {
@@ -213,6 +313,12 @@ const userSlice = createSlice({
   },
 });
 
-export const { setIsProductLoading, resetProducts, updateSearchHistory } =
-  userSlice.actions;
+// Correctly export the reducer and actions separately
+export const {
+  setIsProductLoading,
+  resetProducts,
+  updateSearchHistory,
+  setSearchQuery,
+  resetSearchHistory,
+} = userSlice.actions;
 export default userSlice.reducer;

@@ -2,35 +2,28 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../../Slices/AuthenSlice";
+import { logout, loginSuccess } from "../../Slices/AuthenSlice";
 import "react-toastify/dist/ReactToastify.css";
 import mainBg from "../../assets/mainBackground.png";
 import logo from "../../assets/logo.png";
 import Carousel from "./Carousel";
 import ProductField from "./Products";
 import LoginModal from "./Login";
-import { useNavigate } from "react-router-dom";
 import SearchDropdown from "./SearchDropdown";
 import "../Users.css";
 import RecommendedProduct from "./RecommendedProduct";
-import ModelDropdown from "./ModelDropdown";
+import Footer from "./Footer";
 
-const Index = (props) => {
+const Index = () => {
   const dispatch = useDispatch();
   const { isAuth, user } = useSelector((state) => state.auth);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  // const [NavLoginSuccess, setNavLoginSuccess] = useState(false);
-  const [searchInput, setSearchInput] = useState("");
-  const [submitSearch, setSubmitSearch] = useState(false);
-  const navigate = useNavigate();
-  const [value, setValue] = useState(""); // Used for managing dropdown state
 
   useEffect(() => {
     if (isAuth) {
       setShowLoginModal(false);
-      console.log("user", user);
     }
-  }, [isAuth, user]);
+  }, [isAuth]);
 
   const noLoginCartNotification = () => {
     toast.error("Please login first to continue.", {
@@ -38,19 +31,8 @@ const Index = (props) => {
     });
   };
 
-  const handleSearchInput = (event) => {
-    setSearchInput(event.target.value); // Update search input state
-  };
-
-  const handleSearchSubmit = () => {
-    if (searchInput.trim()) {
-      navigate(`/search/${encodeURIComponent(searchInput)}`);
-    }
-  };
-
   const openLoginModal = () => {
     setShowLoginModal(true);
-    // cause warning but needed to stop logout alert shows 2 times.
   };
 
   const closeLoginModal = (boolean) => {
@@ -60,12 +42,12 @@ const Index = (props) => {
   const handleLoginSuccess = () => {
     setShowLoginModal(false);
     // Optionally, handle additional logic for the logged-in user
-    console.log(user?.data); // Access user data after login
+    // console.log(user?.data); // Access user data after login// Save user info
+    dispatch(loginSuccess({ user: user }));
   };
 
   const Logout = () => {
     dispatch(logout());
-    // setNavLoginSuccess(false);
     toast.success("Successfully logged out!", {
       position: toast.POSITION.TOP_CENTER,
     });
@@ -182,12 +164,7 @@ const Index = (props) => {
             stock lasts.
           </p>
           {/* <ModelDropdown /> */}
-          <SearchDropdown
-            options={user?.search_history || []}
-            id="id"
-            selectedVal={value}
-            handleChange={setValue}
-          />
+          <SearchDropdown />
         </div>
       </div>
       {/* start header - part 1 */}
@@ -203,13 +180,13 @@ const Index = (props) => {
         <div className="row mb-5">
           <div className="col-md-9">
             <div className="recommended-products-section">
-              <h2 className="font-weight-bold">Recommended Products</h2>
+              <h2 className="font-weight-bold">For You</h2>
               <RecommendedProduct />
             </div>
             <h2 className="font-weight-bold">Our Products</h2>
             <ProductField
-              searchInput={searchInput}
-              submitSearch={submitSearch}
+            // searchInput={searchInput}
+            // submitSearch={submitSearch}
             />
           </div>
         </div>
@@ -218,7 +195,7 @@ const Index = (props) => {
 
       {/* Footer */}
       <hr className="horizontal-line" />
-
+      <Footer />
       {/* Modals */}
       <LoginModal
         showLoginModal={showLoginModal}
@@ -226,7 +203,7 @@ const Index = (props) => {
         onLoginSuccess={handleLoginSuccess} // Pass the callback here
       />
       {/* Modals */}
-    </div >
+    </div>
   );
 };
 export default Index;

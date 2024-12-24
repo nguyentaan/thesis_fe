@@ -46,17 +46,10 @@ const Footer = () => {
             Look inside trendy,elegant & fantastic fashion in Batam. Tell the
             world who you are with style without having to speak.
           </small>
-          <div className="mt-4">
-            <small className="pt-4">© 2020 S2-Boutique Batam</small>
-          </div>
         </div>
 
         <div className="col-md-3">
           <p className="footer-title">REACH OUT</p>
-          <button className="btn btn-outline-success mr-3">
-            <i className="fab fa-whatsapp fa-lg" />
-          </button>
-
           <button className="btn btn-outline-instagram mr-3">
             <i className="fab fa-instagram fa-lg" />
           </button>
@@ -93,7 +86,7 @@ const Footer = () => {
             </div>
           </div>
           <small className="text-secondary">
-            We will not share your gmail/whatsapp to anyone else.
+            We will not share your gmail to anyone else.
           </small>
         </div>
       </div>

@@ -64,16 +64,14 @@ const UserOrdersPage = () => {
   const handleAddReview = (product) => {
     console.log("Adding review for product:", product._id);
     console.log("Product:", product);
-    
+
     setSelectedOrder(product); // Update to set the product instead of the order
     setIsReviewOpen(true); // Open the review modal
     console.log("Is Review Open:", isReviewOpen);
-
   };
 
   return (
     <div>
-      {/* Navbar */}
       <nav
         id="top"
         className="navbar fixed-top navbar-expand-lg navbar-light bg-light"
@@ -115,8 +113,8 @@ const UserOrdersPage = () => {
         {/* Loading and Error Handling */}
         {isOrderLoading ? (
           <p>Loading orders...</p>
-        ) : error ? (
-          <p className="text-danger">Failed to load orders: {error}</p>
+        ) : error && error.message ? (
+          <p className="text-danger">Failed to load orders: {error.message}</p>
         ) : (
           <div className="table-responsive">
             <table className="table table-striped">

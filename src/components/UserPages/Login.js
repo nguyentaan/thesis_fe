@@ -11,8 +11,8 @@ import { loginSuccess } from "../../Slices/AuthenSlice";
 const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
   const dispatch = useDispatch();
 
-  const { isLoading } = useSelector((state) => state.auth);
-  const [email, setEmail] = useState("20521920@gm.uit.edu.vn");
+  const { isLoading } = useSelector((state) =>state.auth);
+  const [email, setEmail] = useState("20521920@gm.uit.edu.vn"); 
   const [password, setPassword] = useState("12345678");
   const [otpVisible, setOtpVisible] = useState(false);
   const [signUpVisible, setSignUpVisible] = useState(false);
@@ -21,6 +21,19 @@ const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
+  // Check for tokens on component mount to restore auth state
+  // useEffect(() => {
+  //   const accessToken = localStorage.getItem("accessToken");
+  //   if (accessToken) {
+  //     // Assuming you decode the token to check user info
+  //     const decodedToken = jwtDecode(accessToken);
+  //     if (decodedToken) {
+  //       dispatch({ type: "auth/loginSuccess", payload: decodedToken });
+  //       setOtpVisible(true); // or set isAuth to true and update UI state accordingly
+  //     }
+  //   }
+  // }, [dispatch]);
 
   // const handleGoogleLogin = async () => {
   //   try {
@@ -38,9 +51,7 @@ const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
     try {
       const response = await dispatch(emailLogin({ email, password })).unwrap();
       if (response.status === "OK") {
-        const { data, access_token, refresh_token } = response; // Destructure the result
-        dispatch(loginSuccess({ user: data, accessToken: access_token, refreshToken: refresh_token }));
-        alert("Login sucessfully!");
+        setOtpVisible(true); 
       } else {
         console.error("Login failed:", response.message);
       }
@@ -48,7 +59,7 @@ const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
       console.error("Email login error:", error);
     }
   };
-
+  
 
   const handleBackToLogin = () => {
     // setOtpVisible(false);

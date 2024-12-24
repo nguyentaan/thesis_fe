@@ -20,7 +20,7 @@ const ProductsRender = ({ dataProduct, isProductLoading }) => {
 
   return (
     <div style={{ fontFamily: "Karla,sans-serif" }}>
-      {isProductLoading && <Loader />}
+      <Loader isProductLoading={isProductLoading} />
       {/* Render product list only if modal is not visible */}
       {!showDetailModel && !isProductLoading && (
         <div className="row">
@@ -66,8 +66,6 @@ const ProductsRender = ({ dataProduct, isProductLoading }) => {
           )}
         </div>
       )}
-
-      {isProductLoading && <p>Loading more products...</p>}
 
       {dataProduct &&
         dataProduct.products &&

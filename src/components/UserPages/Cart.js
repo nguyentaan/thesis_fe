@@ -11,6 +11,7 @@ import {
   decreaseQuantity,
   // removeItem,
 } from "../../Slices/CartSlice";
+import Loader from "./Loader";
 
 const Cart = () => {
   const dispatch = useDispatch();
@@ -18,7 +19,6 @@ const Cart = () => {
     dataCart = [],
     // cartTotal,
     isCartLoading,
-    error,
   } = useSelector((state) => state.cart);
   const [subTotal, setSubTotal] = React.useState(0);
   const total = subTotal + 5;
@@ -53,8 +53,6 @@ const Cart = () => {
       }, 0)
     );
   }, [dataCart]);
-  console.log(dataCart);
-  console.log("userId", userId);
 
   // Enhanced parsePrice function to handle different invalid cases
   const parsePrice = (price) => {
@@ -68,12 +66,7 @@ const Cart = () => {
   };
 
   if (isCartLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    console.error("Error details:", error);
-    return <div>Error: {error.message || "Something went wrong"}</div>;
+    return <Loader isProductLoading={isCartLoading} />;
   }
 
   const handleIncreaseQty = async (item) => {
@@ -97,21 +90,6 @@ const Cart = () => {
     );
     dispatch(fetchCart(userId)); // Refetch the cart data
   };
-
-  // const handleRemoveItem = async (item) => {
-  //   try {
-  //     await dispatch(
-  //       removeItem({
-  //         userId,
-  //         productId: item.productId._id,
-  //         size: item.size,
-  //       })
-  //     ).unwrap(); // Unwraps to handle errors directly
-  //     dispatch(fetchCart(userId)); // Refetch the cart data
-  //   } catch (removeError) {
-  //     console.error("Error removing item:", removeError);
-  //   }
-  // };
 
   return (
     <div>
@@ -213,12 +191,6 @@ const Cart = () => {
                       <h6 className="font-weight-bold text-secondary align-self-center my-0">
                         ${parsePrice(item.productId.price) * item.quantity}
                       </h6>
-                      <button
-                        className="btn trash-cart-btn ml-2"
-                        // onClick={handleRemoveItem(item)}
-                      >
-                        <i className="far fa-trash-alt fa-sm"></i>
-                      </button>
                     </div>
                   </td>
                 </tr>
