@@ -80,7 +80,7 @@ const authSlice = createSlice({
   name: "auth",
   initialState: {
     user: null,
-    isAuth: false, // Check if accessToken exists
+    isAuth: !!localStorage.getItem("accessToken"), // Check if accessToken exists
     isLoading: false,
     error: null,
     accessToken: localStorage.getItem("accessToken"), // Load from localStorage
@@ -90,8 +90,10 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.isAuth = false;
-      state.accessToken = localStorage.removeItem("accessToken");
-      state.refreshToken = localStorage.removeItem("refreshToken");
+      state.accessToken = null;
+      state.refreshToken = null;
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
     },
     loginSuccess(state, action) {
       state.isAuth = true;

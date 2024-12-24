@@ -13,12 +13,11 @@ import SearchDropdown from "./SearchDropdown";
 import "../Users.css";
 import RecommendedProduct from "./RecommendedProduct";
 
-const Index = (props) => {
+const Index = () => {
   const dispatch = useDispatch();
   const { isAuth, user } = useSelector((state) => state.auth);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  console.log("isAuth: ",isAuth);
-  
+
   useEffect(() => {
     if (isAuth) {
       setShowLoginModal(false);
@@ -48,7 +47,6 @@ const Index = (props) => {
 
   const Logout = () => {
     dispatch(logout());
-    // setNavLoginSuccess(false);
     toast.success("Successfully logged out!", {
       position: toast.POSITION.TOP_CENTER,
     });
@@ -204,7 +202,7 @@ const Index = (props) => {
         onLoginSuccess={handleLoginSuccess} // Pass the callback here
       />
       {/* Modals */}
-    </div >
+    </div>
   );
 };
 export default Index;
