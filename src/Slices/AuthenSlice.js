@@ -42,22 +42,6 @@ export const emailLogin = createAsyncThunk(
   }
 );
 
-// export const verifyOTP = createAsyncThunk(
-//   "authen/verify-otp",
-//   async ({ email, password, otp }, { rejectWithValue }) => {
-//     try {
-//       const response = await axios.post(`${API_URL}/api/auth/verify-otp`, {
-//         email,
-//         password,
-//         otp,
-//       });
-//       return response.data;
-//     } catch (error) {
-//       return rejectWithValue(handleError(error));
-//     }
-//   }
-// );
-
 export const createUser = createAsyncThunk(
   "authen/register",
   async ({ name, email, password, phoneNumber }, { rejectWithValue }) => {
@@ -97,11 +81,9 @@ const authSlice = createSlice({
     },
     loginSuccess(state, action) {
       state.isAuth = true;
-      state.user = action.payload.user;
+      state.user = { data: action.payload.user };
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
-      localStorage.setItem("accessToken", action.payload.accessToken);
-      localStorage.setItem("refreshToken", action.payload.refreshToken);
     },
   },
   extraReducers: (builder) => {
