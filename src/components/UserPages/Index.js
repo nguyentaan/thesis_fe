@@ -12,8 +12,9 @@ import LoginModal from "./Login";
 import SearchDropdown from "./SearchDropdown";
 import "../Users.css";
 import RecommendedProduct from "./RecommendedProduct";
+import Footer from "./Footer";
 
-const Index = (props) => {
+const Index = () => {
   const dispatch = useDispatch();
   const { isAuth, user } = useSelector((state) => state.auth);
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -47,7 +48,6 @@ const Index = (props) => {
 
   const Logout = () => {
     dispatch(logout());
-    // setNavLoginSuccess(false);
     toast.success("Successfully logged out!", {
       position: toast.POSITION.TOP_CENTER,
     });
@@ -195,7 +195,7 @@ const Index = (props) => {
 
       {/* Footer */}
       <hr className="horizontal-line" />
-
+      <Footer />
       {/* Modals */}
       <LoginModal
         showLoginModal={showLoginModal}
@@ -203,7 +203,7 @@ const Index = (props) => {
         onLoginSuccess={handleLoginSuccess} // Pass the callback here
       />
       {/* Modals */}
-    </div >
+    </div>
   );
 };
 export default Index;

@@ -17,6 +17,8 @@ const initialState = {
     variant: "light",
   },
   error: null,
+  searchQuery:'',
+  searchHistory: [], // Initialize search history state
 };
 
 export const getAllProducts = createAsyncThunk(
@@ -56,12 +58,6 @@ export const getRecommendProducts = createAsyncThunk(
   "product/recommend",
   async ({ user_id }, { rejectWithValue }) => {
     try {
-      // Check if user_id is provided (optional API scenario)
-      if (!user_id) {
-        console.warn("User is not authenticated. Skipping recommendation API.");
-        return []; // Return an empty array or fallback recommendations
-      }
-
       // Call the recommendation API
       const res = await axios.post(`${PYTHON_URL}/recommend`, { user_id });
       // console.log("Recommendation API response:", res.data);
@@ -95,6 +91,36 @@ export const addSearchKeyword = createAsyncThunk(
   }
 );
 
+export const removeSearchHistoryItem = createAsyncThunk(
+  "user/search/remove",
+  async ({ query, user_id }, { rejectWithValue }) => {
+    try {
+      const res = await axios.delete(`${API_URL}/api/user/keyword/remove`, {
+        data: { query, user_id },
+      });
+      return res.data;
+    } catch (error) {
+      console.error("API error:", error);
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+)
+
+export const clearAllSearchHistory = createAsyncThunk(
+  "user/search/clear-all",
+  async ({ user_id }, { rejectWithValue }) => {
+    try {
+      const res = await axios.delete(`${API_URL}/api/user/keyword/remove-all`, {
+        data: { user_id },
+      });
+      return res.data;
+    } catch (error) {
+      console.error("API error:", error);
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+)
+
 export const getAllUser = createAsyncThunk(
   "user/getAll",
   async ({ } = {}, { rejectWithValue }) => {
@@ -121,10 +147,13 @@ const userSlice = createSlice({
     },
     updateSearchHistory(state, action) {
       state.searchHistory = action.payload;
-      // toast.success("Search history updated successfully!", {
-      //   position: toast.POSITION.TOP_CENTER,
-      // });
     },
+    setSearchQuery(state, action) {
+      state.searchQuery = action.payload
+    },
+    resetSearchHistory(state) {
+      state.searchHistory = [];
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -182,6 +211,24 @@ const userSlice = createSlice({
       .addCase(addSearchKeyword.rejected, (state, action) => {
         state.isUserLoading = false;
       })
+      .addCase(removeSearchHistoryItem.pending, (state) => {
+        state.isUserLoading = true;
+      })
+      .addCase(removeSearchHistoryItem.fulfilled, (state, action) => {
+        state.isUserLoading = false;
+      })
+      .addCase(removeSearchHistoryItem.rejected, (state, action) => {
+        state.isUserLoading = false;
+      })
+      .addCase(clearAllSearchHistory.pending, (state) => {
+        state.isUserLoading = true;
+      })
+      .addCase(clearAllSearchHistory.fulfilled, (state, action) => {
+        state.isUserLoading = false;
+      })
+      .addCase(clearAllSearchHistory.rejected, (state, action) => {
+        state.isUserLoading = false;
+      })
       .addCase(getRecommendProducts.pending, (state) => {
         state.isProductLoading = true;
         state.recommendedProducts = []; // Clear recommendations while loading
@@ -200,8 +247,13 @@ const userSlice = createSlice({
 });
 
 // Correctly export the reducer and actions separately
-export const { setIsProductLoading, resetProducts, updateSearchHistory } =
-  userSlice.actions;
+export const {
+  setIsProductLoading,
+  resetProducts,
+  updateSearchHistory,
+  setSearchQuery,
+  resetSearchHistory,
+} = userSlice.actions;
 export default userSlice.reducer;
 
 

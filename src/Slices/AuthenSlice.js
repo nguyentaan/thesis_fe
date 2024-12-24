@@ -80,7 +80,7 @@ const authSlice = createSlice({
   name: "auth",
   initialState: {
     user: null,
-    isAuth: false,
+    isAuth: !!localStorage.getItem("accessToken"), // Check if accessToken exists
     isLoading: false,
     error: null,
     accessToken: localStorage.getItem("accessToken"), // Load from localStorage
@@ -90,12 +90,14 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.isAuth = false;
-      state.accessToken = localStorage.removeItem("accessToken");
-      state.refreshToken = localStorage.removeItem("refreshToken");
+      state.accessToken = null;
+      state.refreshToken = null;
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
     },
     loginSuccess(state, action) {
       state.isAuth = true;
-      state.user = { data: action.payload.user };
+      state.user = action.payload.user;
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
       localStorage.setItem("accessToken", action.payload.accessToken);
@@ -161,7 +163,7 @@ const authSlice = createSlice({
       .addCase(createUser.rejected, (state, action) => {
         state.error = action.payload; // Capture error message
         state.isLoading = false;
-      })
+      });
   },
 });
 export const { logout, loginSuccess } = authSlice.actions;

@@ -16,6 +16,7 @@ import "../Search.css";
 import logo from "../../assets/logo.png";
 import { Link } from "react-router-dom";
 import SearchDropdown from "./SearchDropdown";
+import Footer from "./Footer";
 
 const Search = () => {
   const { keyword } = useParams();
@@ -261,6 +262,8 @@ const Search = () => {
           </div>
         </div>
       </div>
+      <hr className="horizontal-line" />
+      <Footer />
       <LoginModal
         showLoginModal={showLoginModal}
         closeLoginModal={closeLoginModal}

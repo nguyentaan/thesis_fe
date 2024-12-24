@@ -1,9 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-
-import { Modal, Button, Alert } from "react-bootstrap";
-import EditProductModal from "./AdminProductEdit";
-import AddProductModal from "./AdminProductAdd";
+import { useSelector, useDispatch } from "react-redux";
+import { Modal, Button } from "react-bootstrap";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { getAllUser } from "../../Slices/UserSlice";
+import ContentLayout from "../admin-panel/content-layout";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "../ui/breadcrumb";
+import { Link } from "react-router-dom";
+import PlaceholderContent from "../misc/placeholder-content";
 
 const AdminProduct = (props) => {
   const urlLocalhost = `${process.env.REACT_APP_API_URL}`;
@@ -14,13 +24,12 @@ const AdminProduct = (props) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [dataDelete, setDataDelete] = useState({});
 
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         if (isAuth && refreshToken) {
           const response = await dispatch(getAllUser()).unwrap();
-          console.log("Response get user:", response);  // Log the response here
+          console.log("Response get user:", response); // Log the response here
         }
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -33,7 +42,7 @@ const AdminProduct = (props) => {
     if (dataUser?.users) {
       console.log("User data updated: ", dataUser);
     }
-  }, [dataUser])
+  }, [dataUser]);
 
   const displayDeleteModal = (data) => {
     setDataDelete(data);
@@ -78,13 +87,17 @@ const AdminProduct = (props) => {
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link to="/admin/dashboard" className="no-underline text-black">Home</Link>
+              <Link to="/admin/dashboard" className="no-underline text-black">
+                Home
+              </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link to="/admin/dashboard" className="no-underline text-black">Dashboard</Link>
+              <Link to="/admin/dashboard" className="no-underline text-black">
+                Dashboard
+              </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />

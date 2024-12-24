@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserView, MobileView } from "react-device-detect";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import UserPage from "./components/UserPages/Index";
