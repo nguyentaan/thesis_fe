@@ -17,7 +17,8 @@ const Index = (props) => {
   const dispatch = useDispatch();
   const { isAuth, user } = useSelector((state) => state.auth);
   const [showLoginModal, setShowLoginModal] = useState(false);
-
+  console.log("isAuth: ",isAuth);
+  
   useEffect(() => {
     if (isAuth) {
       setShowLoginModal(false);
