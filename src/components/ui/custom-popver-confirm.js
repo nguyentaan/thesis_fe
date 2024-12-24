@@ -6,10 +6,10 @@ export const CustomPopoverConfirm = ({ children, button, onConfirm }) => {
     const [open, setOpen] = useState(false);
     return (
         <Popover modal={true} open={open} onOpenChange={setOpen}>
-            <PopoverTrigger className="w-full">
+            <PopoverTrigger className="w-full bg-white">
                 {button || <Button>Delete</Button>}
             </PopoverTrigger>
-            <PopoverContent>
+            <PopoverContent className='bg-white'>
                 {children || (
                     <>
                         <div>This action cannot be undone, are you sure?</div>

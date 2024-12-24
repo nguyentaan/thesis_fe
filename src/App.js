@@ -11,7 +11,6 @@ import UserOrdersPage from "./components/UserPages/UserOrders";
 function App() {
   return (
     <div>
-      <BrowserView>
         <Router>
           <Routes>
             <Route path="/" element={<UserPage />} />
@@ -22,10 +21,6 @@ function App() {
             <Route path="/admin/*" element={<AdminPage />} />
           </Routes>
         </Router>
-      </BrowserView>
-      <MobileView>
-        <h1> Not Rendered on Mobile, Please check via Desktop/PC. </h1>
-      </MobileView>
     </div>
   );
 }
