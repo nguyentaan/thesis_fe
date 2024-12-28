@@ -12,13 +12,13 @@ const initialState = {
 
 export const addToCart = createAsyncThunk(
   "cart/addToCart",
-  async ({ userId, productId, quantity, size }, { rejectWithValue }) => {
+  async ({ userId, productId, quantity, color }, { rejectWithValue }) => {
     try {
       const response = await axios.post(`${API_URL}/api/cart`, {
         userId,
         productId,
         quantity,
-        size,
+        color,
       });
       return response.data;
     } catch (error) {
@@ -39,14 +39,15 @@ export const fetchCart = createAsyncThunk(
   }
 );
 
+// Thunk to increase quantity of an item
 export const increaseQuantity = createAsyncThunk(
   "cart/increaseQuantity",
-  async ({ userId, productId, size }, { rejectWithValue }) => {
+  async ({ userId, productId, color }, { rejectWithValue }) => {
     try {
       const response = await axios.put(`${API_URL}/api/cart/increase`, {
         userId,
         productId,
-        size,
+        color,  // Correct the field name to color instead of size
       });
       return response.data;
     } catch (error) {
@@ -55,14 +56,15 @@ export const increaseQuantity = createAsyncThunk(
   }
 );
 
+// Thunk to decrease quantity of an item
 export const decreaseQuantity = createAsyncThunk(
   "cart/decreaseQuantity",
-  async ({ userId, productId, size }, { rejectWithValue }) => {
+  async ({ userId, productId, color }, { rejectWithValue }) => {
     try {
       const response = await axios.put(`${API_URL}/api/cart/decrease`, {
         userId,
         productId,
-        size,
+        color,  // Correct the field name to color instead of size
       });
       return response.data;
     } catch (error) {
@@ -71,12 +73,13 @@ export const decreaseQuantity = createAsyncThunk(
   }
 );
 
+// Thunk to remove item from the cart
 export const removeItem = createAsyncThunk(
   "cart/removeItem",
-  async ({ userId, productId, size }, { rejectWithValue }) => {
+  async ({ userId, productId, color }, { rejectWithValue }) => {
     try {
       const response = await axios.delete(`${API_URL}/api/cart/remove`, {
-        data: { userId, productId, size },
+        data: { userId, productId, color },  // Correct the field name to color instead of size
       });
       return response.data;
     } catch (error) {

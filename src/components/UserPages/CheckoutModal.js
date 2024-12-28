@@ -35,15 +35,6 @@ const CheckoutModal = ({
 
   const closeCheckoutModal = () => unDisplayCheckoutModal(false);
   // Enhanced parsePrice function to handle different invalid cases
-  const parsePrice = (price) => {
-    if (price == null || price === "" || typeof price !== "string") return 0; // Handle null, undefined, or non-string values
-
-    // Use regex to find the first valid number in the string, like "17.50" in "$Now 17.50"
-    const match = price.match(/(\d+(\.\d+)?)/);
-    const sanitizedPrice = match ? parseFloat(match[0]) : 0;
-
-    return sanitizedPrice;
-  };
   return (
     <Modal size="lg" show={showCheckoutModal} onHide={closeCheckoutModal}>
       <Modal.Header closeButton>
@@ -133,7 +124,7 @@ const CheckoutModal = ({
                         </p>
                         <span className="ml-2">× {item.quantity}</span>
                         <p className="mb-0 font-weight-bold">
-                          ${parsePrice(item.productId.price) * item.quantity}
+                          ${item.productId.price * item.quantity}
                         </p>
                       </div>
                     ))}

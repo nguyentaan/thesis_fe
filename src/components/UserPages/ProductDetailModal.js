@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import "../Users.css";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../../Slices/CartSlice";
@@ -13,16 +13,12 @@ const ProductDetailModal = ({
   unDisplayDetailModal,
 }) => {
   const dispatch = useDispatch();
-  const [selectedImage, setSelectedImage] = useState(selectedProduct.images[0]);
-  const [selectedSize, setSelectedSize] = useState(null);
-  const [selectedStock, setSelectedStock] = useState(null);
-  const [openDescription, setOpenDescription] = useState(null);
   const modalRef = useRef(null);
   const { user, isAuth } = useSelector((state) => state.auth);
   // Check if user is logged in
   const isUserLoggedIn = isAuth;
   // console.log("selectedProduct", selectedProduct);
-  
+
   // Close modal when clicking outside of it
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -40,10 +36,6 @@ const ProductDetailModal = ({
     };
   }, [unDisplayDetailModal]);
 
-  const toggleDescription = (index) => {
-    setOpenDescription(openDescription === index ? null : index);
-  };
-
   const handleAddToCart = () => {
     if (!isUserLoggedIn) {
       // Notify user to log in
@@ -53,37 +45,13 @@ const ProductDetailModal = ({
       return; // Exit early if user is not logged in
     }
 
-    if (!selectedSize) {
-      toast.error("Please select a size!");
-      return;
-    }
-
-    // Check if the selected size is in stock
-    const selectedSizeStock = selectedProduct.sizes.find(
-      (size) => size.size_name === selectedSize
-    )?.stock;
-
-    if (selectedSizeStock === 0) {
-      toast.error("This size is out of stock!");
-      return;
-    }
-
     // Proceed to add to cart if size is selected and in stock
     const productId = selectedProduct._id;
-    const size = selectedSize;
+    const color = selectedProduct.color;
     const quantity = 1;
-    // console.log("Adding to cart:", { productId, size, quantity });
-    
+    console.log("Adding to cart:", { productId, color, quantity });
 
-    dispatch(addToCart({ userId: user._id, productId, quantity, size }));
-  };
-
-  const handleSelectSize = (size) => {
-    setSelectedSize(size);
-    const sizeStock = selectedProduct.sizes.find(
-      (sizeItem) => sizeItem.size_name === size
-    )?.stock;
-    setSelectedStock(sizeStock);
+    dispatch(addToCart({ userId: user._id, productId, quantity, color }));
   };
 
   if (!showDetailModel) return null; // Hide modal if not visible
@@ -100,34 +68,13 @@ const ProductDetailModal = ({
         <div className="product-detail-tabs">
           <div className="images-column">
             <div className="mw-450">
-              {selectedProduct.images.length > 0 ? (
-                <div>
-                  <img
-                    src={selectedImage}
-                    alt={selectedProduct.name}
-                    className="large-product-image"
-                  />
-                  <ul className="image-gallery">
-                    {selectedProduct.images.slice(0, -1).map((image, index) => (
-                      <li
-                        className="image-item"
-                        key={index}
-                        onClick={() => setSelectedImage(image)}
-                      >
-                        <img
-                          src={image}
-                          alt={`${selectedProduct.name} - ${index + 1}`}
-                          className={`product-image ${
-                            image === selectedImage ? "selected" : ""
-                          }`}
-                        />
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : (
-                <p>No images available</p>
-              )}
+              <div>
+                <img
+                  src={selectedProduct.image_url}
+                  alt={selectedProduct.name}
+                  className="large-product-image"
+                />
+              </div>
             </div>
           </div>
           <div className="product-info">
@@ -135,31 +82,11 @@ const ProductDetailModal = ({
               <div className="product-name">
                 <h1 className="pr-name-title">{selectedProduct.name}</h1>
               </div>
-              <div className="list-size">
-                <div className="size-list">
-                  {selectedProduct.sizes.map((size, index) => (
-                    <div
-                      key={index}
-                      className={`size-item ${
-                        selectedSize === size.size_name ? "selected" : ""
-                      } ${size.stock === 0 ? "out-of-stock" : ""}`}
-                      onClick={() =>
-                        size.stock > 0 && handleSelectSize(size.size_name)
-                      }
-                      style={{
-                        cursor: size.stock > 0 ? "pointer" : "not-allowed",
-                      }}
-                    >
-                      {size.size_name} {size.stock === 0 && "(Out of stock)"}
-                    </div>
-                  ))}
-                </div>
-              </div>
-              {selectedStock !== null && (
+              {/* {selectedStock !== null && (
                 <div className="stock-info">
                   <p>Stock available: {selectedStock}</p>
                 </div>
-              )}
+              )} */}
               <div className="clr-rating">
                 <div className="product-color">
                   <p className="color-label">Color: </p>
@@ -182,26 +109,7 @@ const ProductDetailModal = ({
             </div>
             {/* Collapsible Descriptions */}
             <div className="product-description">
-              {selectedProduct.description.map((item, index) => (
-                <div key={index} className="description-item">
-                  <div
-                    className={`description-title ${
-                      openDescription === index ? "active" : ""
-                    }`}
-                    onClick={() => toggleDescription(index)}
-                  >
-                    {Object.keys(item)[0]}{" "}
-                    <span className="toggle-icon">
-                      {openDescription === index ? "▲" : "▼"}
-                    </span>
-                  </div>
-                  {openDescription === index && (
-                    <div className="description-content">
-                      <p>{Object.values(item)[0]}</p>
-                    </div>
-                  )}
-                </div>
-              ))}
+              <p>{selectedProduct.description}</p>
             </div>
 
             {/* Reviews Section */}
