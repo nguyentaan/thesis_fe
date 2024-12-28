@@ -9,10 +9,10 @@ import logo from "../../assets/logo.png";
 import Carousel from "./Carousel";
 import ProductField from "./Products";
 import LoginModal from "./Login";
-import SearchDropdown from "./SearchDropdown";
 import "../Users.css";
 import RecommendedProduct from "./RecommendedProduct";
 import Footer from "./Footer";
+import SearchComponent from "./SearchInput";
 
 const Index = () => {
   const dispatch = useDispatch();
@@ -60,7 +60,6 @@ const Index = () => {
       backgroundPosition: "center",
     };
   };
-
   return (
     <div
       style={{
@@ -163,8 +162,7 @@ const Index = () => {
             Ready to wear dresses tailored for you from online. Hurry up while
             stock lasts.
           </p>
-          {/* <ModelDropdown /> */}
-          <SearchDropdown />
+          <SearchComponent />
         </div>
       </div>
       {/* start header - part 1 */}
@@ -184,10 +182,7 @@ const Index = () => {
               <RecommendedProduct />
             </div>
             <h2 className="font-weight-bold">Our Products</h2>
-            <ProductField
-            // searchInput={searchInput}
-            // submitSearch={submitSearch}
-            />
+            <ProductField />
           </div>
         </div>
       </div>

@@ -135,7 +135,7 @@ const UserOrdersPage = () => {
                         {order.items.map((item) => (
                           <div key={item._id} className="product-info1">
                             <img
-                              src={item.productId.images[0]}
+                              src={item.productId.image_url}
                               alt={item.productId.name}
                               className="product-image-small"
                             />

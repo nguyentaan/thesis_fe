@@ -54,10 +54,14 @@ const Products = () => {
                   >
                     <div className="card-img-top">
                       <img
-                        src={product.images[0]}
+                        src={product.image_url}
                         className="card-img-top"
                         alt={product.name}
-                        style={{ width: "100%", height: "auto" }}
+                        style={{
+                          width: "100%",
+                          height: "300px", // You can adjust this height as per your design
+                          objectFit: "contain",
+                        }}
                       />
                       <h3 className="text-success-s2 font-weight-bold">
                         SEE DETAIL

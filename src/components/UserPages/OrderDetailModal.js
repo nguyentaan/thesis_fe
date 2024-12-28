@@ -69,7 +69,7 @@ const OrderDetailModal = ({ order, isOpen, closeModal }) => {
                           >
                             {/* Product Image */}
                             <img
-                              src={item.productId.images[0]}
+                              src={item.productId.image_url}
                               alt={item.productId.name}
                               className="img-thumbnail"
                               style={{

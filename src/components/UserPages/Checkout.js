@@ -35,22 +35,12 @@ const Checkout = (props) => {
     setSubTotal(
       dataCart.reduce((total, item) => {
         // Use parsePrice to sanitize and parse each item price
-        const itemPrice = parsePrice(item.productId.price);
+        const itemPrice = item.productId.price;
         return total + itemPrice * item.quantity;
       }, 0)
     );
   }, [dataCart]);
 
-  // Enhanced parsePrice function to handle different invalid cases
-  const parsePrice = (price) => {
-    if (price == null || price === "" || typeof price !== "string") return 0; // Handle null, undefined, or non-string values
-
-    // Use regex to find the first valid number in the string, like "17.50" in "$Now 17.50"
-    const match = price.match(/(\d+(\.\d+)?)/);
-    const sanitizedPrice = match ? parseFloat(match[0]) : 0;
-
-    return sanitizedPrice;
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -224,7 +214,7 @@ const Checkout = (props) => {
                           <div
                             className=" text-center"
                             style={{
-                              backgroundImage: `url(${item.productId.images[0]})`,
+                              backgroundImage: `url(${item.productId.image_url})`,
                               height: "75px",
                               width: "75px",
                               backgroundSize: "contain",
