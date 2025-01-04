@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { getOrdersByUserId, cancelOrder } from "../../Slices/OrderSlice";
@@ -18,10 +18,10 @@ const UserOrdersPage = () => {
     error,
   } = useSelector((state) => state.order);
 
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const [selectedOrder, setSelectedOrder] = React.useState(null);
-  const [isReviewOpen, setIsReviewOpen] = React.useState(false); // State to control review modal
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isReviewOpen, setIsReviewOpen] = useState(false); // State to control review modal
+  
   // Fetch orders on component mount
   useEffect(() => {
     dispatch(getOrdersByUserId(userId));
@@ -30,8 +30,6 @@ const UserOrdersPage = () => {
   // Open the modal and set selected order
   const openModal = (order) => {
     setSelectedOrder(order);
-    console.log("Selected order:", order);
-
     setIsModalOpen(true);
   };
 

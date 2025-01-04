@@ -9,21 +9,28 @@ import logo from "../../assets/logo.png";
 import Carousel from "./Carousel";
 import ProductField from "./Products";
 import LoginModal from "./Login";
-import "../Users.css";
-import RecommendedProduct from "./RecommendedProduct";
 import Footer from "./Footer";
 import SearchComponent from "./SearchInput";
+import Chatbot from "./chatbot";
+import "../Users.css";
 
 const Index = () => {
   const dispatch = useDispatch();
   const { isAuth, user } = useSelector((state) => state.auth);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     if (isAuth) {
       setShowLoginModal(false);
     }
   }, [isAuth]);
+
+  // Handle search submit when button is clicked
+  const handleSearchSubmit = (query) => {
+    console.log("Searching for:", query);
+    // Trigger your search action here, e.g., dispatch an action
+  };
 
   const noLoginCartNotification = () => {
     toast.error("Please login first to continue.", {
@@ -67,6 +74,7 @@ const Index = () => {
         backgroundColor: "#f8f9fa",
       }}
     >
+      <Chatbot />
       <div className="main-bg-height" style={picture(mainBg)}>
         <nav className="navbar fixed-top navbar-expand-lg navbar-light bg-light">
           <div className="container">
@@ -162,7 +170,11 @@ const Index = () => {
             Ready to wear dresses tailored for you from online. Hurry up while
             stock lasts.
           </p>
-          <SearchComponent />
+          <SearchComponent
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            onSearchSubmit={handleSearchSubmit}
+          />
         </div>
       </div>
       {/* start header - part 1 */}
@@ -177,12 +189,8 @@ const Index = () => {
       <div className="container">
         <div className="row mb-5">
           <div className="col-md-9">
-            <div className="recommended-products-section">
-              <h2 className="font-weight-bold">For You</h2>
-              <RecommendedProduct />
-            </div>
             <h2 className="font-weight-bold">Our Products</h2>
-            <ProductField />
+            <ProductField searchQuery={searchQuery} />
           </div>
         </div>
       </div>

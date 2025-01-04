@@ -6,7 +6,7 @@ import ProductDetailModal from "./ProductDetailModal";
 import RatingDisplay from "./RatingDisplay";
 import Loader from "./Loader";
 
-const Products = () => {
+const Products = ({searchQuery }) => {
   const dispatch = useDispatch();
   const { dataProduct, isProductLoading } = useSelector((state) => state.user);
 
@@ -17,8 +17,8 @@ const Products = () => {
   const [showDetailModel, setShowDetailModel] = useState(false);
 
   useEffect(() => {
-    dispatch(getAllProducts({ page, limit }));
-  }, [dispatch, page]);
+    dispatch(getAllProducts({ page, limit, searchQuery }));
+  }, [dispatch, page, searchQuery]);
 
   const loadMoreProducts = () => {
     setPage((prevPage) => prevPage + 1);

@@ -23,36 +23,16 @@ const initialState = {
 
 export const getAllProducts = createAsyncThunk(
   "product/getall",
-  async ({ page = 1, limit = 15 }, { rejectWithValue }) => {
+  async ({ page = 1, limit = 15, search = "" }, { rejectWithValue }) => {
     try {
       const res = await axios.get(`${API_URL}/api/products`, {
-        params: { page, limit },
+        params: { page, limit, search },
       });
       const { products, total } = res.data;
       return { products, total, page };
     } catch (error) {
       console.error("API error:", error);
       return rejectWithValue(error.response?.data || error.message);
-    }
-  }
-);
-
-export const getRecommendProducts = createAsyncThunk(
-  "product/recommend",
-  async ({ user_id }, { rejectWithValue }) => {
-    try {
-      // Call the recommendation API
-      const res = await axios.post(`${PYTHON_URL}/recommend`, { user_id });
-      // console.log("Recommendation API response:", res.data);
-
-      return res.data.recommendations; // Return recommendations if the call is successful
-    } catch (error) {
-      console.error("Recommendation API error:", error);
-
-      // Handle API failure gracefully
-      return rejectWithValue(
-        error.response?.data || "Failed to fetch recommendations."
-      );
     }
   }
 );
@@ -150,20 +130,6 @@ const userSlice = createSlice({
           position: toast.POSITION.TOP_CENTER,
           autoClose: 3000,
         });
-      })
-      .addCase(getRecommendProducts.pending, (state) => {
-        state.isProductLoading = true;
-        state.recommendedProducts = []; // Clear recommendations while loading
-        state.error = null; // Reset error
-      })
-      .addCase(getRecommendProducts.fulfilled, (state, action) => {
-        state.isProductLoading = false;
-        state.recommendedProducts = action.payload; // Populate recommendations
-      })
-      .addCase(getRecommendProducts.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload; // Capture error message
-        state.recommendations = []; // Optional: Clear recommendations on failure
       })
       .addCase(getAllFile.pending, (state) => {
         state.isFileLoading = true;
