@@ -4,6 +4,7 @@ import authnReducer from "./AuthenSlice"; // Import the default export
 import cartReducer from "./CartSlice"; // Import the default export
 import orderReducer from "./OrderSlice";
 import reviewReducer from "./ReviewSlice";
+import chatbotReducer from "./ChatbotSlice";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
@@ -26,6 +27,7 @@ export const store = configureStore({
     cart: persistedCartReducer,
     order: persistedOrderReducer,
     review: persistedReviewReducer,
+    chatbot: chatbotReducer
   },
   devTools: process.env.NODE_ENV !== "production",
   middleware: (getDefaultMiddleware) =>

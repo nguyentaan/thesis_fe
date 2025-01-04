@@ -106,7 +106,7 @@ const orderSlice = createSlice({
       .addCase(cancelOrder.rejected, (state, action) => {
         state.isOrderLoading = false;
         state.error = action.payload;
-        // toast.error(action.payload.message);
+        toast.error(action.payload.message);
       });
   },
 });
