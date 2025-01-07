@@ -175,6 +175,68 @@
   background-color: #146c43;
 }
 
+.bot-message {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.bot-products,
+.similar-products-list {
+  margin: 10px 0;
+  padding-left: 20px;
+}
+
+.bot-product-item,
+.similar-product-item {
+  list-style: disc;
+  margin-bottom: 5px;
+}
+
+.similar-products-title {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #333;
+}
+
+.product-card {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.product-image {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin-right: 10px;
+}
+.bot-products {
+  list-style-type: none;
+  padding: 0;
+}
+
+.bot-product-item {
+  margin: 10px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.bot-product-item:hover {
+  background-color: #f0f0f0;  /* Light background color on hover */
+  transform: scale(1.05);      /* Slightly enlarge the item on hover */
+}
+
+.product-info-chatbot{
+  flex: 1;
+}
+.product-name{
+  margin-left: 10px;
+}
+
+
 @keyframes slideDown {
   0% {
     transform: translateY(-20px);

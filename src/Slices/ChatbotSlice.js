@@ -40,10 +40,12 @@ const chatbotSlice = createSlice({
         state.loading = true;
       })
       .addCase(fetchChatbot.fulfilled, (state, action) => {
+        console.log("Action Payload:", action.payload); // Log to inspect the structure
+
         // Add the bot's response after the user query
         state.messages.push({
           sender: "bot",
-          text: action.payload.botResponse?.message || "No response received.",
+          text: action.payload.botResponse?.answer || "No response received.",
         });
         state.loading = false;
       })
