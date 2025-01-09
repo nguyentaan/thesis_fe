@@ -30,6 +30,7 @@
     "firebase": "^11.0.1",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.462.0",
+    "marked": "^15.0.6",
     "react": "^18.2.0",
     "react-bootstrap": "^2.9.1",
     "react-day-picker": "^9.4.3",

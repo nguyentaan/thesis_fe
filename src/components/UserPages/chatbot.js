@@ -3,6 +3,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchChatbot, addMessage } from "../../Slices/ChatbotSlice";
 import ProductDetailModal from "./ProductDetailModal";
 import "../Chatbot.css"; // Styles for the chatbot component
+import { marked } from "marked"; // Import marked for markdown rendering
+
 
 const ChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -40,7 +42,6 @@ const ChatBot = () => {
     setShowDetailModel(false);
     setSelectedProduct(null);
   };
-
   return (
     <>
       <div className="chatbot-button" onClick={toggleChat}>
@@ -75,7 +76,6 @@ const ChatBot = () => {
                           <p key={i}>{line}</p>
                         ))}
                       </div>
-
                       <ul className="bot-products">
                         {message.text.products.map((product, i) => (
                           <li

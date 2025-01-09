@@ -6,7 +6,7 @@ import ProductDetailModal from "./ProductDetailModal";
 import RatingDisplay from "./RatingDisplay";
 import Loader from "./Loader";
 
-const Products = ({searchQuery }) => {
+const Products = ({ searchQuery }) => {
   const dispatch = useDispatch();
   const { dataProduct, isProductLoading } = useSelector((state) => state.user);
 
@@ -17,8 +17,15 @@ const Products = ({searchQuery }) => {
   const [showDetailModel, setShowDetailModel] = useState(false);
 
   useEffect(() => {
-    dispatch(getAllProducts({ page, limit, searchQuery }));
-  }, [dispatch, page, searchQuery]);
+    // Fetch products when searchQuery changes or page changes
+    if (searchQuery.trim() === "") {
+      // If searchQuery is empty, fetch all products
+      dispatch(getAllProducts({ page, limit, search: "" }));
+    } else {
+      // If searchQuery is not empty, fetch products based on the search query
+      dispatch(getAllProducts({ page, limit, search: searchQuery }));
+    }
+  }, [searchQuery, dispatch, page]); // Run when searchQuery or page changes
 
   const loadMoreProducts = () => {
     setPage((prevPage) => prevPage + 1);
@@ -26,8 +33,6 @@ const Products = ({searchQuery }) => {
 
   const openProductDetail = (product) => {
     setSelectedProduct(product);
-    console.log("product", product);
-
     setShowDetailModel(true);
   };
 

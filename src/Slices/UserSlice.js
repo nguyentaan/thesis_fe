@@ -25,9 +25,8 @@ export const getAllProducts = createAsyncThunk(
   "product/getall",
   async ({ page = 1, limit = 15, search = "" }, { rejectWithValue }) => {
     try {
-      const res = await axios.get(`${API_URL}/api/products`, {
-        params: { page, limit, search },
-      });
+      const params = { page, limit, search }; // Create params object
+      const res = await axios.get(`${API_URL}/api/products`, { params }); // Pass params correctly
       const { products, total } = res.data;
       return { products, total, page };
     } catch (error) {

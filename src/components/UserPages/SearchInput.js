@@ -4,13 +4,13 @@ import "../Search.css";
 const SearchComponent = ({ searchQuery, setSearchQuery, onSearchSubmit }) => {
   // Handle the input change and update the search query
   const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
+    setSearchQuery(e.target.value); // Update the state on input change
   };
 
   // Handle submitting a search
   const handleSearchSubmit = () => {
     if (searchQuery.trim()) {
-      onSearchSubmit(searchQuery); // Trigger the search action here
+      onSearchSubmit(searchQuery); // Trigger the search when button is clicked
     }
   };
 
@@ -19,7 +19,7 @@ const SearchComponent = ({ searchQuery, setSearchQuery, onSearchSubmit }) => {
       <input
         type="text"
         value={searchQuery}
-        onChange={handleSearchChange}
+        onChange={handleSearchChange} // Only updates the query on typing
         placeholder="Search..."
         className="search-input"
       />

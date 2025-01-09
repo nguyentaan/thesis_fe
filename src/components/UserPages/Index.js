@@ -19,6 +19,7 @@ const Index = () => {
   const { isAuth, user } = useSelector((state) => state.auth);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [finalSearchQuery, setFinalSearchQuery] = useState(""); // State for submitted query
 
   useEffect(() => {
     if (isAuth) {
@@ -28,8 +29,7 @@ const Index = () => {
 
   // Handle search submit when button is clicked
   const handleSearchSubmit = (query) => {
-    console.log("Searching for:", query);
-    // Trigger your search action here, e.g., dispatch an action
+    setFinalSearchQuery(query); // Set the final query when search is clicked
   };
 
   const noLoginCartNotification = () => {
@@ -48,8 +48,6 @@ const Index = () => {
 
   const handleLoginSuccess = () => {
     setShowLoginModal(false);
-    // Optionally, handle additional logic for the logged-in user
-    // console.log(user?.data); // Access user data after login// Save user info
     dispatch(loginSuccess({ user: user }));
   };
 
@@ -190,7 +188,7 @@ const Index = () => {
         <div className="row mb-5">
           <div className="col-md-9">
             <h2 className="font-weight-bold">Our Products</h2>
-            <ProductField searchQuery={searchQuery} />
+            <ProductField searchQuery={finalSearchQuery} />
           </div>
         </div>
       </div>
