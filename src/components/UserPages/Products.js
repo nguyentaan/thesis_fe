@@ -6,7 +6,7 @@ import ProductDetailModal from "./ProductDetailModal";
 import RatingDisplay from "./RatingDisplay";
 import Loader from "./Loader";
 
-const Products = () => {
+const Products = ({searchQuery }) => {
   const dispatch = useDispatch();
   const { dataProduct, isProductLoading } = useSelector((state) => state.user);
 
@@ -17,8 +17,8 @@ const Products = () => {
   const [showDetailModel, setShowDetailModel] = useState(false);
 
   useEffect(() => {
-    dispatch(getAllProducts({ page, limit }));
-  }, [dispatch, page]);
+    dispatch(getAllProducts({ page, limit, searchQuery }));
+  }, [dispatch, page, searchQuery]);
 
   const loadMoreProducts = () => {
     setPage((prevPage) => prevPage + 1);
@@ -54,10 +54,14 @@ const Products = () => {
                   >
                     <div className="card-img-top">
                       <img
-                        src={product.images[0]}
+                        src={product.image_url}
                         className="card-img-top"
                         alt={product.name}
-                        style={{ width: "100%", height: "auto" }}
+                        style={{
+                          width: "100%",
+                          height: "300px", // You can adjust this height as per your design
+                          objectFit: "contain",
+                        }}
                       />
                       <h3 className="text-success-s2 font-weight-bold">
                         SEE DETAIL

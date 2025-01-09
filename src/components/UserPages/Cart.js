@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import { ToastContainer } from "react-toastify";
@@ -9,31 +9,26 @@ import {
   fetchCart,
   increaseQuantity,
   decreaseQuantity,
-  // removeItem,
 } from "../../Slices/CartSlice";
 import Loader from "./Loader";
 
 const Cart = () => {
   const dispatch = useDispatch();
-  const {
-    dataCart = [],
-    // cartTotal,
-    isCartLoading,
-  } = useSelector((state) => state.cart);
-  const [subTotal, setSubTotal] = React.useState(0);
-  const total = subTotal + 5;
-  // console.log(cartTotal);
+  const { dataCart = [], isCartLoading } = useSelector((state) => state.cart);
+  const [subTotal, setSubTotal] = useState(0);
+  const total = subTotal + 5; // Adding shipping cost
 
   const { user } = useSelector((state) => state.auth);
-  const userId = user._id;
+  const userId = user?._id;
 
-  // Fetch the cart when the component mounts
+  // Fetch cart data on component mount
   useEffect(() => {
+    if (!userId) {
+      console.error("User ID is missing, cannot fetch cart.");
+      return;
+    }
+
     const fetchData = async () => {
-      if (!userId) {
-        console.error("User ID is missing, cannot fetch cart.");
-        return;
-      }
       try {
         await dispatch(fetchCart(userId));
       } catch (error) {
@@ -44,52 +39,41 @@ const Cart = () => {
     fetchData();
   }, [dispatch, userId]);
 
+  // Recalculate subtotal whenever dataCart changes
   useEffect(() => {
-    setSubTotal(
-      dataCart.reduce((total, item) => {
-        // Use parsePrice to sanitize and parse each item price
-        const itemPrice = parsePrice(item.productId.price);
-        return total + itemPrice * item.quantity;
-      }, 0)
+    const total = dataCart.reduce(
+      (acc, item) => acc + (item.productId.price * item.quantity || 0),
+      0
     );
+    setSubTotal(total);
   }, [dataCart]);
 
-  // Enhanced parsePrice function to handle different invalid cases
-  const parsePrice = (price) => {
-    if (price == null || price === "" || typeof price !== "string") return 0; // Handle null, undefined, or non-string values
+  // Handle increase and decrease quantity
+  const handleIncreaseQty = (item) => {
+    dispatch(
+      increaseQuantity({
+        userId,
+        productId: item.productId._id,
+        color: item.color,
+      })
+    );
+    dispatch(fetchCart(userId)); // Refetch cart after updating
+  };
 
-    // Use regex to find the first valid number in the string, like "17.50" in "$Now 17.50"
-    const match = price.match(/(\d+(\.\d+)?)/);
-    const sanitizedPrice = match ? parseFloat(match[0]) : 0;
-
-    return sanitizedPrice;
+  const handleDecreaseQty = (item) => {
+    dispatch(
+      decreaseQuantity({
+        userId,
+        productId: item.productId._id,
+        color: item.color,
+      })
+    );
+    dispatch(fetchCart(userId)); // Refetch cart after updating
   };
 
   if (isCartLoading) {
     return <Loader isProductLoading={isCartLoading} />;
   }
-
-  const handleIncreaseQty = async (item) => {
-    await dispatch(
-      increaseQuantity({
-        userId,
-        productId: item.productId._id,
-        size: item.size,
-      })
-    );
-    dispatch(fetchCart(userId)); // Refetch the cart data
-  };
-
-  const handleDecreaseQty = async (item) => {
-    await dispatch(
-      decreaseQuantity({
-        userId,
-        productId: item.productId._id,
-        size: item.size,
-      })
-    );
-    dispatch(fetchCart(userId)); // Refetch the cart data
-  };
 
   return (
     <div>
@@ -101,17 +85,6 @@ const Cart = () => {
           <Link to="/" className="navbar-brand">
             <img src={logo} className="logo-fx" alt="..." />
           </Link>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-toggle="collapse"
-            data-target="#navbarNav"
-            aria-controls="navbarNav"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav ml-auto">
               <li className="nav-item mx-4">
@@ -133,7 +106,7 @@ const Cart = () => {
             <tr>
               <th scope="col">PRODUCT</th>
               <th scope="col">NAME</th>
-              <th scope="col">SIZE</th>
+              <th scope="col">Color</th>
               <th scope="col">UNIT PRICE</th>
               <th scope="col">QUANTITY</th>
               <th scope="col">TOTAL</th>
@@ -147,9 +120,11 @@ const Cart = () => {
                     <div
                       className="w-75 text-center"
                       style={{
-                        backgroundImage: `url(${item.productId.images[0]})`,
+                        backgroundImage: `url(${item.productId.image_url})`,
                         height: "75px",
-                        backgroundSize: "cover",
+                        backgroundSize: "contain",
+                        backgroundRepeat: "no-repeat", // Prevents repetition
+                        backgroundPosition: "center", // Centers the image
                       }}
                     />
                   </td>
@@ -157,7 +132,7 @@ const Cart = () => {
                     <p className="my-0 text-secondary">{item.productId.name}</p>
                   </td>
                   <td>
-                    <p className="my-0 text-secondary">{item.size}</p>
+                    <p className="my-0 text-secondary">{item.color}</p>
                   </td>
                   <td style={{ verticalAlign: "middle" }}>
                     <p className="my-0 text-secondary">
@@ -189,7 +164,7 @@ const Cart = () => {
                   <td>
                     <div className="d-flex d-row">
                       <h6 className="font-weight-bold text-secondary align-self-center my-0">
-                        ${parsePrice(item.productId.price) * item.quantity}
+                        ${item.productId.price * item.quantity}
                       </h6>
                     </div>
                   </td>

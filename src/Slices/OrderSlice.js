@@ -80,6 +80,7 @@ const orderSlice = createSlice({
       .addCase(createOrderFromCart.rejected, (state, action) => {
         state.isOrderLoading = false;
         state.error = action.payload;
+        toast.error(action.payload.message);
       })
       .addCase(getOrdersByUserId.pending, (state) => {
         state.isOrderLoading = true;
@@ -105,7 +106,7 @@ const orderSlice = createSlice({
       .addCase(cancelOrder.rejected, (state, action) => {
         state.isOrderLoading = false;
         state.error = action.payload;
-        // toast.error(action.payload.message);
+        toast.error(action.payload.message);
       });
   },
 });
