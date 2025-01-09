@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
 import { fetchChatbot, addMessage } from "../../Slices/ChatbotSlice";
 import ProductDetailModal from "./ProductDetailModal";
 import "../Chatbot.css"; // Styles for the chatbot component
-import { marked } from "marked"; // Import marked for markdown rendering
 
 
 const ChatBot = () => {
@@ -45,7 +45,9 @@ const ChatBot = () => {
   return (
     <>
       <div className="chatbot-button" onClick={toggleChat}>
-        <button className="btn-chat">Search Advance</button>
+        <button className="btn-chat">
+          <MagnifyingGlassIcon style={{ width: "24px", height: "24px" }} />
+        </button>
       </div>
 
       {isOpen && (

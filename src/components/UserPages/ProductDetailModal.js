@@ -17,7 +17,7 @@ const ProductDetailModal = ({
   const { user, isAuth } = useSelector((state) => state.auth);
   // Check if user is logged in
   const isUserLoggedIn = isAuth;
-  // console.log("selectedProduct", selectedProduct);
+  console.log("selectedProduct", selectedProduct);
 
   // Close modal when clicking outside of it
   useEffect(() => {
@@ -97,7 +97,9 @@ const ProductDetailModal = ({
                 </div>
               </div>
               <div className="product-wrapper">
-                <p className="product-price">${selectedProduct.price}</p>
+                <p className="product-price">
+                  ${selectedProduct.price || "N/A"}
+                </p>
                 <button
                   className="btn btn-outline-success d-flex d-row ml-auto"
                   onClick={handleAddToCart}
@@ -109,7 +111,9 @@ const ProductDetailModal = ({
             </div>
             {/* Collapsible Descriptions */}
             <div className="product-description">
-              <p>{selectedProduct.description}</p>
+              <p>
+                {selectedProduct.description || "No description available."}
+              </p>
             </div>
 
             {/* Reviews Section */}

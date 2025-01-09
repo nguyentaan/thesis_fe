@@ -8,7 +8,8 @@
 .btn-chat {
   background-color: #009e7f;
   color: white;
-  padding: 10px 20px;
+  padding: 10px;
+  font-size: 1.8rem;
   border: none;
   border-radius: 5px;
   cursor: pointer;
