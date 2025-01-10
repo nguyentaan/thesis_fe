@@ -6,10 +6,11 @@ import ProductDetailModal from "./ProductDetailModal";
 import RatingDisplay from "./RatingDisplay";
 import Loader from "./Loader";
 
-const Products = ({searchQuery }) => {
+const Products = ({ searchQuery }) => {
   const dispatch = useDispatch();
   const { dataProduct, isProductLoading } = useSelector((state) => state.user);
-
+  // console.log("dataProduct", dataProduct);
+  
   const [page, setPage] = useState(1);
   const limit = 15;
 
@@ -17,8 +18,15 @@ const Products = ({searchQuery }) => {
   const [showDetailModel, setShowDetailModel] = useState(false);
 
   useEffect(() => {
-    dispatch(getAllProducts({ page, limit, searchQuery }));
-  }, [dispatch, page, searchQuery]);
+    // Fetch products when searchQuery changes or page changes
+    if (searchQuery.trim() === "") {
+      // If searchQuery is empty, fetch all products
+      dispatch(getAllProducts({ page, limit, search: "" }));
+    } else {
+      // If searchQuery is not empty, fetch products based on the search query
+      dispatch(getAllProducts({ page, limit, search: searchQuery }));
+    }
+  }, [searchQuery, dispatch, page]); // Run when searchQuery or page changes
 
   const loadMoreProducts = () => {
     setPage((prevPage) => prevPage + 1);
@@ -26,8 +34,6 @@ const Products = ({searchQuery }) => {
 
   const openProductDetail = (product) => {
     setSelectedProduct(product);
-    console.log("product", product);
-
     setShowDetailModel(true);
   };
 
@@ -54,12 +60,12 @@ const Products = ({searchQuery }) => {
                   >
                     <div className="card-img-top">
                       <img
-                        src={product.image_url}
+                        src={product.image_url || "placeholder.jpg"}
                         className="card-img-top"
-                        alt={product.name}
+                        alt={product.name || "Product Image"}
                         style={{
                           width: "100%",
-                          height: "300px", // You can adjust this height as per your design
+                          height: "300px",
                           objectFit: "contain",
                         }}
                       />
@@ -69,14 +75,14 @@ const Products = ({searchQuery }) => {
                     </div>
                     <div className="card-body">
                       <p className="font-weight-bold my-0 product-title">
-                        {product.name}
+                        {product.name || "Unknown Product"}
                       </p>
                       <br />
                       <div className="d-flex d-row mt-4">
                         <p className="my-0 text-success-s2 font-weight-bold">
-                          ${product.price}
+                          ${product.price || "N/A"}
                         </p>
-                        <RatingDisplay rating={product.avg_rating} />
+                        <RatingDisplay rating={product.avg_rating || 0} />
                       </div>
                     </div>
                   </div>

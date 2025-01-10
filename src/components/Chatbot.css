@@ -8,7 +8,8 @@
 .btn-chat {
   background-color: #009e7f;
   color: white;
-  padding: 10px 20px;
+  padding: 10px;
+  font-size: 1.8rem;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -176,8 +177,13 @@
 }
 
 .bot-message {
-  font-weight: bold;
+  font-size: 14px; /* Adjust font size for markdown text */
+  line-height: 1.6; /* Increase line height for better readability */
+  word-wrap: break-word; /* Ensure text wraps properly */
   margin-bottom: 5px;
+    max-width: 100%; /* Ensure message doesn’t overflow */
+  box-sizing: border-box;
+
 }
 
 .bot-products,
