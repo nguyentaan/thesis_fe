@@ -90,6 +90,11 @@ const Index = () => {
             >
               <span className="navbar-toggler-icon"></span>
             </button>
+            <SearchComponent
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              onSearchSubmit={handleSearchSubmit}
+            />
             <div className="collapse navbar-collapse" id="navbarNav">
               <ul className="navbar-nav ml-auto">
                 {isAuth ? (
@@ -168,11 +173,11 @@ const Index = () => {
             Ready to wear dresses tailored for you from online. Hurry up while
             stock lasts.
           </p>
-          <SearchComponent
+          {/* <SearchComponent
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             onSearchSubmit={handleSearchSubmit}
-          />
+          /> */}
         </div>
       </div>
       {/* start header - part 1 */}
