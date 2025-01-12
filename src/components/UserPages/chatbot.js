@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
 import { fetchChatbot, addMessage } from "../../Slices/ChatbotSlice";
 import ProductDetailModal from "./ProductDetailModal";
+import marked from "marked";
 import "../Chatbot.css"; // Styles for the chatbot component
 
 
@@ -53,7 +54,7 @@ const ChatBot = () => {
       {isOpen && (
         <div className={`chatbot-container ${isOpen ? "open" : ""}`}>
           <div className="chatbot-header">
-            <h5>Chat with us!</h5>
+            <h5>AI-powered assistant</h5>
             <button className="close-btn" onClick={toggleChat}>
               X
             </button>
