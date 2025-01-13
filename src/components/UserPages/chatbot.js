@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
+import { MagnifyingGlassIcon, PaperPlaneIcon } from "@radix-ui/react-icons";
 import { fetchChatbot, addMessage } from "../../Slices/ChatbotSlice";
 import ProductDetailModal from "./ProductDetailModal";
-import marked from "marked";
 import "../Chatbot.css"; // Styles for the chatbot component
-
 
 const ChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -61,6 +59,13 @@ const ChatBot = () => {
           </div>
           <div className="chatbot-body">
             <div className="chatbot-messages">
+              {messages.length === 0 && !loading && !error && (
+                <div className="default-message">
+                  <p>
+                    Hi! I'm here to help. Ask me anything about our products.
+                  </p>
+                </div>
+              )}
               {messages.map((message, index) => (
                 <div
                   key={index}
@@ -117,7 +122,9 @@ const ChatBot = () => {
               )}
               {error && (
                 <div className="message bot error">
-                  Error: {error.detail[0]?.msg}
+                  Error:{" "}
+                  {error.detail?.[0]?.msg ||
+                    "An error occurred. Please try again."}
                 </div>
               )}
             </div>
@@ -131,7 +138,7 @@ const ChatBot = () => {
               placeholder="Type a query..."
             />
             <button className="chatbot-send-btn" onClick={handleSendMessage}>
-              Send
+              <PaperPlaneIcon style={{ width: "24px", height: "24px" }} />
             </button>
           </div>
         </div>
