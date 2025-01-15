@@ -41,7 +41,7 @@ export const getAllUser = createAsyncThunk(
   "user/getAll",
   async (_arg, { rejectWithValue }) => {
     try {
-      const res = await axios.get(`${API_URL}/api/users/profile/list`);
+      const res = await axios.get(`${API_URL}/api/user/profile/list`);
       return res.data;
     } catch (error) {
       console.error("API error:", error);

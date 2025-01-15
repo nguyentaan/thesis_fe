@@ -90,6 +90,10 @@ const AdminFileUpload = () => {
     </Modal>
   );
 
+  const setSearch = () => {
+    // Add search logic here
+  };
+
   return (
     <ContentLayout title="File Management">
       <Breadcrumb>
@@ -133,7 +137,7 @@ const AdminFileUpload = () => {
                   </CustomDialog>
                   <SearchFilterCustom
                     // search={search.filter}
-                    // setSearch={setSearch}
+                    setSearch={setSearch}
                     searchPlaceholder="Search by name"
                   />
                 </div>
@@ -141,10 +145,6 @@ const AdminFileUpload = () => {
               isLoading={isFileLoading}
               columns={fileColumn}
               data={dataFileUpload?.files || []}
-            // pagination={{
-            //   ...pagination,
-            //   total: data?.total ?? 0,
-            // }}
             />
           )}
         </TableActionProvider>

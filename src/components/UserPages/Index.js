@@ -67,6 +67,7 @@ const Index = () => {
       backgroundPosition: "center",
     };
   };
+
   return (
     <div
       style={{
@@ -125,7 +126,7 @@ const Index = () => {
                         aria-haspopup="true"
                         aria-expanded="false"
                       >
-                        {`Hello, ${user.name}`}
+                        {`Hello, ${user?.data?.name}`}
                       </button>
                       <div className="dropdown-menu t45">
                         <Link
