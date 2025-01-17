@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Modal, Button } from "react-bootstrap";
-import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
-import { getAllUser } from "../../Slices/UserSlice";
+import { getAllFile } from "../../Slices/UserSlice";
 import ContentLayout from "../admin-panel/content-layout";
 import {
   Breadcrumb,
@@ -10,46 +9,33 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator
+  BreadcrumbSeparator,
 } from "../ui/breadcrumb";
 import { Link } from "react-router-dom";
 import PlaceholderContent from "../misc/placeholder-content";
 import { TableActionProvider } from "../../providers/table-action-provider";
-import {
-  SkeletonCard
-} from "../ui/skeleton-card"
+import { SkeletonCard } from "../ui/skeleton-card";
 import { DataTable } from "../ui/data-table";
 import { CustomDialog } from "../ui/custom-dialog";
-import {SearchFilterCustom} from "../misc/search-filter-custom";
-import {userColumns} from "../misc/model/user-column";
-const AdminUsers = () => {
-  const dispatch = useDispatch();
-  const { dataUser, isUserLoading } = useSelector((state) => state.user);
-  const { isAuth, refreshToken } = useSelector((state) => state.auth);
+import { SearchFilterCustom } from "../misc/search-filter-custom";
+import { fileEmbeddingColumn } from "../misc/model/file-embedding-column";
+import EmbeddingFileForm from "../ui/embedding_file_form";
 
+const AdminEmbeddingPage = () => {
+  const dispatch = useDispatch();
+  const { dataFileUpload, isFileLoading } = useSelector((state) => state.user);
+  const { isAuth } = useSelector((state) => state.auth);
+
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [dataDelete, setDataDelete] = useState({});
-
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (isAuth) {
-          const response = await dispatch(getAllUser()).unwrap();
-          console.log("Response get user:", dataUser);  // Log the response here
-        }
-      } catch (error) {
-        console.error("Error fetching user:", error);
-      }
-    };
-    fetchData();
-  }, [dispatch, isAuth, refreshToken]);
+  const [selectedFiles, setSelectedFiles] = useState([]);
 
   useEffect(() => {
-    if (dataUser?.users) {
-      console.log("User data updated: ", dataUser);
+    if (isAuth) {
+      dispatch(getAllFile({}));
     }
-  }, [dataUser])
+  }, [dispatch, isAuth]);
 
   const displayDeleteModal = (data) => {
     setDataDelete(data);
@@ -61,12 +47,29 @@ const AdminUsers = () => {
   };
 
   const handleDelete = () => {
-    // Add delete logic here (e.g., dispatching deleteUser action)
     setShowDeleteModal(false);
   };
 
-  const setSearch = () => {
-    // Add search logic here
+  const handleFileSelect = (fileData, isChecked) => {
+    setSelectedFiles((prev) => {
+      if (isChecked) {
+        // Add the entire row data if it's not already in the list
+        return prev.some((item) => item._id === fileData._id) ? prev : [...prev, fileData];
+      } else {
+        // Remove the fileData from the list
+        return prev.filter((item) => item._id !== fileData._id);
+      }
+    });
+  };
+
+
+  const handleStartEmbedding = () => {
+    if (selectedFiles.length === 0) {
+      alert("No files selected for embedding!");
+      return;
+    }
+    alert(`Embedding started for files: ${selectedFiles.join(", ")}`);
+    setSelectedFiles([]); // Clear selection after embedding start
   };
 
   const DeleteProductModal = () => (
@@ -74,12 +77,11 @@ const AdminUsers = () => {
       <Modal.Header closeButton>
         <Modal.Title>
           <p>
-            Are you sure you want to delete the user
+            Are you sure you want to delete this file
             <span className="text-success-s2"> "{dataDelete.username}"</span>?
           </p>
         </Modal.Title>
       </Modal.Header>
-
       <Modal.Footer>
         <Button variant="secondary" onClick={closeDeleteModal}>
           Close
@@ -92,7 +94,7 @@ const AdminUsers = () => {
   );
 
   return (
-    <ContentLayout title="User Management">
+    <ContentLayout title="File Management">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -108,51 +110,50 @@ const AdminUsers = () => {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>User Management</BreadcrumbPage>
+            <BreadcrumbPage>File Management</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
       <PlaceholderContent>
-        <TableActionProvider
-          initialValues={{
-            // onEdit: handleEdit,
-            // setSorting,
-            // onDelete: handleDelete,
-          }}
-        >
-          {isUserLoading ? (
+        <TableActionProvider initialValues={{}}>
+          {isFileLoading ? (
             <SkeletonCard />
           ) : (
             <DataTable
               extra={
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 w-full h-full">
                   <CustomDialog
-                    button={<Button>Add User</Button>}
-                    title="New Campaign"
+                    button={<Button>Embedding File</Button>}
                     noFooter
+                    title="Embedding File"
                   >
                     {({ close }) => (
-                      <div>
-                        Ongoing
-                      </div>
+                      <EmbeddingFileForm
+                        handleStartEmbedding={handleStartEmbedding}
+                        selectedFiles={selectedFiles} // Pass selected files to the form
+                      />
                     )}
                   </CustomDialog>
                   <SearchFilterCustom
-                    // search={search.filter}
-                    setSearch={setSearch}
+                    setSearch={() => { }}
                     searchPlaceholder="Search by name"
                   />
                 </div>
               }
-              isLoading={isUserLoading}
-              columns={userColumns}
-              data={dataUser?.users || []}
+              isLoading={isFileLoading}
+              columns={fileEmbeddingColumn(handleFileSelect, selectedFiles)} // Pass selectedFiles to column definition
+              data={dataFileUpload?.files || []}
             />
           )}
         </TableActionProvider>
       </PlaceholderContent>
+      {showSuccessToast && (
+        <div className="toast toast-success">
+          File embedding successfully!
+        </div>
+      )}
     </ContentLayout>
   );
 };
 
-export default AdminUsers;
+export default AdminEmbeddingPage;

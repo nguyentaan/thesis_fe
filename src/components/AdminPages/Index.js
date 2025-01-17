@@ -7,7 +7,7 @@ import AdminProductPage from "./AdminProduct";
 import AdminUsersPage from "./AdminUsers";
 import AdminLayout from "./AdminLayout";
 import AdminFileUpload from "./AdminFileUpload";
-
+import AdminEmbeddingPage from "./AdminEmbedding";
 const Index = () => {
   const { isAuth, user } = useSelector((state) => state.auth);
 
@@ -57,6 +57,18 @@ const Index = () => {
             isAuth && user?.data?.isAdmin ? (
                 <AdminLayout>
                   <AdminFileUpload />
+                </AdminLayout>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+         <Route
+          path="/embedding"
+          element={
+            isAuth && user?.data?.isAdmin ? (
+                <AdminLayout>
+                  <AdminEmbeddingPage />
                 </AdminLayout>
             ) : (
               <Navigate to="/login" />

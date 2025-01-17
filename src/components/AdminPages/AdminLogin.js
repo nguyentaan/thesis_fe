@@ -7,9 +7,8 @@ import "react-toastify/dist/ReactToastify.css"; // Ensure Toastify styles are im
 import logo from "../../assets/logo.png";
 import "../Users.css";
 import { emailLogin } from "../../Slices/AuthenSlice"; // Adjust path if necessary
-// import OtpVerification from "./OtpVerification";
 import { loginSuccess } from "../../Slices/AuthenSlice";
-
+import { Input } from "../ui/input";
 const AdminLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [dataInput, setDataInput] = useState({
@@ -78,10 +77,6 @@ const AdminLogin = () => {
       unSuccessfulLoginNotification();
       console.error("Email login error:", error);
     }
-  };
-
-  const handleBackToLogin = () => {
-    // setOtpVisible(false);
   };
 
   const togglePasswordVisibility = () => {

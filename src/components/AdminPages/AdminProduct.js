@@ -56,6 +56,10 @@ const AdminProducts = () => {
     setShowDeleteModal(false);
   };
 
+  const setSearch = () => {
+    // Add search logic here
+  };
+
   const DeleteProductModal = () => (
     <Modal show={showDeleteModal} onHide={closeDeleteModal}>
       <Modal.Header closeButton>
@@ -130,6 +134,7 @@ const AdminProducts = () => {
                   </CustomDialog>
                   <SearchFilterCustom
                     searchPlaceholder="Search by name"
+                    setSearch={setSearch}
                   />
                 </div>
               }

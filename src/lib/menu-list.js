@@ -86,46 +86,9 @@ export function getMenuList(pathname) {
                     icon: GitPullRequest,
                     submenus: [
                         {
-                            href: "/embedding",
+                            href: "/admin/embedding",
                             label: "Embedding Files",
-                            active: pathname === "/embedding",
-                        },
-                    ],
-                },
-            ],
-        },
-        {
-            groupLabel: "Administrations",
-            groupRole: ["admin"],
-            menus: [
-                {
-                    href: "",
-                    label: "Logs",
-                    active: pathname.includes("/popup-logs"),
-                    icon: LogsIcon,
-                    submenus: [
-                        {
-                            href: "/popup-logs",
-                            label: "Hotspot Logs",
-                            active: pathname === "/popup-logs",
-                        },
-                        {
-                            href: "/connect-logs",
-                            label: "Click Connect Logs",
-                            active: pathname === "/landing-pages",
-                        },
-                    ],
-                },
-                {
-                    href: "",
-                    label: "Features",
-                    active: pathname.includes("/management/features"),
-                    icon: Settings,
-                    submenus: [
-                        {
-                            href: "/management/features",
-                            label: "All Features",
-                            active: pathname === "/management/features",
+                            active: pathname === "/admin/embedding",
                         },
                     ],
                 },
