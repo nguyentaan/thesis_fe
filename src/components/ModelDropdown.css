@@ -1,60 +1,70 @@
-/* Container for the dropdown button */
 .model-dropdown-container {
   position: relative;
-  display: inline-block;
-  font-family: Arial, sans-serif;
+  z-index: 1000; /* Ensure it appears above other elements */
 }
 
-/* Style for the dropdown button */
 .dropdown-button {
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #4caf50;  /* Green background */
-  color: white;
-  border: none;
-  border-radius: 5px;
+  padding: 10px 15px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 4px;
   cursor: pointer;
+  width: 200px; /* Ensure a consistent button width */
+  text-align: left; /* Align text to the left for better readability */
   display: flex;
+  justify-content: space-between; /* Align dropdown icon on the right */
   align-items: center;
-  justify-content: space-between;
-  width: 200px;
 }
 
-/* Change button color when hovered */
-.dropdown-button:hover {
-  background-color: #45a049;
-}
-
-/* Style for the dropdown menu */
-.dropdown-menu {
+.dropdown-menu-model {
+  padding: 0;
+  display: block; /* Ensure it's visible when open */
   position: absolute;
-  top: 100%;  /* Position directly below the button */
-  left: 0;
-  width: 100%;
-  background-color: #ffffff;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-  z-index: 1000;  /* Ensure dropdown appears above other content */
-  max-height: 250px;
-  overflow-y: auto;
-  font-size: 16px;
-  padding: 5px 0;
+  top: 100%; /* Position the dropdown below the button */
+  left: 0; /* Align the dropdown to the left of the button */
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-top: 5px;
+  max-height: 250px; /* Limit the height of the dropdown */
+  overflow-y: auto; /* Enable scrolling if content overflows */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1550;
+  width: 100%; /* Match the button's width */
 }
 
-/* Style for individual items in the dropdown */
-.dropdown-item {
-  padding: 12px 20px;
+.dropdown-item-model {
+  padding: 10px 15px;
+  font-size: 0.9rem;
+  color: #333;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
-/* Change background when hovered */
-.dropdown-item:hover {
-  background-color: #f1f1f1;
+.dropdown-item-model:hover,
+.dropdown-item-model:focus {
+  background-color: #f0f0f0;
+  outline: none;
 }
 
-/* Icon for the dropdown */
+.dropdown-item-model:active {
+  background-color: #e0e0e0; /* Provide a visual cue for clicks */
+}
+
+/* Ensure focus is visually distinct */
+.dropdown-item-model:focus {
+  outline: 2px solid #0056b3;
+  outline-offset: 2px;
+}
+
 .fas {
-  margin-left: 10px;
+  font-size: 0.9rem; /* Adjust the icon size */
+  transition: transform 0.3s ease; /* Smooth transition for icon rotation */
+}
+
+.fas.fa-chevron-up {
+  transform: rotate(180deg); /* Rotate icon when dropdown is open */
 }
