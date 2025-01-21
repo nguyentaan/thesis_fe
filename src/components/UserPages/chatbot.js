@@ -4,12 +4,14 @@ import { MagnifyingGlassIcon, PaperPlaneIcon } from "@radix-ui/react-icons";
 import { fetchChatbot, addMessage } from "../../Slices/ChatbotSlice";
 import ProductDetailModal from "./ProductDetailModal";
 import "../Chatbot.css"; // Styles for the chatbot component
+import ModelDropdown from "./ModelDropdown";
 
 const ChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [userInput, setUserInput] = useState("");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showDetailModel, setShowDetailModel] = useState(false);
+  const [selectedModel, setSelectedModel] = useState("Mistral");
 
   const dispatch = useDispatch();
   const { messages, loading, error } = useSelector((state) => state.chatbot);
@@ -41,6 +43,13 @@ const ChatBot = () => {
     setShowDetailModel(false);
     setSelectedProduct(null);
   };
+
+  const handleModelSelect = (model) => {
+    console.log("Selected Model:", model); // For debugging
+    setSelectedModel(model);
+    // Pass this value to other components or use it for API requests
+  };
+
   return (
     <>
       <div className="chatbot-button" onClick={toggleChat}>
@@ -52,7 +61,8 @@ const ChatBot = () => {
       {isOpen && (
         <div className={`chatbot-container ${isOpen ? "open" : ""}`}>
           <div className="chatbot-header">
-            <h5>AI-powered assistant</h5>
+            {/* <h5>AI-powered assistant</h5> */}
+            <ModelDropdown onModelSelect={handleModelSelect} />
             <button className="close-btn" onClick={toggleChat}>
               X
             </button>
