@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { MagnifyingGlassIcon, PaperPlaneIcon } from "@radix-ui/react-icons";
 import { fetchChatbot, addMessage } from "../../Slices/ChatbotSlice";
 import ProductDetailModal from "./ProductDetailModal";
 import "../Chatbot.css"; // Styles for the chatbot component
+// import ModelDropdown from "./ModelDropdown";
 
 const ChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [userInput, setUserInput] = useState("");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showDetailModel, setShowDetailModel] = useState(false);
+  // const [selectedModel, setSelectedModel] = useState("Mistral");
 
   const dispatch = useDispatch();
   const { messages, loading, error } = useSelector((state) => state.chatbot);
@@ -41,22 +44,38 @@ const ChatBot = () => {
     setSelectedProduct(null);
   };
 
+  // const handleModelSelect = (model) => {
+  //   console.log("Selected Model:", model); // For debugging
+  //   setSelectedModel(model);
+  //   // Pass this value to other components or use it for API requests
+  // };
+
   return (
     <>
       <div className="chatbot-button" onClick={toggleChat}>
-        <button className="btn-chat">Search Advance</button>
+        <button className="btn-chat">
+          <MagnifyingGlassIcon style={{ width: "24px", height: "24px" }} />
+        </button>
       </div>
 
       {isOpen && (
         <div className={`chatbot-container ${isOpen ? "open" : ""}`}>
           <div className="chatbot-header">
-            <h5>Chat with us!</h5>
+            <h5>AI-powered assistant</h5> 
+            {/* <ModelDropdown onModelSelect={handleModelSelect} /> */}
             <button className="close-btn" onClick={toggleChat}>
               X
             </button>
           </div>
           <div className="chatbot-body">
             <div className="chatbot-messages">
+              {messages.length === 0 && !loading && !error && (
+                <div className="default-message">
+                  <p>
+                    Hi! I'm here to help. Ask me anything about our products.
+                  </p>
+                </div>
+              )}
               {messages.map((message, index) => (
                 <div
                   key={index}
@@ -75,7 +94,6 @@ const ChatBot = () => {
                           <p key={i}>{line}</p>
                         ))}
                       </div>
-
                       <ul className="bot-products">
                         {message.text.products.map((product, i) => (
                           <li
@@ -114,7 +132,9 @@ const ChatBot = () => {
               )}
               {error && (
                 <div className="message bot error">
-                  Error: {error.detail[0]?.msg}
+                  Error:{" "}
+                  {error.detail?.[0]?.msg ||
+                    "An error occurred. Please try again."}
                 </div>
               )}
             </div>
@@ -128,7 +148,7 @@ const ChatBot = () => {
               placeholder="Type a query..."
             />
             <button className="chatbot-send-btn" onClick={handleSendMessage}>
-              Send
+              <PaperPlaneIcon style={{ width: "24px", height: "24px" }} />
             </button>
           </div>
         </div>

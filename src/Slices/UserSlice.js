@@ -25,9 +25,12 @@ export const getAllProducts = createAsyncThunk(
   "product/getall",
   async ({ page = 1, limit = 15, search = "" }, { rejectWithValue }) => {
     try {
-      const res = await axios.get(`${API_URL}/api/products`, {
-        params: { page, limit, search },
-      });
+      const params = {
+        page,
+        limit,
+        search: search.toLowerCase(), // Normalize to lowercase
+      };
+      const res = await axios.get(`${API_URL}/api/products`, { params });
       const { products, total } = res.data;
       return { products, total, page };
     } catch (error) {
@@ -36,6 +39,7 @@ export const getAllProducts = createAsyncThunk(
     }
   }
 );
+
 
 export const getAllUser = createAsyncThunk(
   "user/getAll",

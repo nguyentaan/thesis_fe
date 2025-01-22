@@ -2,13 +2,14 @@
   position: fixed;
   bottom: 20px;
   right: 20px;
-  z-index: 1000;
+  z-index: 999;
 }
 
 .btn-chat {
   background-color: #009e7f;
   color: white;
-  padding: 10px 20px;
+  padding: 10px;
+  font-size: 1.8rem;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -21,18 +22,18 @@
 .chatbot-container {
   position: fixed;
   bottom: 80px;
-  right: 20px;
-  width: 400px; /* Increase width */
-  height: 500px; /* Increase height */
+  top: 72px;
+  right: 0;
+  width: 432px;
+  height: calc(100% - 72px);
   background-color: #fff;
-  border-radius: 10px;
   box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   z-index: 999;
-  opacity: 0; /* Start hidden */
-  transform: translateY(50px); /* Start below the screen */
-  transition: opacity 0.3s ease, transform 0.3s ease; /* Transition for opacity and slide effect */
+  opacity: 0;
+  transform: translateY(50px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .chatbot-container.open {
@@ -47,21 +48,32 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
+  /* border-top-left-radius: 10px;
+  border-top-right-radius: 10px; */
   animation: slideDown 0.3s ease-out;
 }
 
 .chatbot-header h5 {
+  padding: 5px 10px;
+  font-weight: 700;
   margin: 0;
 }
 
+/* Close button styling */
 .close-btn {
-  background: none;
-  border: none;
   color: white;
   font-size: 18px;
+  padding: 8px 16px; /* Rectangle shape with padding */
+  border: none;
+  border-radius: 5px; /* Slightly rounded corners */
   cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Add smooth transition for hover effect */
+}
+
+/* Hover effect */
+.close-btn:hover {
+  background-color: #146c43; /* Darken the button */
+  transform: scale(1.05); /* Slightly enlarge the button */
 }
 
 .chatbot-body {
@@ -74,6 +86,23 @@
 
 .chatbot-messages {
   flex-grow: 1;
+}
+
+.default-message {
+  text-align: center;
+  background-color: #f4f4f4; /* Light gray background for contrast */
+  padding: 20px;
+  margin: 10px 0;
+  border-radius: 10px;
+  font-size: 16px;
+  color: #555; /* Neutral text color */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.default-message p {
+  margin: 0;
+  line-height: 1.5;
+  font-weight: 500; /* Medium font weight for better readability */
 }
 
 .message {
@@ -147,7 +176,7 @@
 .chatbot-footer {
   display: flex;
   align-items: center;
-  padding: 10px;
+  padding: 24px 10px;
   background-color: #f8f9fa;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
@@ -176,8 +205,12 @@
 }
 
 .bot-message {
-  font-weight: bold;
+  font-size: 14px; /* Adjust font size for markdown text */
+  line-height: 1.6; /* Increase line height for better readability */
+  word-wrap: break-word; /* Ensure text wraps properly */
   margin-bottom: 5px;
+  max-width: 100%; /* Ensure message doesn’t overflow */
+  box-sizing: border-box;
 }
 
 .bot-products,
@@ -225,17 +258,16 @@
 }
 
 .bot-product-item:hover {
-  background-color: #f0f0f0;  /* Light background color on hover */
-  transform: scale(1.05);      /* Slightly enlarge the item on hover */
+  background-color: #f0f0f0; /* Light background color on hover */
+  transform: scale(1.05); /* Slightly enlarge the item on hover */
 }
 
-.product-info-chatbot{
+.product-info-chatbot {
   flex: 1;
 }
-.product-name{
+.product-name {
   margin-left: 10px;
 }
-
 
 @keyframes slideDown {
   0% {
