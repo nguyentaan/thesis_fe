@@ -9,7 +9,7 @@ import Loader from "./Loader";
 const Products = ({ searchQuery }) => {
   const dispatch = useDispatch();
   const { dataProduct, isProductLoading } = useSelector((state) => state.user);
-  // console.log("dataProduct", dataProduct);
+  console.log("dataProduct", dataProduct);
   
   const [page, setPage] = useState(1);
   const limit = 15;

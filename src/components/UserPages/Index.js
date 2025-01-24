@@ -129,7 +129,7 @@ const Index = () => {
                         aria-haspopup="true"
                         aria-expanded="false"
                       >
-                        {`Hello, ${user?.data?.name}`}
+                        {`Hello, ${user?.name}`}
                       </button>
                       <div className="dropdown-menu t45">
                         <Link
