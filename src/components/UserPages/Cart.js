@@ -16,10 +16,11 @@ const Cart = () => {
   const dispatch = useDispatch();
   const { dataCart = [], isCartLoading } = useSelector((state) => state.cart);
   const [subTotal, setSubTotal] = useState(0);
-  const total = subTotal + 5; // Adding shipping cost
 
   const { user } = useSelector((state) => state.auth);
   const userId = user?._id;
+  const shippingCost = 5;
+  const total = subTotal + shippingCost;
 
   // Fetch cart data on component mount
   useEffect(() => {
@@ -27,68 +28,57 @@ const Cart = () => {
       console.error("User ID is missing, cannot fetch cart.");
       return;
     }
-
-    const fetchData = async () => {
-      try {
-        await dispatch(fetchCart(userId));
-      } catch (error) {
-        console.error("Error fetching cart:", error);
-      }
-    };
-
-    fetchData();
+    dispatch(fetchCart(userId));
   }, [dispatch, userId]);
 
   // Recalculate subtotal whenever dataCart changes
   useEffect(() => {
-    const total = dataCart.reduce(
+    const totalAmount = dataCart.reduce(
       (acc, item) => acc + (item.productId.price * item.quantity || 0),
       0
     );
-    setSubTotal(total);
+    setSubTotal(totalAmount);
   }, [dataCart]);
 
-  // Handle increase and decrease quantity
-  const handleIncreaseQty = (item) => {
-    dispatch(
-      increaseQuantity({
-        userId,
-        productId: item.productId._id,
-        color: item.color,
-      })
-    );
-    dispatch(fetchCart(userId)); // Refetch cart after updating
-  };
+  // Handle quantity updates optimistically
+  const handleQuantityChange = async (item, type) => {
+    try {
+      if (type === "increase") {
+        await dispatch(
+          increaseQuantity({
+            userId,
+            productId: item.productId._id,
+            color: item.color,
+          })
+        );
+      } else {
+        await dispatch(
+          decreaseQuantity({
+            userId,
+            productId: item.productId._id,
+            color: item.color,
+          })
+        );
+      }
 
-  const handleDecreaseQty = (item) => {
-    dispatch(
-      decreaseQuantity({
-        userId,
-        productId: item.productId._id,
-        color: item.color,
-      })
-    );
-    dispatch(fetchCart(userId)); // Refetch cart after updating
+      // Fetch updated cart data after action completes
+      await dispatch(fetchCart(userId));
+    } catch (error) {
+      console.error("Error updating cart:", error);
+    }
   };
-
-  if (isCartLoading) {
-    return <Loader isProductLoading={isCartLoading} />;
-  }
 
   return (
     <div>
-      <nav
-        id="top"
-        className="navbar fixed-top navbar-expand-lg navbar-light bg-light"
-      >
+      <nav className="navbar fixed-top navbar-expand-lg navbar-light bg-light">
         <div className="container">
           <Link to="/" className="navbar-brand">
             <img src={logo} className="logo-fx" alt="..." />
           </Link>
-          <div className="collapse navbar-collapse" id="navbarNav">
+          <div className="collapse navbar-collapse">
             <ul className="navbar-nav ml-auto">
               <li className="nav-item mx-4">
-                <h6 className="my-0 text-success-s2 d-flex d-row">
+                <h6 className="my-0 text-success-s2 d-flex">
                   <Link to="/" className="text-success-s2 mr-2">
                     HOME
                   </Link>
@@ -104,16 +94,22 @@ const Cart = () => {
         <table className="table">
           <thead style={{ backgroundColor: "#009e7f", color: "white" }}>
             <tr>
-              <th scope="col">PRODUCT</th>
-              <th scope="col">NAME</th>
-              <th scope="col">Color</th>
-              <th scope="col">UNIT PRICE</th>
-              <th scope="col">QUANTITY</th>
-              <th scope="col">TOTAL</th>
+              <th>PRODUCT</th>
+              <th>NAME</th>
+              <th>Color</th>
+              <th>UNIT PRICE</th>
+              <th>QUANTITY</th>
+              <th>TOTAL</th>
             </tr>
           </thead>
           <tbody>
-            {dataCart.length !== 0 ? (
+            {isCartLoading ? (
+              <tr>
+                <td colSpan="6" className="text-center">
+                  <Loader isProductLoading={isCartLoading} />
+                </td>
+              </tr>
+            ) : dataCart.length > 0 ? (
               dataCart.map((item, index) => (
                 <tr key={index}>
                   <td>
@@ -123,8 +119,8 @@ const Cart = () => {
                         backgroundImage: `url(${item.productId.image_url})`,
                         height: "75px",
                         backgroundSize: "contain",
-                        backgroundRepeat: "no-repeat", // Prevents repetition
-                        backgroundPosition: "center", // Centers the image
+                        backgroundRepeat: "no-repeat",
+                        backgroundPosition: "center",
                       }}
                     />
                   </td>
@@ -140,10 +136,11 @@ const Cart = () => {
                     </p>
                   </td>
                   <td>
-                    <div className="btn-group" role="group" aria-label="...">
+                    <div className="btn-group">
                       <button
-                        onClick={() => handleDecreaseQty(item)}
+                        onClick={() => handleQuantityChange(item, "decrease")}
                         className="btn btn-outline-success"
+                        disabled={item.quantity === 0}
                       >
                         -
                       </button>
@@ -154,7 +151,7 @@ const Cart = () => {
                         <b>{item.quantity}</b>
                       </p>
                       <button
-                        onClick={() => handleIncreaseQty(item)}
+                        onClick={() => handleQuantityChange(item, "increase")}
                         className="btn btn-outline-success"
                       >
                         +
@@ -162,11 +159,9 @@ const Cart = () => {
                     </div>
                   </td>
                   <td>
-                    <div className="d-flex d-row">
-                      <h6 className="font-weight-bold text-secondary align-self-center my-0">
-                        ${item.productId.price * item.quantity}
-                      </h6>
-                    </div>
+                    <h6 className="font-weight-bold text-secondary">
+                      ${item.productId.price * item.quantity}
+                    </h6>
                   </td>
                 </tr>
               ))
@@ -184,47 +179,42 @@ const Cart = () => {
         </table>
 
         <div style={{ margin: "4rem 16rem" }}>
-          <div className="card shadow-subtotal-fx m-b-20">
+          <div className="card shadow-subtotal-fx">
             <div className="card-body p-5">
               <h5 className="font-weight-bold mb-4">Cart Totals</h5>
               <div className="border border-top-0">
-                <div className="border-top d-flex d-row py-3 px-3">
+                <div className="border-top d-flex py-3 px-3">
                   <h6 className="font-weight-bold my-0">Subtotal</h6>
                   <h6 className="ml-auto my-0">${subTotal}</h6>
                 </div>
-                <div className="border-top d-flex d-row py-3 px-3">
+                <div className="border-top d-flex py-3 px-3">
                   <h6 className="font-weight-bold my-0">Shipping</h6>
-                  <h6 className="ml-auto my-0">$5</h6>
+                  <h6 className="ml-auto my-0">${shippingCost}</h6>
                 </div>
-                <div className="border-top d-flex d-row py-3 px-3">
+                <div className="border-top d-flex py-3 px-3">
                   <h6 className="font-weight-bold my-0">Total</h6>
                   <h6 className="ml-auto my-0">${total}</h6>
                 </div>
               </div>
               <div className="d-flex">
-                <div>
-                  {dataCart.length !== 0 ? (
-                    <Link
-                      className="btn btn-outline-success mt-4"
-                      to="/checkout"
-                    >
-                      PROCEED TO CHECKOUT <i className="fas fa-print"></i>
-                    </Link>
-                  ) : (
-                    <button className="btn btn-outline-secondary mt-4" disabled>
-                      PROCEED TO CHECKOUT <i className="fas fa-print"></i>
-                    </button>
-                  )}
-                  <ToastContainer />
-                </div>
+                {dataCart.length > 0 ? (
+                  <Link className="btn btn-outline-success mt-4" to="/checkout">
+                    PROCEED TO CHECKOUT
+                  </Link>
+                ) : (
+                  <button className="btn btn-outline-secondary mt-4" disabled>
+                    PROCEED TO CHECKOUT
+                  </button>
+                )}
                 <Link to="/" className="btn btn-outline-primary mt-4 ml-auto">
-                  CONTINUE SHOPPING <i className="fas fa-shopping-cart"></i>
+                  CONTINUE SHOPPING
                 </Link>
               </div>
             </div>
           </div>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };
