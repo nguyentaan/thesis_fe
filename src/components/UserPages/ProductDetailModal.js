@@ -18,7 +18,7 @@ const ProductDetailModal = ({
   // Check if user is logged in
   const isUserLoggedIn = isAuth;
   console.log("selectedProduct", selectedProduct);
-
+  
   // Close modal when clicking outside of it
   useEffect(() => {
     const handleClickOutside = (event) => {

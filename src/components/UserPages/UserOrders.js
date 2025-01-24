@@ -5,6 +5,7 @@ import { getOrdersByUserId, cancelOrder } from "../../Slices/OrderSlice";
 import OrderDetailModal from "./OrderDetailModal";
 import logo from "../../assets/logo.png";
 import WriteReview from "./WriteReview";
+import Loader from "./Loader";
 import "../Order.css";
 
 const UserOrdersPage = () => {
@@ -15,13 +16,12 @@ const UserOrdersPage = () => {
   const {
     dataOrder = [], // Default to empty array if undefined
     isOrderLoading,
-    error,
   } = useSelector((state) => state.order);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isReviewOpen, setIsReviewOpen] = useState(false); // State to control review modal
-  
+
   // Fetch orders on component mount
   useEffect(() => {
     dispatch(getOrdersByUserId(userId));
@@ -110,9 +110,7 @@ const UserOrdersPage = () => {
 
         {/* Loading and Error Handling */}
         {isOrderLoading ? (
-          <p>Loading orders...</p>
-        ) : error && error.message ? (
-          <p className="text-danger">Failed to load orders: {error.message}</p>
+          <Loader isProductLoading={isOrderLoading} />
         ) : (
           <div className="table-responsive">
             <table className="table table-striped">
