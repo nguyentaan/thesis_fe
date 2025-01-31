@@ -9,9 +9,11 @@ const initialState = {
   isProductLoading: false,
   isUserLoading: false,
   isFileLoading: false,
+  isCategoryLoading: false,
   dataUser: { users: [], total: 0 },
   dataFileUpload: { files: [], total: 0 },
   dataProduct: { products: [], total: 0, currentPage: 1, limit: 15 },
+  dataCategory: { categories: [], total: 0 }, // New category state
   recommendedProducts: [],
   alert: {
     show: false,
@@ -40,6 +42,47 @@ export const getAllProducts = createAsyncThunk(
   }
 );
 
+export const getProductsByCategory = createAsyncThunk(
+  "product/getByCategory",
+  async (
+    { page = 1, limit = 15, search = "", category },
+    { rejectWithValue }
+  ) => {
+    try {
+      const params = {
+        page,
+        limit,
+        search: search.toLowerCase(), // Normalize to lowercase
+      };
+      const res = await axios.get(
+        `${API_URL}/api/products/category/${category}`,
+        { params }
+      );
+
+      // Check if the response structure is correct
+      const productsData = res.data || {}; // Ensure res.data is an object
+      const { products = [], total = 0, page: responsePage = 1 } = productsData; // Fallback to default values
+
+      return { products, total, page: responsePage, category };
+    } catch (error) {
+      console.error("API error:", error);
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+export const getAllCategories = createAsyncThunk(
+  "category/getall",
+  async (_arg, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`${API_URL}/api/products/category`);
+      return res.data; // Assuming API returns `{ categories: [], total: 0 }`
+    } catch (error) {
+      console.error("API error:", error);
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
 
 export const getAllUser = createAsyncThunk(
   "user/getAll",
@@ -115,6 +158,33 @@ const userSlice = createSlice({
       })
       .addCase(getAllProducts.rejected, (state) => {
         state.isProductLoading = false;
+      })
+      .addCase(getProductsByCategory.pending, (state) => {
+        state.isProductLoading = true;
+      })
+      .addCase(getProductsByCategory.fulfilled, (state, action) => {
+        const { products, total, page, category } = action.payload;
+        // You can store the products in a way that groups by category, if needed
+        state.dataProduct.products =
+          page === 1 ? products : [...state.dataProduct.products, ...products];
+        state.dataProduct.total = total;
+        state.dataProduct.currentPage = page;
+        state.dataProduct.category = category; // Optionally track the category in state
+        state.isProductLoading = false;
+      })
+      .addCase(getProductsByCategory.rejected, (state) => {
+        state.isProductLoading = false;
+      })
+      .addCase(getAllCategories.pending, (state) => {
+        state.isCategoryLoading = true;
+      })
+      .addCase(getAllCategories.fulfilled, (state, action) => {
+        state.dataCategory.categories = action.payload.categories;
+        state.dataCategory.total = action.payload.total;
+        state.isCategoryLoading = false;
+      })
+      .addCase(getAllCategories.rejected, (state) => {
+        state.isCategoryLoading = false;
       })
       .addCase(getAllUser.pending, (state) => {
         state.isUserLoading = true;

@@ -15,7 +15,7 @@ const ChatBot = () => {
 
   const dispatch = useDispatch();
   const { messages, loading, error } = useSelector((state) => state.chatbot);
-  console.log("messages", messages);
+  // console.log("messages", messages);
   
   const toggleChat = () => {
     setIsOpen(!isOpen);
