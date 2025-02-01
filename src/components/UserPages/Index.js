@@ -19,13 +19,11 @@ import CategorySidebar from "./CategorySideBar";
 const Index = () => {
   const dispatch = useDispatch();
   const { isAuth, user } = useSelector((state) => state.auth);
-  const { dataCategory } = useSelector(
-    (state) => state.user
-  );
+  const { dataCategory } = useSelector((state) => state.user);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [finalSearchQuery, setFinalSearchQuery] = useState(""); // State for submitted query
-  const [selectedCategory, setSelectedCategory] = useState(null); // Store the selected category
+  const [selectedCategory, setSelectedCategory] = useState("All"); // Default to "All"
 
   useEffect(() => {
     if (isAuth) {
@@ -40,11 +38,12 @@ const Index = () => {
   // Handle search submit when button is clicked
   const handleSearchSubmit = (query) => {
     setFinalSearchQuery(query); // Set the final query when search is clicked
+    setSelectedCategory("All"); // Reset category to "All" after search
   };
 
   const handleCategorySelect = (category) => {
     setSelectedCategory(category); // Update the selected category
-  };  
+  };
 
   const noLoginCartNotification = () => {
     toast.error("Please login first to continue.", {
@@ -208,8 +207,10 @@ const Index = () => {
           <div className="col-md-3">
             <CategorySidebar
               categories={dataCategory.categories}
-              onCategorySelect={handleCategorySelect} // Pass the callback to CategorySidebar
-            />{" "}
+              onCategorySelect={handleCategorySelect}
+              selectedCategory={selectedCategory}
+              setSelectedCategory={setSelectedCategory} // Pass this prop to reset category
+            />
           </div>
           <div className="col-md-9">
             <h2 className="font-weight-bold">Our Products</h2>
