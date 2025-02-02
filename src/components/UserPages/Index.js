@@ -31,6 +31,9 @@ const Index = () => {
     }
   }, [isAuth]);
 
+  console.log(dataCategory);
+  
+
   useEffect(() => {
     dispatch(getAllCategories());
   }, [dispatch]);
