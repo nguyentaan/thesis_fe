@@ -92,7 +92,7 @@ export const getAllCategories = createAsyncThunk(
   "category/getall",
   async (_arg, { rejectWithValue }) => {
     try {
-      const res = await axios.get(`${API_URL}/api/products/category`);
+      const res = await axios.get(`${API_URL}/api/products/category/get`);
       return res.data; // Assuming API returns `{ categories: [], total: 0 }`
     } catch (error) {
       console.error("API error:", error);
