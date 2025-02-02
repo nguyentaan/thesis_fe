@@ -190,6 +190,19 @@ export const uploadFile = createAsyncThunk(
   }
 );
 
+export const getAllUniqueIndexName = createAsyncThunk(
+  "file/getAllUniqueIndexName",
+  async (_arg, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`${API_URL}/api/products/index_name/getAll`);
+      return res.data;
+    } catch (error) {
+      console.error("API error:", error);
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 const userSlice = createSlice({
   name: "user",
   initialState,
@@ -326,6 +339,17 @@ const userSlice = createSlice({
         state.dataProduct.products = action.payload;
       })
       .addCase(getOneProduct.rejected, (state) => {
+        state.isProductLoading = false;
+      })
+      //Get all unique index name
+      .addCase(getAllUniqueIndexName.pending, (state) => {
+        state.isProductLoading = true;
+      })
+      .addCase(getAllUniqueIndexName.fulfilled, (state, action) => {
+        state.isProductLoading = false;
+        state.dataProduct.products = action.payload;
+      })
+      .addCase(getAllUniqueIndexName.rejected, (state) => {
         state.isProductLoading = false;
       })
   },

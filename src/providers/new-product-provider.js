@@ -11,6 +11,7 @@ const initialFormValues = {
     total_stock: "0",
     price: "0",
     imageUrl: "",
+    index_name: "",
 };
 
 // Create the context
