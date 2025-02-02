@@ -19,7 +19,7 @@ const Cart = () => {
   const total = subTotal + 5; // Adding shipping cost
 
   const { user } = useSelector((state) => state.auth);
-  const userId = user?._id;
+  const userId = user?.data?._id;
 
   // Fetch cart data on component mount
   useEffect(() => {

@@ -50,8 +50,9 @@ const ProductDetailModal = ({
     const color = selectedProduct.color;
     const quantity = 1;
     console.log("Adding to cart:", { productId, color, quantity });
+    console.log("Adding to user._id:", user?.data?._id);
 
-    dispatch(addToCart({ userId: user._id, productId, quantity, color }));
+    dispatch(addToCart({ userId: user?.data?._id, productId, quantity, color }));
   };
 
   if (!showDetailModel) return null; // Hide modal if not visible

@@ -12,7 +12,7 @@ import { Input } from "../ui/input";
 const AdminLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [dataInput, setDataInput] = useState({
-    email: "20521920@gm.uit.edu.vn",
+    email: "minhthanh5346@gmail.com",
     password: "12345678",
   });
   // const [otpVisible, setOtpVisible] = useState(false);

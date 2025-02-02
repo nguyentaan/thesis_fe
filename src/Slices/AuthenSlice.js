@@ -19,7 +19,7 @@ export const googleLogin = createAsyncThunk(
         credential: token,
       });
       console.log("response", response.data);
-      
+
       return response.data;
     } catch (error) {
       return rejectWithValue(handleError(error));
@@ -52,6 +52,79 @@ export const createUser = createAsyncThunk(
         password,
         phoneNumber,
       });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(handleError(error));
+    }
+  }
+);
+
+export const deleteUser = createAsyncThunk(
+  "authen/delete",
+  async ({ user_id }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${API_URL}/api/user/users/remove-one`, {
+        user_id
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(handleError(error));
+    }
+  }
+);
+
+export const deleteProduct = createAsyncThunk(
+  "authen/product/delete",
+  async ({ product_id }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${API_URL}/api/products/delete`, {
+        product_id
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(handleError(error));
+    }
+  }
+);
+
+
+export const updateUser = createAsyncThunk(
+  "authen/update",
+  async ({ user_id, update_data }, { rejectWithValue }) => {
+    try {
+      const { name, email, phoneNumber } = update_data; // Destructure from update_data
+      const response = await axios.put(`${API_URL}/api/user/profile/update`, {
+        user_id,
+        update_data: { name, email, phone: phoneNumber}
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data || error.message);
+    }
+  }
+);
+
+export const updateProduct = createAsyncThunk(
+  "product/update",
+  async ({ product_id, update_data }, { rejectWithValue }) => {
+    try {
+      const { name, price, description, category, image_url } = update_data; // Destructure from update_data
+      const response = await axios.put(`${API_URL}/api/products/update`, {
+        product_id,
+        update_data: { name, price, description, category, image_url }
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+export const dashboardData = createAsyncThunk(
+  "authen/dashboard",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${API_URL}/api/auth/dashboard`);
       return response.data;
     } catch (error) {
       return rejectWithValue(handleError(error));
@@ -143,6 +216,66 @@ const authSlice = createSlice({
         state.isLoading = false;
       })
       .addCase(createUser.rejected, (state, action) => {
+        state.error = action.payload; // Capture error message
+        state.isLoading = false;
+      })
+      // User Deletion Cases
+      .addCase(deleteUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(deleteUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+      })
+      .addCase(deleteUser.rejected, (state, action) => {
+        state.error = action.payload; // Capture error message
+        state.isLoading = false;
+      })
+      // Product Deletion Cases
+      .addCase(deleteProduct.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+        state.isLoading = false;
+      })
+      .addCase(deleteProduct.rejected, (state, action) => {
+        state.error = action.payload; // Capture error message
+        state.isLoading = false;
+      })
+      // User Update Cases
+      .addCase(updateUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+      })
+      .addCase(updateUser.rejected, (state, action) => {
+        state.error = action.payload; // Capture error message
+        state.isLoading = false;
+      })
+      // Product Update Cases
+      .addCase(updateProduct.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updateProduct.fulfilled, (state, action) => {
+        state.isLoading = false;
+      })
+      .addCase(updateProduct.rejected, (state, action) => {
+        state.error = action.payload; // Capture error message
+        state.isLoading = false;
+      })
+      // Dashboard Data Cases
+      .addCase(dashboardData.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(dashboardData.fulfilled, (state, action) => {
+        state.isLoading = false;
+      })
+      .addCase(dashboardData.rejected, (state, action) => {
         state.error = action.payload; // Capture error message
         state.isLoading = false;
       });

@@ -59,7 +59,7 @@ export function getMenuList(pathname) {
                             active: pathname === "/products",
                         },
                         {
-                            href: "/products/new",
+                            href: "/admin/products/new",
                             label: "New Products",
                             active: pathname === "/products/new",
                         },

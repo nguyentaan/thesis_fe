@@ -1,9 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { API_URL, PYTHON_URL, CHUNKING_URL } from "../config";
 
-const API_URL = `${process.env.REACT_APP_API_URL}`;
-const PYTHON_URL = `${process.env.REACT_APP_PYTHON_URL}`;
+const CHUNKING_SERVER_API = CHUNKING_URL;
 
 const initialState = {
   isProductLoading: false,
@@ -18,6 +18,9 @@ const initialState = {
     message: "",
     variant: "light",
   },
+  isEmbeddingLoading: false,
+  embeddingResults: null,
+  embeddingModel: null,
   error: null,
 };
 
@@ -40,12 +43,39 @@ export const getAllProducts = createAsyncThunk(
   }
 );
 
+export const getOneProduct = createAsyncThunk(
+  "product/getOne",
+  async ( product_id, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`${API_URL}/api/products/${product_id}`);
+      const products = res.data;
+      return products ;
+    } catch (error) {
+      console.error("API error:", error);
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 
 export const getAllUser = createAsyncThunk(
   "user/getAll",
   async (_arg, { rejectWithValue }) => {
     try {
       const res = await axios.get(`${API_URL}/api/user/profile/list`);
+      return res.data;
+    } catch (error) {
+      console.error("API error:", error);
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+export const getOneUser = createAsyncThunk(
+  "user/getOne",
+  async (user_id, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`${API_URL}/api/user/profile/id/${user_id}`);
       return res.data;
     } catch (error) {
       console.error("API error:", error);
@@ -67,6 +97,34 @@ export const getAllFile = createAsyncThunk(
   }
 );
 
+export const getAllChunkFromSelectedFile = createAsyncThunk(
+  "file/getAllChunk",
+  async (payload, { rejectWithValue }) => {
+    try {
+      // Send the payload in the request body
+      const res = await axios.post(`${API_URL}/api/files/chunking_list/`, payload);
+      return res.data;
+    } catch (error) {
+      console.error("API error:", error);
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+export const embeddingChunkingList = createAsyncThunk(
+  "file/embeddingChunkingList",
+  async (payload, { rejectWithValue }) => {
+    try {
+      console.log("Flattened json_list for embedding:", payload);
+      const res = await axios.post(`${PYTHON_URL}/embedding`, { json_list: payload });
+      return res.data; // Contains `embedding_results` and `model`
+    } catch (error) {
+      console.error("API error:", error);
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 export const uploadFile = createAsyncThunk(
   "file/upload",
   async ({ file, file_type }, { rejectWithValue }) => {
@@ -75,7 +133,7 @@ export const uploadFile = createAsyncThunk(
       formData.append("files", file);
       formData.append("file_type", file_type);
 
-      const res = await axios.post(`${PYTHON_URL}/chunking/`, formData, {
+      const res = await axios.post(`${CHUNKING_SERVER_API}/chunking/`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -166,7 +224,40 @@ const userSlice = createSlice({
           position: toast.POSITION.TOP_CENTER,
           autoClose: 3000,
         });
-      });
+      })
+      .addCase(embeddingChunkingList.pending, (state) => {
+        state.isEmbeddingLoading = true;
+        state.error = null;
+      })
+      .addCase(embeddingChunkingList.fulfilled, (state, action) => {
+        const { embedding_results, model } = action.payload;
+        state.embeddingResults = embedding_results;
+        state.embeddingModel = model;
+        state.isEmbeddingLoading = false;
+        toast.success("Embedding completed successfully!", {
+          position: toast.POSITION.TOP_CENTER,
+          autoClose: 3000,
+        });
+      })
+      .addCase(embeddingChunkingList.rejected, (state, action) => {
+        state.isEmbeddingLoading = false;
+        state.error = action.payload || "Embedding failed.";
+        toast.error(`Embedding failed: ${state.error}`, {
+          position: toast.POSITION.TOP_CENTER,
+          autoClose: 3000,
+        });
+      })
+      .addCase(getOneProduct.pending, (state) => {
+        state.isProductLoading = true;
+      }
+      )
+      .addCase(getOneProduct.fulfilled, (state, action) => {
+        state.isProductLoading = false;
+        state.dataProduct.products = action.payload;
+      })
+      .addCase(getOneProduct.rejected, (state) => {
+        state.isProductLoading = false;
+      })
   },
 });
 

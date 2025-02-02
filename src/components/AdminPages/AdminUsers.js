@@ -17,11 +17,14 @@ import PlaceholderContent from "../misc/placeholder-content";
 import { TableActionProvider } from "../../providers/table-action-provider";
 import {
   SkeletonCard
-} from "../ui/skeleton-card"
+} from "../ui/skeleton-card";
 import { DataTable } from "../ui/data-table";
 import { CustomDialog } from "../ui/custom-dialog";
-import {SearchFilterCustom} from "../misc/search-filter-custom";
-import {userColumns} from "../misc/model/user-column";
+import { SearchFilterCustom } from "../misc/search-filter-custom";
+import { userColumns } from "../misc/model/user-column";
+import { useNavigate } from "react-router-dom";
+import { deleteUser } from "../../Slices/AuthenSlice";
+
 const AdminUsers = () => {
   const dispatch = useDispatch();
   const { dataUser, isUserLoading } = useSelector((state) => state.user);
@@ -29,14 +32,16 @@ const AdminUsers = () => {
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [dataDelete, setDataDelete] = useState({});
+  const [users, setUsers] = useState(dataUser?.users || []); // Local state for users
 
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         if (isAuth) {
           const response = await dispatch(getAllUser()).unwrap();
-          console.log("Response get user:", dataUser);  // Log the response here
+          setUsers(response?.data || []);
         }
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -48,8 +53,20 @@ const AdminUsers = () => {
   useEffect(() => {
     if (dataUser?.users) {
       console.log("User data updated: ", dataUser);
+      setUsers(dataUser?.users || []);
     }
-  }, [dataUser])
+  }, [dataUser]);
+
+  useEffect(() => {
+    if (searchQuery) {
+      const filterUsers = dataUser?.users?.filter((user) =>
+        user.email.includes(searchQuery)
+      );
+      setUsers(filterUsers || []);
+    } else {
+      setUsers(dataUser?.users || []);
+    }
+  }, [searchQuery, dataUser]);
 
   const displayDeleteModal = (data) => {
     setDataDelete(data);
@@ -60,22 +77,33 @@ const AdminUsers = () => {
     setShowDeleteModal(false);
   };
 
-  const handleDelete = () => {
-    // Add delete logic here (e.g., dispatching deleteUser action)
-    setShowDeleteModal(false);
+  const handleDelete = async () => {
+    if (dataDelete._id) {
+      try {
+        const response = await dispatch(deleteUser({ user_id: dataDelete._id })).unwrap();
+        console.log("Response delete user:", response);
+        if (response.status === 'SUCCESS') {
+          setUsers(users.filter((user) => user._id !== dataDelete._id));
+          closeDeleteModal(); // Close the modal after deleting
+        }
+      } catch (error) {
+        console.error("Error deleting user:", error);
+      }
+    }
   };
 
-  const setSearch = () => {
-    // Add search logic here
+  const handleSearch = (query) => {
+    setSearchQuery(query.search);
   };
 
-  const DeleteProductModal = () => (
-    <Modal show={showDeleteModal} onHide={closeDeleteModal}>
+
+  const DeleteuserModal = () => (
+    <Modal show={showDeleteModal} onHide={closeDeleteModal} className="mt-52">
       <Modal.Header closeButton>
         <Modal.Title>
           <p>
             Are you sure you want to delete the user
-            <span className="text-success-s2"> "{dataDelete.username}"</span>?
+            <span className="text-success-s2"> "{dataDelete.name}"</span>? with User ID: {dataDelete._id}
           </p>
         </Modal.Title>
       </Modal.Header>
@@ -90,6 +118,12 @@ const AdminUsers = () => {
       </Modal.Footer>
     </Modal>
   );
+
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate("/admin/users/new");
+  };
 
   return (
     <ContentLayout title="User Management">
@@ -115,9 +149,10 @@ const AdminUsers = () => {
       <PlaceholderContent>
         <TableActionProvider
           initialValues={{
-            // onEdit: handleEdit,
-            // setSorting,
-            // onDelete: handleDelete,
+            onDelete: displayDeleteModal, // Update to call displayDeleteModal
+            onEdit: (data) => {
+              navigate(`/admin/users/${data._id}`);
+            }
           }}
         >
           {isUserLoading ? (
@@ -126,31 +161,25 @@ const AdminUsers = () => {
             <DataTable
               extra={
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 w-full h-full">
-                  <CustomDialog
-                    button={<Button>Add User</Button>}
-                    title="New Campaign"
-                    noFooter
-                  >
-                    {({ close }) => (
-                      <div>
-                        Ongoing
-                      </div>
-                    )}
-                  </CustomDialog>
+                  <Button onClick={handleClick}>
+                    Add User
+                  </Button>
                   <SearchFilterCustom
-                    // search={search.filter}
-                    setSearch={setSearch}
+                    setSearch={handleSearch}
                     searchPlaceholder="Search by name"
                   />
                 </div>
               }
               isLoading={isUserLoading}
               columns={userColumns}
-              data={dataUser?.users || []}
+              data={users} // Use local users state for table data
             />
           )}
         </TableActionProvider>
       </PlaceholderContent>
+
+      {/* Delete Modal */}
+      <DeleteuserModal />
     </ContentLayout>
   );
 };

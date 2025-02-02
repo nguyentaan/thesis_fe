@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const PYTHON_API = `${process.env.REACT_APP_PYTHON_URL}`;
-
+console.log("PYTHON_API", PYTHON_API);
 export const fetchChatbot = createAsyncThunk(
   "chatbot/fetchResponse",
   async (userQuery, { rejectWithValue }) => {
