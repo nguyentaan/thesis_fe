@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { useSelector, useDispatch } from "react-redux";
 import { logout, loginSuccess } from "../../Slices/AuthenSlice";
+import { getAllCategories } from "../../Slices/UserSlice";
 import "react-toastify/dist/ReactToastify.css";
 import mainBg from "../../assets/mainBackground.png";
 import logo from "../../assets/logo.png";
@@ -13,13 +14,16 @@ import Footer from "./Footer";
 import SearchComponent from "./SearchInput";
 import Chatbot from "./chatbot";
 import "../Users.css";
+import CategorySidebar from "./CategorySideBar";
 
 const Index = () => {
   const dispatch = useDispatch();
   const { isAuth, user } = useSelector((state) => state.auth);
+  const { dataCategory } = useSelector((state) => state.user);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [finalSearchQuery, setFinalSearchQuery] = useState(""); // State for submitted query
+  const [selectedCategory, setSelectedCategory] = useState("All"); // Default to "All"
 
   useEffect(() => {
     if (isAuth) {
@@ -27,9 +31,18 @@ const Index = () => {
     }
   }, [isAuth]);
 
+  useEffect(() => {
+    dispatch(getAllCategories());
+  }, [dispatch]);
+
   // Handle search submit when button is clicked
   const handleSearchSubmit = (query) => {
     setFinalSearchQuery(query); // Set the final query when search is clicked
+    setSelectedCategory("All"); // Reset category to "All" after search
+  };
+
+  const handleCategorySelect = (category) => {
+    setSelectedCategory(category); // Update the selected category
   };
 
   const noLoginCartNotification = () => {
@@ -119,7 +132,7 @@ const Index = () => {
                   </li>
                 )}
 
-                <li className="nav-item mx-4">
+                <li className="nav-item">
                   {isAuth ? (
                     <div className="btn-group">
                       <button
@@ -129,7 +142,7 @@ const Index = () => {
                         aria-haspopup="true"
                         aria-expanded="false"
                       >
-                        {`Hello, ${user?.data?.name}`}
+                        {`Hello, ${user?.name}`}
                       </button>
                       <div className="dropdown-menu t45">
                         <Link
@@ -188,13 +201,23 @@ const Index = () => {
         <Carousel />
       </div>
       {/* carousel-brochure */}
-
       {/* part 3 - content */}
       <div className="container">
         <div className="row mb-5">
+          <div className="col-md-3">
+            <CategorySidebar
+              categories={dataCategory.categories}
+              onCategorySelect={handleCategorySelect}
+              selectedCategory={selectedCategory}
+              setSelectedCategory={setSelectedCategory} // Pass this prop to reset category
+            />
+          </div>
           <div className="col-md-9">
             <h2 className="font-weight-bold">Our Products</h2>
-            <ProductField searchQuery={finalSearchQuery} />
+            <ProductField
+              searchQuery={finalSearchQuery}
+              category={selectedCategory} // Send selected category here
+            />{" "}
           </div>
         </div>
       </div>

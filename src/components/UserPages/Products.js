@@ -1,32 +1,40 @@
 import React, { useEffect, useState } from "react";
 import "../Users.css";
-import { getAllProducts } from "../../Slices/UserSlice";
+import { getAllProducts, getProductsByCategory } from "../../Slices/UserSlice";
 import { useDispatch, useSelector } from "react-redux";
 import ProductDetailModal from "./ProductDetailModal";
 import RatingDisplay from "./RatingDisplay";
 import Loader from "./Loader";
 
-const Products = ({ searchQuery }) => {
+const Products = ({ searchQuery, category }) => {
   const dispatch = useDispatch();
   const { dataProduct, isProductLoading } = useSelector((state) => state.user);
-  // console.log("dataProduct", dataProduct);
-  
   const [page, setPage] = useState(1);
   const limit = 15;
-
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showDetailModel, setShowDetailModel] = useState(false);
+  console.log("page", page);
+  
+  // Reset dataProduct when category changes
+  useEffect(() => {
+    setPage(1); // Reset to page 1 when category changes
+  }, [category]);
 
   useEffect(() => {
-    // Fetch products when searchQuery changes or page changes
-    if (searchQuery.trim() === "") {
-      // If searchQuery is empty, fetch all products
-      dispatch(getAllProducts({ page, limit, search: "" }));
+    // Check if category is 'all' or not
+    if (category === "All") {
+      // Fetch all products and filter by search query
+      dispatch(getAllProducts({ page, limit, search: searchQuery }));
+    } else if (category) {
+      // Fetch products based on the selected category, and apply the search query
+      dispatch(
+        getProductsByCategory({ category, page, limit, search: searchQuery })
+      );
     } else {
-      // If searchQuery is not empty, fetch products based on the search query
+      // Fetch all products and filter by search query if no category is selected
       dispatch(getAllProducts({ page, limit, search: searchQuery }));
     }
-  }, [searchQuery, dispatch, page]); // Run when searchQuery or page changes
+  }, [searchQuery, dispatch, page, category]); // Dependency array triggers the effect when these values change
 
   const loadMoreProducts = () => {
     setPage((prevPage) => prevPage + 1);
@@ -43,7 +51,7 @@ const Products = ({ searchQuery }) => {
   };
 
   return (
-    <div style={{ fontFamily: "Karla,sans-serif" }}>
+    <div style={{ fontFamily: "Karla, sans-serif" }}>
       <Loader isProductLoading={isProductLoading} />
       {/* Render product list only if modal is not visible */}
       {!showDetailModel && !isProductLoading && (

@@ -31,13 +31,6 @@ const Reviews = ({ productId }) => {
       {reviews.length === 0 ? (
         <div className="no-reviews">
           <p>No reviews yet. Be the first to review this product!</p>
-          {/* Optional Call-to-Action */}
-          <button
-            className="add-review-button"
-            onClick={() => alert("Add your review!")}
-          >
-            Write a Review
-          </button>
         </div>
       ) : (
         <ul className="reviews-list">
