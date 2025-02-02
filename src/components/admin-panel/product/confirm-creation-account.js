@@ -40,8 +40,8 @@ const ConfirmCreationAccount = () => {
         total_stock: product?.total_stock,
         price: product?.price,
         image_url: product?.imageUrl,
+        index_name: product?.index_name,
       });
-      console.log("response", response);
       if (response.status === 200) {
         successfulRegisterNotification();
         navigate("/admin/products"); // Navigate to /admin/products instead of /login
@@ -78,6 +78,9 @@ const ConfirmCreationAccount = () => {
         </p>
         <p>
           <strong>Description:</strong> {product?.description}
+        </p>
+        <p>
+          <strong>Index Name:</strong> {product?.index_name}
         </p>
         <p>
           <strong>Price:</strong> {product?.price}
