@@ -22,25 +22,63 @@ import { DataTable } from "../ui/data-table";
 import { CustomDialog } from "../ui/custom-dialog";
 import { SearchFilterCustom } from "../misc/search-filter-custom";
 import { productColumn } from "../misc/model/product-column";
+import { useNavigate } from "react-router-dom";
+import { deleteProduct } from "../../Slices/AuthenSlice";
+
 const AdminProducts = () => {
   const dispatch = useDispatch();
   const { dataProduct, isProductLoading } = useSelector((state) => state.user);
   const { isAuth, refreshToken } = useSelector((state) => state.auth);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [dataDelete, setDataDelete] = useState({});
+  const [products, setProducts] = useState(dataProduct?.products || []);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    size: 15,
+    total: 0
+  });
 
   useEffect(() => {
-    if (isAuth) {
-      dispatch(getAllProducts({}));
-    }
-  }, [dispatch]);
+    const fetchData = async () => {
+      try {
+        if (isAuth) {
+          const response = await dispatch(getAllProducts({
+            page: pagination.page,
+            limit: pagination.size
+          })).unwrap();
+          setProducts(response?.products || []);
+          setPagination(prev => ({
+            ...prev,
+            total: response?.total || 0
+          }));
+          console.log("pagination", pagination);
+        }
+      } catch (error) {
+        console.error("Error fetching product:", error);
+      }
+    };
+    fetchData();
+  }, [dispatch, isAuth, refreshToken, pagination.page]);
 
   useEffect(() => {
-    if (isAuth &&dataProduct?.products) {
-      console.log("Products: ", dataProduct);
+    if (dataProduct?.products) {
+      setProducts(dataProduct?.products || []);
     }
-  }, [dataProduct])
+  }, [dataProduct]);
+
+  useEffect(() => {
+    if (searchQuery) {
+      const filteredProducts = dataProduct?.products?.filter((product) =>
+        product.name.includes(searchQuery)
+      );
+      setProducts(filteredProducts || []);
+    } else {
+      setProducts(dataProduct?.products || []);
+    }
+  }, [searchQuery, dataProduct]);
+  
 
   const displayDeleteModal = (data) => {
     setDataDelete(data);
@@ -51,22 +89,37 @@ const AdminProducts = () => {
     setShowDeleteModal(false);
   };
 
-  const handleDelete = () => {
-    // Add delete logic here (e.g., dispatching deleteUser action)
-    setShowDeleteModal(false);
+  const handleDelete = async () => {
+    if (dataDelete._id) {
+      try {
+        const response = await dispatch(deleteProduct({ product_id: dataDelete._id })).unwrap();
+        if (response.status === 'SUCCESS') {
+          setProducts(products.filter((product) => product._id !== dataDelete._id));
+          closeDeleteModal(); // Close the modal after deleting
+        }
+      } catch (error) {
+        console.error("Error deleting product:", error);
+      }
+    }
   };
 
-  const setSearch = () => {
-    // Add search logic here
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate("/admin/products/new");
+  };
+
+  const handleSearch = (query) => {
+    setSearchQuery(query.search);
   };
 
   const DeleteProductModal = () => (
-    <Modal show={showDeleteModal} onHide={closeDeleteModal}>
+    <Modal show={showDeleteModal} onHide={closeDeleteModal} className="mt-52">
       <Modal.Header closeButton>
         <Modal.Title>
           <p>
-            Are you sure you want to delete this products from your account?
-            <span className="text-success-s2"> "{dataDelete.username}"</span>?
+            Are you sure you want to delete this product from your account?
+            <span className="text-success-s2"> "{dataDelete.name}"</span>?
           </p>
         </Modal.Title>
       </Modal.Header>
@@ -110,9 +163,10 @@ const AdminProducts = () => {
       <PlaceholderContent>
         <TableActionProvider
           initialValues={{
-            // onEdit: handleEdit,
-            // setSorting,
-            // onDelete: handleDelete,
+            onDelete: displayDeleteModal,
+            onEdit: (data) => {
+              navigate(`/admin/products/${data._id}`);
+            }
           }}
         >
           {isProductLoading ? (
@@ -121,30 +175,23 @@ const AdminProducts = () => {
             <DataTable
               extra={
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 w-full h-full">
-                  <CustomDialog
-                    button={<Button>Add Product</Button>}
-                    title="New Campaign"
-                    noFooter
-                  >
-                    {({ close }) => (
-                      <div>
-                        Ongoing
-                      </div>
-                    )}
-                  </CustomDialog>
+                  <Button onClick={handleClick}>
+                    Add Product
+                  </Button>
                   <SearchFilterCustom
+                    setSearch={handleSearch}
                     searchPlaceholder="Search by name"
-                    setSearch={setSearch}
                   />
                 </div>
               }
               isLoading={isProductLoading}
               columns={productColumn}
-              data={dataProduct?.products || []}
+              data={products || []}
             />
           )}
         </TableActionProvider>
       </PlaceholderContent>
+      <DeleteProductModal />
     </ContentLayout>
   );
 };

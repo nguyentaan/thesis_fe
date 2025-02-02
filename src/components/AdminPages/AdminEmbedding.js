@@ -20,6 +20,7 @@ import { CustomDialog } from "../ui/custom-dialog";
 import { SearchFilterCustom } from "../misc/search-filter-custom";
 import { fileEmbeddingColumn } from "../misc/model/file-embedding-column";
 import EmbeddingFileForm from "../ui/embedding_file_form";
+import { getAllChunkFromSelectedFile, embeddingChunkingList } from "../../Slices/UserSlice";
 
 const AdminEmbeddingPage = () => {
   const dispatch = useDispatch();
@@ -62,14 +63,42 @@ const AdminEmbeddingPage = () => {
     });
   };
 
-
-  const handleStartEmbedding = () => {
+  const handleEmbedding = async (jsonList) => {
+    await dispatch(embeddingChunkingList(jsonList));
+  };
+  
+  const handleStartEmbedding = async () => {
     if (selectedFiles.length === 0) {
       alert("No files selected for embedding!");
       return;
     }
-    alert(`Embedding started for files: ${selectedFiles.join(", ")}`);
-    setSelectedFiles([]); // Clear selection after embedding start
+    const groupedFiles = selectedFiles.reduce((acc, file) => {
+      const { file_type, chunk_lists } = file;
+      if (!acc[file_type]) {
+        acc[file_type] = { type: file_type, chunk_list: [] };
+      }
+      acc[file_type].chunk_list.push(...chunk_lists);
+      return acc;
+    }, {});
+
+    const payload = Object.values(groupedFiles);
+    alert(`Embedding started for files grouped by type.`);
+    console.log("Selected files for embedding (grouped by type):", payload);
+    try {
+      const response = await dispatch(
+        getAllChunkFromSelectedFile({
+          payload: payload,
+        })
+      ).unwrap();
+      const json_list = response.flatMap(group => group.products);
+      await handleEmbedding(json_list);
+    } catch (error) {
+      console.error("Error during embedding:", error);
+      alert(`An error occurred: ${error.message || "Unknown error"}`);
+    } finally {
+      // Clear selection after embedding
+      setSelectedFiles([]);
+    }
   };
 
   const DeleteProductModal = () => (

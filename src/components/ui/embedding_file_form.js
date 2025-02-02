@@ -6,15 +6,10 @@ import { Input } from "./input";
 const EmbeddingFileForm = ({ selectedFiles, handleStartEmbedding }) => {
   const [embeddingModel, setEmbeddingModel] = useState("");
   const [error, setError] = useState("");
-  console.log(selectedFiles);
   useEffect(() => {
   }, [selectedFiles]);
 
   const handleUpload = () => {
-    if (!embeddingModel.trim()) {
-      setError("Embedding model is required.");
-      return;
-    }
     handleStartEmbedding();
   };
 
@@ -50,10 +45,11 @@ const EmbeddingFileForm = ({ selectedFiles, handleStartEmbedding }) => {
       <div className="mt-4 space-y-4">
         <Input
           type="text"
-          placeholder="Enter embedding model (e.g., bert-base-uncased)"
+          placeholder="Sentence-Transformers/all-mpnet-base-v2"
           value={embeddingModel}
           onChange={(e) => setEmbeddingModel(e.target.value)}
           className="w-full px-4 py-2 bg-white text-gray-800 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-purple-300"
+          disabled
         />
         <div className="text-center">
           <Button

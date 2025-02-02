@@ -18,7 +18,7 @@ const Cart = () => {
   const [subTotal, setSubTotal] = useState(0);
 
   const { user } = useSelector((state) => state.auth);
-  const userId = user?._id;
+  const userId = user?.data?._id;
   const shippingCost = 5;
   const total = subTotal + shippingCost;
 
