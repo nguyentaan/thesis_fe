@@ -45,9 +45,9 @@ const AdminLogin = () => {
 
   // Redirect if authenticated and admin
   useEffect(() => {
-    if (isAuth && user?.data?.isAdmin === true) {
+    if (isAuth && user?.isAdmin === true) {
       navigate("/admin/dashboard");
-    } else if (isAuth && user?.data?.isAdmin === false) {
+    } else if (isAuth && user?.isAdmin === false) {
       unAuthoriaztionLoginNotification();
       navigate("/");
     }

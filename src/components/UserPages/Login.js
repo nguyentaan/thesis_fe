@@ -65,9 +65,8 @@ const Login = ({ showLoginModal, closeLoginModal, onLoginSuccess }) => {
       if (response.status === "OK") {
         successfulLoginNotification();
         const { data, access_token, refresh_token } = response; // Destructure the result
-        console.log("response", response)
         dispatch(loginSuccess({ user: data, accessToken: access_token, refreshToken: refresh_token }));
-        alert("Login sucessfully!");
+        // alert("Login sucessfully!");
         // setOtpVisible(true); // Show OTP verification step
       } else {
         console.error("Login failed:", response.message);
