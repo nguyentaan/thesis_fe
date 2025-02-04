@@ -200,6 +200,9 @@ const authSlice = createSlice({
         state.error = action.payload; // Capture error message
         state.isLoading = false;
       })
+      .addCase(emailLogin.fulfilled, (state, action) => {
+        state.isAuth = true;
+      })
       // // OTP Verification Cases
       // .addCase(verifyOTP.pending, (state) => {
       //   state.isLoading = true;

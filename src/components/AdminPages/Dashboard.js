@@ -19,8 +19,8 @@ import { dashboardData } from "../../Slices/AuthenSlice";
 const Dashboard = () => {
   const { isAuth } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  const [dashboard, setDashboard] = useState([]); 
-
+  const [dashboard, setDashboard] = useState([]);
+  console.log("dashboard isAuth", isAuth);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -34,7 +34,7 @@ const Dashboard = () => {
     };
     fetchData();
   }, [dispatch, isAuth]);
-  
+
   const cardList = [
     {
       title: "Total Products",
@@ -89,7 +89,7 @@ const Dashboard = () => {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      
+
       <PlaceholderContent>
         {isAuth ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -111,13 +111,6 @@ const Dashboard = () => {
         ) : (
           <SkeletonCard />
         )}
-         {/* {isAuth ? (
-          <div className="flex flex-col gap-4">
-            
-          </div>
-        ) : (
-          <SkeletonCard />
-        )} */}
       </PlaceholderContent>
 
       {/* FAQ Section */}

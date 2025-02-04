@@ -21,7 +21,7 @@ const Index = () => {
         <Route
           path="/dashboard"
           element={
-            isAuth && user?.data?.isAdmin ? (
+            isAuth && user?.isAdmin ? (
               <AdminLayout>
                 <AdminDashboard />
               </AdminLayout>
@@ -34,7 +34,7 @@ const Index = () => {
         <Route
           path="/products"
           element={
-            isAuth && user?.data?.isAdmin ? (
+            isAuth && user?.isAdmin ? (
               <AdminLayout>
                 <AdminProductPage />
               </AdminLayout>
@@ -46,7 +46,7 @@ const Index = () => {
         <Route
           path="/products/new"
           element={
-            isAuth && user?.data?.isAdmin ? (
+            isAuth && user?.isAdmin ? (
               <AdminLayout>
                 <AdminProductAdd />
               </AdminLayout>
@@ -58,7 +58,7 @@ const Index = () => {
         <Route
           path={`/products/:product_id`}
           element={
-            isAuth && user?.data?.isAdmin ? (
+            isAuth && user?.isAdmin ? (
               <AdminLayout>
                 <AdminProductDetail />
               </AdminLayout>
@@ -70,7 +70,7 @@ const Index = () => {
         <Route
           path="/users"
           element={
-            isAuth && user?.data?.isAdmin ? (
+            isAuth && user?.isAdmin ? (
               <AdminLayout>
                 <AdminUsersPage />
               </AdminLayout>
@@ -82,7 +82,7 @@ const Index = () => {
         <Route
           path={`/users/:user_id`}
           element={
-            isAuth && user?.data?.isAdmin ? (
+            isAuth && user?.isAdmin ? (
               <AdminLayout>
                 <AdminUserDetail />
               </AdminLayout>
@@ -94,7 +94,7 @@ const Index = () => {
         <Route
           path="/users/new"
           element={
-            isAuth && user?.data?.isAdmin ? (
+            isAuth && user?.isAdmin ? (
               <AdminLayout>
                 <AdminUserAdd />
               </AdminLayout>
@@ -106,7 +106,7 @@ const Index = () => {
         <Route
           path="/files"
           element={
-            isAuth && user?.data?.isAdmin ? (
+            isAuth && user?.isAdmin ? (
               <AdminLayout>
                 <AdminFileUpload />
               </AdminLayout>
@@ -118,7 +118,7 @@ const Index = () => {
         <Route
           path="/embedding"
           element={
-            isAuth && user?.data?.isAdmin ? (
+            isAuth && user?.isAdmin ? (
               <AdminLayout>
                 <AdminEmbeddingPage />
               </AdminLayout>
