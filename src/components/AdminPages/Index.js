@@ -12,6 +12,9 @@ import AdminUserAdd from "./AdminUsersAdd";
 import AdminProductAdd from "./AdminProductAdd";
 import AdminUserDetail from "./AdminUsersDetail";
 import AdminProductDetail from "./AdminProductDetail";
+import AdminOrderPage from "./AdminOrder";
+import AdminOrderDetail from "./AdminOrderDetail";
+import AdminOrderAdd from "./AdminOrderAdd";
 const Index = () => {
   const { isAuth, user } = useSelector((state) => state.auth);
 
@@ -61,6 +64,42 @@ const Index = () => {
             isAuth && user?.isAdmin ? (
               <AdminLayout>
                 <AdminProductDetail />
+              </AdminLayout>
+            ) : (
+              <Navigate to="/admin/login" />
+            )
+          }
+        />
+        <Route
+          path="/orders"
+          element={
+            isAuth && user?.isAdmin ? (
+              <AdminLayout>
+                <AdminOrderPage />
+              </AdminLayout>
+            ) : (
+              <Navigate to="/admin/login" />
+            )
+          }
+        />
+        <Route
+          path="/orders/new"
+          element={
+            isAuth && user?.isAdmin ? (
+              <AdminLayout>
+                <AdminOrderAdd />
+              </AdminLayout>
+            ) : (
+              <Navigate to="/admin/login" />
+            )
+          }
+        />
+        <Route
+          path={`/orders/:order_id`}
+          element={
+            isAuth && user?.isAdmin ? (
+              <AdminLayout>
+                <AdminOrderDetail />
               </AdminLayout>
             ) : (
               <Navigate to="/admin/login" />

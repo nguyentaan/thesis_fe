@@ -20,7 +20,6 @@ const Dashboard = () => {
   const { isAuth } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const [dashboard, setDashboard] = useState([]);
-  console.log("dashboard isAuth", isAuth);
   useEffect(() => {
     const fetchData = async () => {
       try {
