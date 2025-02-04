@@ -66,6 +66,24 @@ export function getMenuList(pathname) {
                     ],
                 },
                 {
+                    href: "/admin/orders",
+                    label: "Orders",
+                    active: pathname.includes("/orders"),
+                    icon: Router,
+                    submenus: [
+                        {
+                            href: "/admin/orders",
+                            label: "All Orders",
+                            active: pathname === "/orders",
+                        },
+                        {
+                            href: "/admin/orders/new",
+                            label: "New Orders",
+                            active: pathname === "/orders/new",
+                        },
+                    ],
+                },
+                {
                     href: "",
                     label: "Uploaded Files",
                     active:

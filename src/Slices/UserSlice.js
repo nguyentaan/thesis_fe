@@ -6,6 +6,7 @@ import { API_URL, PYTHON_URL, CHUNKING_URL } from "../config";
 const CHUNKING_SERVER_API = CHUNKING_URL;
 
 const initialState = {
+  isOrderLoading: false,
   isProductLoading: false,
   isUserLoading: false,
   isFileLoading: false,
@@ -13,6 +14,7 @@ const initialState = {
   dataUser: { users: [], total: 0 },
   dataFileUpload: { files: [], total: 0 },
   dataProduct: { products: [], total: 0, currentPage: 1, limit: 15 },
+  dataOrder: { orders: [], total: 0 },
   dataCategory: { categories: [], total: 0 }, // New category state
   recommendedProducts: [],
   alert: {
@@ -44,6 +46,21 @@ export const getAllProducts = createAsyncThunk(
     }
   }
 );
+
+export const getAllOrders = createAsyncThunk(
+  "order/getall",
+  async ({ }, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`${API_URL}/api/order/getAll`);
+      const { orders } = res.data;
+      return { orders };
+    } catch (error) {
+      console.error("API error:", error);
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 
 export const getOneProduct = createAsyncThunk(
   "product/getOne",
@@ -213,6 +230,9 @@ const userSlice = createSlice({
     resetProducts(state) {
       state.dataProduct = { products: [], total: 0, currentPage: 1, limit: 15 };
     },
+    setIsOrderLoading(state, action) {
+      state.isOrderLoading = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -352,9 +372,20 @@ const userSlice = createSlice({
       .addCase(getAllUniqueIndexName.rejected, (state) => {
         state.isProductLoading = false;
       })
+      //Get All Orders
+      .addCase(getAllOrders.pending, (state) => {
+        state.isOrderLoading = true;
+      })
+      .addCase(getAllOrders.fulfilled, (state, action) => {
+        state.isOrderLoading = false;
+        state.dataOrder.orders = action.payload;
+      })
+      .addCase(getAllOrders.rejected, (state) => {
+        state.isOrderLoading = false;
+      })
   },
 });
 
 // Correctly export the reducer and actions separately
-export const { setIsProductLoading, resetProducts } = userSlice.actions;
+export const { setIsProductLoading, resetProducts, setIsOrderLoading } = userSlice.actions;
 export default userSlice.reducer;

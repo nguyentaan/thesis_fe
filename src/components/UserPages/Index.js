@@ -29,7 +29,7 @@ const Index = () => {
     if (isAuth) {
       setShowLoginModal(false);
     }
-  }, [isAuth]);    
+  }, [isAuth]);      
 
   useEffect(() => {
     dispatch(getAllCategories());

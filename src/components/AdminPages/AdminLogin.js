@@ -9,7 +9,6 @@ import "../Users.css";
 import { emailLogin } from "../../Slices/AuthenSlice"; // Adjust path if necessary
 import { loginSuccess } from "../../Slices/AuthenSlice";
 import GoogleButton from "../UserPages/googleButton";
-import { Input } from "../ui/input";
 const AdminLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [dataInput, setDataInput] = useState({
@@ -44,25 +43,17 @@ const AdminLogin = () => {
   };
 
   // Redirect if authenticated and admin
-  useEffect(() => {
-    if (isAuth && user?.data?.isAdmin === true) {
-      navigate("/admin/dashboard");
-    } else if (isAuth && user?.data?.isAdmin === false) {
-      unAuthoriaztionLoginNotification();
-      navigate("/");
-    }
-  }, [isAuth, navigate, user]);
-
   // useEffect(() => {
-  //   if (isAuth && user?.isAdmin === true) {
-  //     navigate("/admin/dashboard");
-  //   } else if (isAuth && user?.isAdmin === false) {
-  //     unAuthoriaztionLoginNotification();
-  //     navigate("/");
+  //   if (isAuth) {
+  //     if (user?.isAdmin) {
+  //       navigate("/admin/dashboard", { replace: true });
+  //     } else {
+  //       unAuthoriaztionLoginNotification();
+  //       navigate("/", { replace: true });
+  //     }
   //   }
-  // }, [isAuth, navigate, user]);
+  // }, [isAuth]);
 
-  // Handle input changes
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setDataInput((prevData) => ({ ...prevData, [name]: value }));
@@ -74,9 +65,7 @@ const AdminLogin = () => {
     try {
       const response = await dispatch(emailLogin(dataInput)).unwrap();
       if (response.status === "OK") {
-        successfulLoginNotification();
         const { data, access_token, refresh_token } = response; // Destructure the result
-        console.log("response", response);
         dispatch(
           loginSuccess({
             user: data,
@@ -85,7 +74,12 @@ const AdminLogin = () => {
           })
         );
         alert("Login sucessfully!");
-        // setOtpVisible(true); // Show OTP verification step
+        if (user?.isAdmin === true) {
+          navigate("/admin/dashboard", { replace: true });
+        } else {
+          unAuthoriaztionLoginNotification();
+          navigate("/", { replace: true });
+        }
       } else {
         unSuccessfulLoginNotification();
       }
@@ -177,7 +171,6 @@ const AdminLogin = () => {
           </div>
         </Modal.Body>
       </Modal>
-      <ToastContainer /> {/* Added ToastContainer here */}
     </div>
   );
 };

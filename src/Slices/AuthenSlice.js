@@ -63,9 +63,12 @@ export const deleteUser = createAsyncThunk(
   "authen/delete",
   async ({ user_id }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/api/user/users/remove-one`, {
-        user_id
-      });
+      const response = await axios.post(
+        `${API_URL}/api/user/users/remove-one`,
+        {
+          user_id,
+        }
+      );
       return response.data;
     } catch (error) {
       return rejectWithValue(handleError(error));
@@ -78,7 +81,7 @@ export const deleteProduct = createAsyncThunk(
   async ({ product_id }, { rejectWithValue }) => {
     try {
       const response = await axios.post(`${API_URL}/api/products/delete`, {
-        product_id
+        product_id,
       });
       return response.data;
     } catch (error) {
@@ -87,7 +90,6 @@ export const deleteProduct = createAsyncThunk(
   }
 );
 
-
 export const updateUser = createAsyncThunk(
   "authen/update",
   async ({ user_id, update_data }, { rejectWithValue }) => {
@@ -95,7 +97,7 @@ export const updateUser = createAsyncThunk(
       const { name, email, phoneNumber } = update_data; // Destructure from update_data
       const response = await axios.put(`${API_URL}/api/user/profile/update`, {
         user_id,
-        update_data: { name, email, phone: phoneNumber}
+        update_data: { name, email, phone: phoneNumber },
       });
       return response.data;
     } catch (error) {
@@ -111,7 +113,7 @@ export const updateProduct = createAsyncThunk(
       const { name, price, description, category, image_url } = update_data; // Destructure from update_data
       const response = await axios.put(`${API_URL}/api/products/update`, {
         product_id,
-        update_data: { name, price, description, category, image_url }
+        update_data: { name, price, description, category, image_url },
       });
       return response.data;
     } catch (error) {
@@ -154,9 +156,11 @@ const authSlice = createSlice({
     },
     loginSuccess(state, action) {
       state.isAuth = true;
-      state.user = { data: action.payload.user };
-      state.accessToken = action.payload.accessToken;
-      state.refreshToken = action.payload.refreshToken;
+      state.user = action.payload.user;
+      const accessToken = action.payload.accessToken;
+      const refreshToken = action.payload.refreshToken;
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
     },
   },
   extraReducers: (builder) => {
@@ -195,6 +199,9 @@ const authSlice = createSlice({
       .addCase(emailLogin.rejected, (state, action) => {
         state.error = action.payload; // Capture error message
         state.isLoading = false;
+      })
+      .addCase(emailLogin.fulfilled, (state, action) => {
+        state.isAuth = true;
       })
       // // OTP Verification Cases
       // .addCase(verifyOTP.pending, (state) => {
