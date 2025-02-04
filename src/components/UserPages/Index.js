@@ -29,10 +29,7 @@ const Index = () => {
     if (isAuth) {
       setShowLoginModal(false);
     }
-  }, [isAuth]);
-
-  console.log(dataCategory);
-  
+  }, [isAuth]);    
 
   useEffect(() => {
     dispatch(getAllCategories());

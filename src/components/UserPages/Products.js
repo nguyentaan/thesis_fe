@@ -12,9 +12,7 @@ const Products = ({ searchQuery, category }) => {
   const [page, setPage] = useState(1);
   const limit = 15;
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [showDetailModel, setShowDetailModel] = useState(false);
-  console.log("page", page);
-  
+  const [showDetailModel, setShowDetailModel] = useState(false);  
   // Reset dataProduct when category changes
   useEffect(() => {
     setPage(1); // Reset to page 1 when category changes

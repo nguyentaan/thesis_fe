@@ -8,7 +8,7 @@ const CategorySidebar = ({
   setSelectedCategory,
 }) => {
   const [showAll, setShowAll] = useState(false);
-  console.log(categories);
+  // console.log(categories);
   
   const handleCategorySelect = (category) => {
     setSelectedCategory(category); // Update the selected category state
