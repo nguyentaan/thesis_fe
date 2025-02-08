@@ -2,25 +2,25 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const PYTHON_API = `${process.env.REACT_APP_PYTHON_URL}`;
-console.log("PYTHON_API", PYTHON_API);
+// console.log("PYTHON_API", PYTHON_API);
 export const fetchChatbot = createAsyncThunk(
   "chatbot/fetchResponse",
-  async (userQuery, { rejectWithValue }) => {
+  async ({ userQuery, userId }, { rejectWithValue }) => {
     try {
       // Make the POST request with the query
       const response = await axios.post(`${PYTHON_API}/search`, {
-        query: userQuery, // Ensure the query is in the required format
+        query: userQuery,
+        user_id: userId,
       });
-      console.log("Chatbot response:", response.data);
 
-      return { userQuery, botResponse: response.data }; // Return both the query and bot response
+      console.log("Chatbot response:", response.data);
+      return { userQuery, botResponse: response.data };
     } catch (error) {
       console.error("API Error:", error.response?.data || error.message);
       return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
-
 
 const chatbotSlice = createSlice({
   name: "chatbot",
