@@ -15,18 +15,22 @@ const ChatBot = () => {
 
   const dispatch = useDispatch();
   const { messages, loading, error } = useSelector((state) => state.chatbot);
+  const { isAuth, user } = useSelector((state) => state.auth);
+
   // console.log("messages", messages);
-  
+
   const toggleChat = () => {
     setIsOpen(!isOpen);
   };
 
   const handleSendMessage = () => {
     if (userInput.trim()) {
+      const userId = isAuth ? user._id : "";
+
       // Add the user's message
       dispatch(addMessage({ sender: "user", text: userInput }));
       // Dispatch fetchChatbot to get the bot's response
-      dispatch(fetchChatbot(userInput));
+      dispatch(fetchChatbot({ userQuery: userInput, userId })); // ✅ Correct way
 
       // Clear the input field
       setUserInput("");
